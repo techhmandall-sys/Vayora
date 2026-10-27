@@ -89,6 +89,46 @@ class BookingFlowIntegrationTest extends PostgresIntegrationTest {
     }
 
     @Test
+    void theLastMileGapAndModeShownAreRecordedOnTheBookingAndItsFeatures() {
+        long rideId = ride(2, true);
+
+        Booking booking = bookings.request(user(UserRole.PASSENGER), rideId, 0, 2, 1,
+                PaymentChoice.card(), null, FlexTier.EXACT, null, 2300, "rickshaw");
+
+        assertThat(jdbc.queryForObject(
+                "SELECT last_mile_distance_m FROM bookings WHERE id = ?", Integer.class, booking.id()))
+                .isEqualTo(2300);
+        assertThat(jdbc.queryForObject(
+                "SELECT last_mile_mode_shown FROM bookings WHERE id = ?", String.class, booking.id()))
+                .isEqualTo("rickshaw");
+        assertThat(jdbc.queryForObject(
+                "SELECT hazard_features->>'last_mile_distance_m' FROM bookings WHERE id = ?",
+                String.class, booking.id())).isEqualTo("2300.0");
+        assertThat(jdbc.queryForObject(
+                "SELECT hazard_features->>'last_mile_mode_available' FROM bookings WHERE id = ?",
+                String.class, booking.id())).isEqualTo("1.0");
+        assertThat(jdbc.queryForObject("""
+                SELECT (payload->>'last_mile_distance_m')::int || ':' || (payload->>'last_mile_mode_available')
+                FROM events WHERE event_type = 'booking_requested' AND (payload->>'booking_id')::bigint = ?""",
+                String.class, booking.id())).isEqualTo("2300:true");
+    }
+
+    @Test
+    void aBookingWithNoLastMileGapShownLeavesItUnset() {
+        long rideId = ride(2, true);
+
+        Booking booking = bookings.request(user(UserRole.PASSENGER), rideId, 0, 2, 1,
+                PaymentChoice.card(), null);
+
+        assertThat(jdbc.queryForObject(
+                "SELECT last_mile_distance_m IS NULL AND last_mile_mode_shown IS NULL FROM bookings WHERE id = ?",
+                Boolean.class, booking.id())).isTrue();
+        assertThat(jdbc.queryForObject(
+                "SELECT hazard_features->>'last_mile_distance_m' FROM bookings WHERE id = ?",
+                String.class, booking.id())).isEqualTo("0.0");
+    }
+
+    @Test
     void aFullMiddleLegBlocksEveryStretchThatCrossesIt() {
         long rideId = ride(1, true);
         bookings.request(user(UserRole.PASSENGER), rideId, 1, 2, 1, PaymentChoice.card(), null); // Karad to Satara

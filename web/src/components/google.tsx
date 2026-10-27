@@ -94,7 +94,7 @@ export function GoogleSignIn() {
         <div ref={button} />
         {pending && (
           <div className="space-y-2">
-            <p className="text-sm">{t('No JOURNEX account uses this Google address yet. How will you use JOURNEX?')}</p>
+            <p className="text-sm">{t('No VAYORA account uses this Google address yet. How will you use VAYORA?')}</p>
             <div className="flex flex-wrap gap-2">
               <Button onClick={() => void finish(pending, 'PASSENGER')}>{t('Find rides as a passenger')}</Button>
               <Button tone="secondary" onClick={() => void finish(pending, 'DRIVER')}>

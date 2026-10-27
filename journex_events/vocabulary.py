@@ -29,3 +29,5 @@ class EventType(StrEnum):
     TRIP_STARTED = "trip_started"
     TRIP_COMPLETED = "trip_completed"
     TRIP_FAILED = "trip_failed"
+    LAST_MILE_SHOWN = "last_mile_shown"
+    LAST_MILE_OPTION_SELECTED = "last_mile_option_selected"

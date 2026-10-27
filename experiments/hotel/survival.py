@@ -10,7 +10,7 @@ A Cox model that knows only how far ahead the booking was made stands beside the
 Time is counted in days from the day the booking was made. The file has dates only, so a
 cancellation on day k is placed at k + 0.5, and a booking still standing at arrival on day
 L is censored at L + 1, having outlasted every cancellation that day. Nothing here is
-JOURNEX data, and nothing here is served: the platform's model is still the simulator's.
+VAYORA data, and nothing here is served: the platform's model is still the simulator's.
 Writes experiments/reports/hotel-survival.json.
 """
 

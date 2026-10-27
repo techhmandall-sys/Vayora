@@ -277,6 +277,10 @@ export function SearchPage() {
           tier: checkout ? 'EXACT' : tier,
           // Picked up where the search started, if that is what the result offered.
           ...(candidate.detourMinutes != null ? { pickupLat: criteria!.origin.lat, pickupLon: criteria!.origin.lon } : {}),
+          // The last-mile gap and access option feature 91 showed for this result, for
+          // the durability model; nothing is booked by sending it.
+          lastMileDistanceM: candidate.pickupDistanceM,
+          lastMileModeShown: candidate.pickupRickshaw ? 'rickshaw' : 'walk',
         },
       });
     },
@@ -288,6 +292,13 @@ export function SearchPage() {
       void queryClient.invalidateQueries({ queryKey: ['search'] });
       void queryClient.invalidateQueries({ queryKey: ['bookings'] });
     },
+  });
+
+  // A UI-only signal that the traveller looked closely at an access option; nothing is
+  // booked by it, so its failure is not worth telling anyone about.
+  const selectLastMile = useMutation({
+    mutationFn: (args: { rideId: number; mode: 'walk' | 'rickshaw' | 'bus' }) =>
+      api(`/rides/${args.rideId}/last-mile-selected`, { method: 'POST', body: { mode: args.mode } }),
   });
 
   // The seats held, and which result they are on. One hold at a time: a new one replaces it.
@@ -682,20 +693,30 @@ export function SearchPage() {
                       })}
                     </Detail>
                   )}
-                  <Detail icon={Footprints}>
-                    {t('Pickup {pickup} from your start · drop-off {dropoff} from your destination', {
-                      pickup: units.distance(candidate.pickupDistanceM),
-                      dropoff: units.distance(candidate.dropoffDistanceM),
-                    })}
-                    {candidate.pickupWalkMinutes > 0 &&
-                      ` · ${
-                        candidate.walkOnFootpaths
-                          ? t('about {minutes} min walk to the pickup, by footpath', { minutes: candidate.pickupWalkMinutes })
-                          : t('about {minutes} min walk to the pickup, in a straight line', { minutes: candidate.pickupWalkMinutes })
-                      }`}
-                  </Detail>
+                  <button
+                    type="button"
+                    className="block w-full text-left"
+                    onClick={() => selectLastMile.mutate({ rideId: candidate.rideId, mode: 'walk' })}
+                  >
+                    <Detail icon={Footprints}>
+                      {t('Pickup {pickup} from your start · drop-off {dropoff} from your destination', {
+                        pickup: units.distance(candidate.pickupDistanceM),
+                        dropoff: units.distance(candidate.dropoffDistanceM),
+                      })}
+                      {candidate.pickupWalkMinutes > 0 &&
+                        ` · ${
+                          candidate.walkOnFootpaths
+                            ? t('about {minutes} min walk to the pickup, by footpath', { minutes: candidate.pickupWalkMinutes })
+                            : t('about {minutes} min walk to the pickup, in a straight line', { minutes: candidate.pickupWalkMinutes })
+                        }`}
+                    </Detail>
+                  </button>
                   {(candidate.pickupRickshaw || candidate.dropoffRickshaw) && (
-                    <div className="flex items-start gap-2 text-sm text-slate-600">
+                    <button
+                      type="button"
+                      className="flex w-full items-start gap-2 text-left text-sm text-slate-600"
+                      onClick={() => selectLastMile.mutate({ rideId: candidate.rideId, mode: 'rickshaw' })}
+                    >
                       <CarTaxiFront aria-hidden="true" className="mt-0.5 h-4 w-4 flex-none opacity-70" />
                       <div className="min-w-0 space-y-0.5">
                         {candidate.pickupRickshaw && <p>{rickshawLine(candidate.pickupRickshaw, true, t)}</p>}
@@ -713,7 +734,7 @@ export function SearchPage() {
                             </p>
                           ))}
                       </div>
-                    </div>
+                    </button>
                   )}
                   <Detail icon={Award}>{driverRecord(candidate, t)}</Detail>
                   {criteria.sort === 'BEST_MATCH' && (

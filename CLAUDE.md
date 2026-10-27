@@ -1,4 +1,4 @@
-# JOURNEX — binding project rules
+# VAYORA — binding project rules
 
 AI-powered intercity shared mobility platform. Final-year B.Tech project, CSE (Data
 Science), DYPCET Kolhapur, team of 4.
@@ -62,7 +62,9 @@ No third data store, no fourth runtime.
 
 - Every number in the report is a SQL aggregate over the `events` table, through
   `experiments/analysis/metrics.sql`.
-- The 22-event vocabulary is frozen. A new event type needs explicit approval first.
+- The 24-event vocabulary is frozen (extended from 22 on 2026-10-26 to add
+  `last_mile_shown` and `last_mile_option_selected`, with explicit approval). A new
+  event type needs explicit approval first.
 - Payload keys are snake_case and timestamps ISO-8601 with offset, from both writers.
 - `booking_cancelled` payloads carry `departure_time`; the late-cancellation metric
   depends on it.

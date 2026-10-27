@@ -24,6 +24,7 @@ Time is in hours since ``World.start``.
 from __future__ import annotations
 
 import dataclasses
+import math
 import random
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -127,6 +128,10 @@ class Passenger:
     intervention_delay: float
     release_draw: float
     annoyed_draw: float
+    # Straight-line metres from this passenger's start to wherever they would board;
+    # independent of which ride they take. Never leaves this module as a feature of its
+    # own passenger: only the distance (sim/hazard's effect on it) is observable.
+    last_mile_offset_m: float
     # 0 for the first search; 1 and up for a search made after being left without a seat.
     attempt: int = 0
 
@@ -269,6 +274,8 @@ class Simulation:
                 1.0 / demand.intervention_response.response_delay_mean_hours),
             release_draw=rng.random(),
             annoyed_draw=rng.random(),
+            last_mile_offset_m=rng.lognormvariate(
+                math.log(demand.last_mile.offset_metres_mean), demand.last_mile.offset_metres_sigma),
         )
 
     def _maybe_retry(self, passenger: Passenger) -> None:
@@ -294,6 +301,8 @@ class Simulation:
                 1.0 / demand.intervention_response.response_delay_mean_hours),
             release_draw=rng.random(),
             annoyed_draw=rng.random(),
+            last_mile_offset_m=rng.lognormvariate(
+                math.log(demand.last_mile.offset_metres_mean), demand.last_mile.offset_metres_sigma),
         )
         if retries:
             self.env.process(self._search_again(again, delay))
@@ -372,7 +381,12 @@ class Simulation:
         return self.tracker.features(
             passenger_id=passenger.id, seats=passenger.seats, now=self._at(self.env.now),
             departure=self._at(ride.departure),
-            desired_departure=self._at(passenger.desired_departure))
+            desired_departure=self._at(passenger.desired_departure),
+            last_mile_distance_m=passenger.last_mile_offset_m,
+            last_mile_mode_available=self._last_mile_mode_available(passenger))
+
+    def _last_mile_mode_available(self, passenger: Passenger) -> bool:
+        return passenger.last_mile_offset_m >= self.world.demand.last_mile.offer_beyond_metres
 
     def _request(self, passenger: Passenger, ride: Ride) -> None:
         booking = Booking(len(self.bookings) + 1, ride, passenger.id, passenger.seats)
@@ -390,6 +404,8 @@ class Simulation:
             "passenger_id": passenger.id,
             "seats": booking.seats,
             "departure_time": self._iso(ride.departure),
+            "last_mile_distance_m": round(passenger.last_mile_offset_m),
+            "last_mile_mode_available": self._last_mile_mode_available(passenger),
         }, "passenger", passenger.id)
 
         if passenger.attempt > 0:
@@ -428,10 +444,14 @@ class Simulation:
         }, "driver", ride.driver_id)
 
         kind = self._kind(booking)
+        # A bigger last-mile gap shortens the expected time to cancellation; how much
+        # depends on the (unobservable) type, never on anything a feature could see.
+        scale = kind.weibull_scale_hours / (
+            1.0 + kind.last_mile_sensitivity * (passenger.last_mile_offset_m / 1000.0))
         wait = cancellation_time(
             passenger.cancel_exposure,
             shape=kind.weibull_shape,
-            scale=kind.weibull_scale_hours,
+            scale=scale,
             shock_time=passenger.shock_time,
             shock_multiplier=self.world.demand.shock.hazard_multiplier,
         )

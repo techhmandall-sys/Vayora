@@ -74,7 +74,7 @@ describe.each(['hi', 'mr'] as const)('the %s table', (language) => {
     const emergency = Object.keys(table).find((text) => text.includes('112'))!;
     expect(table[emergency]).toContain('112');
     expect(table['Price to {town} (₹)']).toContain('₹');
-    expect(table['Choose how you will use JOURNEX']).toContain('JOURNEX');
+    expect(table['Choose how you will use VAYORA']).toContain('VAYORA');
   });
 });
 

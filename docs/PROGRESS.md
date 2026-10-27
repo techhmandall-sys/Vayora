@@ -64,7 +64,7 @@
 ## 2026-10-22 — an iOS-style look, light and dark
 
 - **The whole interface restyled**, as asked: iOS's grouped greys and system colours with
-  JOURNEX teal as the tint, a frosted header with the sections as pills, large titles,
+  VAYORA teal as the tint, a frosted header with the sections as pills, large titles,
   capsule buttons that give under the finger, rounded fields with a soft focus glow,
   iOS switches for every on-off setting, notices with icons, status pills, chat as
   message bubbles, a loading shimmer, and a drawn Kolhapur to Pune route on the sign-in
@@ -964,7 +964,7 @@ answer, the screen and the queue all say that the contacts were not messaged.
   someone is. The profile states that no identity document has been checked.
 - The public profile shows an approximate age, never the birth year, and never the
   phone number or gender.
-- The emergency panel puts calling 112 first, before the button that alerts JOURNEX.
+- The emergency panel puts calling 112 first, before the button that alerts VAYORA.
 - Pressing SOS twice within a minute repeats nothing.
 - SOS writes no event-log row: the 22-event vocabulary is frozen and this is not a
   research measurement.

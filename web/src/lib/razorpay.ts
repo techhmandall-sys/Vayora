@@ -63,7 +63,7 @@ export async function payAtCheckout(path: string, body: unknown, description: st
       order_id: order.orderId,
       amount: order.amount,
       currency: order.currency,
-      name: 'JOURNEX',
+      name: 'VAYORA',
       description,
       // Only the ways the platform records: cards, UPI and wallets.
       method: { netbanking: false, emi: false, cardless_emi: false, paylater: false },

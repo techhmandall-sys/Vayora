@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /*
- * The JOURNEX theme: iOS's grouped greys and system colours, with JOURNEX teal as the tint.
+ * The VAYORA theme: iOS's grouped greys and system colours, with VAYORA teal as the tint.
  * Every colour class in the app reads one of these variables (tailwind.config.js), so the
  * dark values below restyle every screen at once. Values are "r g b" for Tailwind's opacity
  * modifiers. Print always uses the light set.

@@ -25,7 +25,7 @@ class TwilioVoiceTest {
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().formDataContains(Map.of(
                         "To", "+919800000001", "From", "+15005550006",
-                        "Twiml", "<Response><Say>JOURNEX is connecting your call.</Say>"
+                        "Twiml", "<Response><Say>VAYORA is connecting your call.</Say>"
                                 + "<Dial callerId=\"+15005550006\"><Number>+919800000002</Number></Dial></Response>")))
                 .andRespond(withSuccess("{\"sid\": \"CA123\", \"status\": \"queued\"}", MediaType.APPLICATION_JSON));
 

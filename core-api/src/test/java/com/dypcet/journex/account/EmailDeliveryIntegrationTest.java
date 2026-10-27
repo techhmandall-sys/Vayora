@@ -50,7 +50,7 @@ class EmailDeliveryIntegrationTest extends PostgresIntegrationTest {
         assertThat(received).hasSize(1);
         assertThat(received[0].getAllRecipients()[0].toString()).isEqualTo(email);
         assertThat(received[0].getFrom()[0].toString()).isEqualTo("noreply@journex.test");
-        assertThat(received[0].getSubject()).startsWith("JOURNEX: ");
+        assertThat(received[0].getSubject()).startsWith("VAYORA: ");
         assertThat(received[0].getContent().toString()).containsPattern("\\b[0-9]{6}\\b");
         assertThat(mock.outbox()).noneMatch(sent -> sent.to().equals(email));
         assertThat(sender.name(Channel.EMAIL)).isEqualTo(DeliveringMessageSender.SMTP);
@@ -59,7 +59,7 @@ class EmailDeliveryIntegrationTest extends PostgresIntegrationTest {
     @Test
     void textMessagesStillGoOnlyToTheOutbox() {
         assertThat(sender.name(Channel.PHONE)).isEqualTo(MockMessageSender.NAME);
-        sender.send(Channel.PHONE, "+919800000001", "JOURNEX: hello");
+        sender.send(Channel.PHONE, "+919800000001", "VAYORA: hello");
         assertThat(SMTP.getReceivedMessages()).isEmpty();
         assertThat(mock.outbox()).anyMatch(sent -> sent.to().equals("+919800000001"));
     }
@@ -80,7 +80,7 @@ class EmailDeliveryIntegrationTest extends PostgresIntegrationTest {
     @Test
     void anEmailThatCannotBeSentIsReportedNotSwallowed() {
         SMTP.stop();
-        assertThatThrownBy(() -> sender.send(Channel.EMAIL, "someone@example.test", "JOURNEX: hello"))
+        assertThatThrownBy(() -> sender.send(Channel.EMAIL, "someone@example.test", "VAYORA: hello"))
                 .isInstanceOf(ResponseStatusException.class).hasMessageContaining("could not be sent");
     }
 }

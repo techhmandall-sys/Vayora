@@ -1,6 +1,6 @@
 # Decisions
 
-The decisions that shape JOURNEX, each with the reason it was made and what it costs. Each
+The decisions that shape VAYORA, each with the reason it was made and what it costs. Each
 was recorded when it was made, in PROGRESS.md; this file gathers them by subject. A
 decision listed here is to be changed on purpose, not by accident: change it here first.
 
@@ -25,7 +25,7 @@ was decided while building within them.
 | Metric queries group rather than join on keys inside the JSON payload | A join on payload keys did not finish in ten minutes; grouping takes seconds | Queries are longer to read |
 | SOS presses and seat holds write no event | The 22-event vocabulary is frozen and neither is a research measurement | They cannot be analysed from the log |
 | A request closed for want of an answer is logged as `booking_rejected` by the platform, with a reason | Tells a lapse from a driver's refusal without a new event type | Queries must read the actor to tell them apart |
-| The public hotel bookings are written into the event log under a run of their own | Every reported number must come from `metrics.sql` over `events`; one query then counts the hotels and the simulator the same way | Rows in `events` that are not JOURNEX's; every query already selects by run |
+| The public hotel bookings are written into the event log under a run of their own | Every reported number must come from `metrics.sql` over `events`; one query then counts the hotels and the simulator the same way | Rows in `events` that are not VAYORA's; every query already selects by run |
 | The hotel survival check trains on 2015 and 2016 arrivals and checks on 2017 | Years are that data's seeds; a later year tests the models on bookings they could not have seen | 2015 is only half a year |
 | Its features are only what is known when a booking is made | Anything changed later would carry the future into the prediction | A refundable deposit is left out too: it separates outcomes |
 | A Cox fit that does not converge stops the run | lifelines' default steps stop early on these data, and a fit that has not converged is not a result | Fit settings live in the config |
@@ -93,7 +93,7 @@ was decided while building within them.
 | Women-only rides rest on the gender a member declares, which nobody checks | It is the only information the platform has | The rule can be got round by anyone willing to lie |
 | Experience levels need a confirmed email from the second level and a confirmed phone from the fourth | Levels should reward what can be checked, however weakly | The thresholds are assumptions |
 | Gender is used but never shown | It decides women-only access; it is not other members' business | |
-| The emergency panel puts calling 112 before alerting JOURNEX | JOURNEX is not an emergency service, and its messages are simulated | |
+| The emergency panel puts calling 112 before alerting VAYORA | VAYORA is not an emergency service, and its messages are simulated | |
 | Durability scores are shown to administrators only | A prediction about a person must not change how they are treated by other members | |
 | Predicted risk never cancels a booking or changes a price | The project's own rules forbid treating a prediction as proof of intent | The intervention can only ask |
 
@@ -124,7 +124,7 @@ was decided while building within them.
 
 | Decision | Why | Cost |
 |---|---|---|
-| An iOS-style look, light, dark or matching the device as the reader chooses in the header, JOURNEX teal as the tint (2026-10-22, as the team chose) | Every colour class reads a CSS variable, so one set of dark values restyles every screen; the shared components carry the rest | |
+| An iOS-style look, light, dark or matching the device as the reader chooses in the header, VAYORA teal as the tint (2026-10-22, as the team chose) | Every colour class reads a CSS variable, so one set of dark values restyles every screen; the shared components carry the rest | |
 | Each role in its own tint: passengers teal, drivers indigo, administrators violet | A person always knows which side of the platform they are on | The brand colour is the passengers' only |
 | Entrances in CSS; exits, height changes and drag in Framer Motion (`framer-motion`) | CSS cannot animate an element leaving the page, a height to "auto", or a swipe | One more dependency, about 110 KB, in its own cached file |
 | Icons from `lucide-react` | One consistent set, each icon imported on its own | One more dependency |
@@ -147,8 +147,8 @@ was decided while building within them.
 | A server error built from values is matched by the app against a template, such as "You can have at most {n} emergency contacts" (from 2026-10-21) | The API's messages stay as they were, and a core-api test fails if the server builds one the app has no template for | A booking status inside one is a code (`CANCELLED`), which the app turns into a word |
 | A date or time inside a notification is written as ISO-8601 (from 2026-10-21) | The server's English renders it as before, so copies read the same, and the app shows it in the reader's language | A value that is exactly an ISO instant is always read as a moment |
 | Notifications are stored as a template and its values | So the app can show them in the reader's language; the English is rendered from the same template, so copies and older notifications read as before. A core-api test reads the web app's list, so a template the app cannot translate fails the build | Every new notification needs its template added to the web app and translated |
-| A front page for signed-out visitors, in the main bundle (from 2026-10-24) | `/` used to send everyone to the sign-in form, which says nothing about what JOURNEX is; every claim on the page is one the code makes good, and its footer says what is simulated | About 10 KB more in the first download |
-| Installable, with an offline page and no other caching (from 2026-10-24) | A phone can keep JOURNEX on its home screen; a page that cannot load says so in all three languages instead of the browser's error. Caching the app itself would risk serving a stale build against a newer API | Nothing works offline beyond that one page |
+| A front page for signed-out visitors, in the main bundle (from 2026-10-24) | `/` used to send everyone to the sign-in form, which says nothing about what VAYORA is; every claim on the page is one the code makes good, and its footer says what is simulated | About 10 KB more in the first download |
+| Installable, with an offline page and no other caching (from 2026-10-24) | A phone can keep VAYORA on its home screen; a page that cannot load says so in all three languages instead of the browser's error. Caching the app itself would risk serving a stale build against a newer API | Nothing works offline beyond that one page |
 | A command palette (Ctrl+K) beside the navigation, not instead of it (from 2026-10-24) | Fast for anyone at a keyboard, and invisible to everyone else | |
 | Dark maps are OpenStreetMap's tiles inverted and hue-rotated, not a dark tile provider (from 2026-10-24) | No second map provider to agree terms with or send readers' addresses to | Colours are approximate: parks and water keep their hue only roughly |
 | The what-if page shows saved sweeps; it runs nothing | Running the simulator from a screen needs a service to run it: intel holds no state and core-api owns transactions, and a fourth runtime is ruled out. The web image is built from `web/` alone, so `export_web.py` copies the sweep figures into `web/src/data/whatif.json`, and `reproduce.sh` and a test fail if the copy drifts | Only settings already swept can be chosen; a new question needs a sweep run by hand |

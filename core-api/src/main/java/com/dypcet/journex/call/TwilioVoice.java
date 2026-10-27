@@ -68,7 +68,7 @@ public class TwilioVoice {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
         form.add("To", caller);
         form.add("From", from);
-        form.add("Twiml", "<Response><Say>JOURNEX is connecting your call.</Say>"
+        form.add("Twiml", "<Response><Say>VAYORA is connecting your call.</Say>"
                 + "<Dial callerId=\"" + xml(from) + "\"><Number>" + xml(callee) + "</Number></Dial></Response>");
         JsonNode call = client.post().uri("/2010-04-01/Accounts/{sid}/Calls.json", accountSid)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(form)

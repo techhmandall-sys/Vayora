@@ -97,8 +97,16 @@ public class BookingService {
         }
     }
 
+    /**
+     * @param lastMileDistanceM straight-line metres from the passenger's start to the
+     *                          boarding stop, as shown on the candidate booked; null
+     *                          when the search did not carry one
+     * @param lastMileModeAvailable whether a non-walk access option (rickshaw or bus)
+     *                              was shown for that candidate; null with the distance
+     */
     record Requested(long bookingId, long rideId, long passengerId, int fromSeq, int toSeq,
-            int seats, Instant departureTime) implements HasActor {
+            int seats, Instant departureTime, Integer lastMileDistanceM, Boolean lastMileModeAvailable)
+            implements HasActor {
         @Override
         public String actorType() {
             return "passenger";
@@ -250,6 +258,21 @@ public class BookingService {
     @Transactional
     public Booking request(long passengerId, long rideId, int fromSeq, int toSeq, int seats,
             PaymentChoice payment, String idempotencyKey, FlexTier tier, Point pickup) {
+        return request(passengerId, rideId, fromSeq, toSeq, seats, payment, idempotencyKey, tier,
+                pickup, null, null);
+    }
+
+    /**
+     * @param lastMileDistanceM straight-line metres from the passenger's start to the
+     *                          boarding stop, as shown on the candidate they are booking
+     *                          (feature 91); null if the client sent none
+     * @param lastMileModeShown the access option shown alongside that stop: "walk",
+     *                          "rickshaw" or "bus"; null with the distance
+     */
+    @Transactional
+    public Booking request(long passengerId, long rideId, int fromSeq, int toSeq, int seats,
+            PaymentChoice payment, String idempotencyKey, FlexTier tier, Point pickup,
+            Integer lastMileDistanceM, String lastMileModeShown) {
         if (toSeq <= fromSeq) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "toSeq must come after fromSeq");
@@ -371,19 +394,20 @@ public class BookingService {
 
         BookingStatus status = ride.instantBooking() ? BookingStatus.CONFIRMED : BookingStatus.PENDING;
         // Taken before the row exists: a booking is not part of its own history.
-        String features = featuresJson(passengerId, seats, now, boarding);
+        String features = featuresJson(passengerId, seats, now, boarding, lastMileDistanceM, lastMileModeShown);
         Long bookingId;
         try {
             bookingId = jdbc.queryForObject("""
                     INSERT INTO bookings (ride_id, passenger_id, from_seq, to_seq, seats, price,
                                           status, hazard_features, accepted_at, idempotency_key,
-                                          boarding_code, flex_tier)
-                    SELECT ?, ?, ?, ?, ?, SUM(price) * ?, ?, CAST(? AS jsonb), ?, ?, ?, ?
+                                          boarding_code, flex_tier, last_mile_distance_m, last_mile_mode_shown)
+                    SELECT ?, ?, ?, ?, ?, SUM(price) * ?, ?, CAST(? AS jsonb), ?, ?, ?, ?, ?, ?
                     FROM ride_segments WHERE ride_id = ? AND seq >= ? AND seq < ?
                     RETURNING id""",
                     Long.class, rideId, passengerId, fromSeq, toSeq, seats, seats, status.name(),
                     features, status == BookingStatus.CONFIRMED ? utc(now) : null, idempotencyKey,
-                    boardingCodes.newCode(), tier.name(), rideId, fromSeq, toSeq);
+                    boardingCodes.newCode(), tier.name(), lastMileDistanceM, lastMileModeShown,
+                    rideId, fromSeq, toSeq);
         } catch (DuplicateKeyException e) {
             // The same key, sent for a different ride at the same moment.
             throw conflict("This request was already submitted");
@@ -404,7 +428,9 @@ public class BookingService {
                 .ifPresent(hold -> holds.release(passengerId));
 
         events.write(EventType.BOOKING_REQUESTED,
-                new Requested(bookingId, rideId, passengerId, fromSeq, toSeq, seats, boarding));
+                new Requested(bookingId, rideId, passengerId, fromSeq, toSeq, seats, boarding,
+                        lastMileDistanceM,
+                        lastMileModeShown == null ? null : !"walk".equals(lastMileModeShown)));
         // Only a choice is logged: exact is what every booking was before tiers existed.
         if (tier != FlexTier.EXACT) {
             events.write(EventType.TIER_SELECTED,
@@ -639,10 +665,11 @@ public class BookingService {
     }
 
     /** Null if the features cannot be written; the booking goes ahead unscored. */
-    private String featuresJson(long passengerId, int seats, Instant now, Instant boarding) {
+    private String featuresJson(long passengerId, int seats, Instant now, Instant boarding,
+            Integer lastMileDistanceM, String lastMileModeShown) {
         try {
-            return mapper.writeValueAsString(
-                    hazardFeatures.snapshot(passengerId, seats, now, boarding));
+            return mapper.writeValueAsString(hazardFeatures.snapshot(
+                    passengerId, seats, now, boarding, lastMileDistanceM, lastMileModeShown));
         } catch (JsonProcessingException e) {
             return null;
         }

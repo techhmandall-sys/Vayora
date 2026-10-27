@@ -38,6 +38,20 @@ def test_a_new_passenger_has_trip_features_and_an_empty_history():
     assert features["departure_hour"] == 15.0  # 09:00 + 30 h, local time
     assert features["desired_gap_hours"] == pytest.approx(1.5)
     assert all(features[name] == 0.0 for name in FEATURES if name.startswith("prior_"))
+    assert features["last_mile_distance_m"] == 0.0
+    assert features["last_mile_mode_available"] == 0.0
+
+
+def test_the_last_mile_gap_and_mode_shown_are_read_from_the_current_candidate():
+    tracker = FeatureTracker()
+
+    shown = tracker.features(
+        passenger_id=7, seats=1, now=NOW, departure=NOW + timedelta(hours=30),
+        desired_departure=NOW + timedelta(hours=28.5),
+        last_mile_distance_m=2300, last_mile_mode_available=True)
+
+    assert shown["last_mile_distance_m"] == 2300.0
+    assert shown["last_mile_mode_available"] == 1.0
 
 
 def test_history_counts_only_what_has_been_observed_for_that_passenger():
@@ -108,7 +122,8 @@ def test_a_model_for_other_features_or_with_a_missing_input_is_refused():
     with pytest.raises(ValueError, match="trained on features"):
         _toy_model(feature_version="f0")
     with pytest.raises(ValueError):
-        _toy_model(features=FEATURES[:-1], coef=(0.0,) * 8, mean=(0.0,) * 8)
+        _toy_model(features=FEATURES[:-1], coef=(0.0,) * (len(FEATURES) - 1),
+                   mean=(0.0,) * (len(FEATURES) - 1))
     with pytest.raises(ValueError, match="time-ordered"):
         _toy_model(times=(20.0, 10.0, 40.0))
     incomplete = {k: v for k, v in ZERO.items() if k != "seats"}
@@ -124,7 +139,7 @@ def test_a_model_survives_a_round_trip_through_its_file(tmp_path):
     assert HazardModel.load(path) == model
 
 
-@pytest.mark.parametrize("name", ["h1-km", "h1-cox", "h2-km", "h2-cox"])
+@pytest.mark.parametrize("name", ["h3-km", "h3-cox"])
 def test_the_shipped_models_load_and_give_sane_decreasing_probabilities(name):
     model = HazardModel.load(MODEL_DIR / f"{name}.json")
     typical = {**ZERO, "lead_hours": 48.0, "seats": 1.0, "departure_hour": 8.0}
@@ -137,7 +152,7 @@ def test_the_shipped_models_load_and_give_sane_decreasing_probabilities(name):
 
 
 def test_the_shipped_cox_model_treats_past_cancellations_as_a_risk():
-    model = HazardModel.load(MODEL_DIR / "h2-cox.json")
+    model = HazardModel.load(MODEL_DIR / "h3-cox.json")
     clean = {**ZERO, "lead_hours": 48.0, "seats": 1.0, "departure_hour": 8.0,
              "prior_accepted": 3.0, "prior_completed": 3.0}
     flaky = {**clean, "prior_completed": 0.0, "prior_cancellations": 3.0,
@@ -162,7 +177,7 @@ def test_scoring_returns_an_estimate_with_its_provenance():
     assert response.status_code == 200
     body = response.json()
     assert 0.0 < body["survival_probability"] < 1.0
-    assert body["model_version"] == "h2-cox"
+    assert body["model_version"] == "h3-cox"
     assert body["feature_version"] == FEATURE_VERSION
     assert body["trained_on"] == "synthetic"
     assert datetime.fromisoformat(body["scored_at"]).utcoffset() is not None

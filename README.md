@@ -1,4 +1,4 @@
-# JOURNEX
+# VAYORA
 
 [![CI](https://github.com/shivampatil4972/VAYORA-/actions/workflows/ci.yml/badge.svg)](https://github.com/shivampatil4972/VAYORA-/actions/workflows/ci.yml)
 
@@ -11,7 +11,7 @@ Final-year B.Tech project, CSE (Data Science), DYPCET Kolhapur, team of four.
 
 **An early cancellation is a success.** A seat released three days before departure gets
 refilled and the journey completes; the same seat released two hours before departure is
-destroyed capacity. JOURNEX models how long a booking will last as a survival curve over
+destroyed capacity. VAYORA models how long a booking will last as a survival curve over
 the seven-day booking horizon, and acts on it while action still helps.
 
 The measure is **completed rides per 100 searches**, never bookings: a platform can take

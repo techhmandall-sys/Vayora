@@ -22,9 +22,9 @@ public class ApiDocsConfig {
     OpenAPI journexApi() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("JOURNEX core-api")
+                        .title("VAYORA core-api")
                         .version("v1")
-                        .description("Transactions and truth for JOURNEX, intercity ride-sharing on the Kolhapur to "
+                        .description("Transactions and truth for VAYORA, intercity ride-sharing on the Kolhapur to "
                                 + "Pune corridor: accounts, rides, bookings, payments, trips and the event log. "
                                 + "Sign in with POST /api/v1/auth/login, then authorize with the token it returns. "
                                 + "Payments are simulated unless a payment provider is configured.")

@@ -378,7 +378,7 @@ export type Chattiness = 'QUIET' | 'MODERATE' | 'TALKATIVE';
 
 export type Gender = 'FEMALE' | 'MALE' | 'OTHER';
 
-/** Only the kind of document: JOURNEX never takes its number or a copy. */
+/** Only the kind of document: VAYORA never takes its number or a copy. */
 export type IdDocument = 'AADHAAR' | 'PAN' | 'DRIVING_LICENCE' | 'PASSPORT' | 'VOTER_ID';
 
 /** A member's own profile. Null means not said. */

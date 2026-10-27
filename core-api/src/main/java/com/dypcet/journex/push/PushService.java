@@ -75,7 +75,7 @@ public class PushService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Push notifications are not set up on this server");
         }
         if (!allowed(endpoint)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "That is not a push service JOURNEX sends to");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "That is not a push service VAYORA sends to");
         }
         byte[] key;
         byte[] secret;
@@ -122,7 +122,7 @@ public class PushService {
             subscriptions = jdbc.query("SELECT id, endpoint, p256dh, auth FROM push_subscriptions WHERE user_id = ?",
                     (rs, n) -> new Subscription(rs.getLong("id"), rs.getString("endpoint"), rs.getBytes("p256dh"),
                             rs.getBytes("auth")), userId);
-            payload = mapper.writeValueAsBytes(Map.of("title", "JOURNEX", "body", body, "url", "/notifications"));
+            payload = mapper.writeValueAsBytes(Map.of("title", "VAYORA", "body", body, "url", "/notifications"));
         } catch (RuntimeException | JsonProcessingException e) {
             log.warn("Push not sent to user {}: {}", userId, e.getMessage());
             return;

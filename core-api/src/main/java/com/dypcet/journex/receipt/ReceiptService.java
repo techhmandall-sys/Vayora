@@ -167,7 +167,7 @@ public class ReceiptService {
                     "Total: " + rupees(receipt.price()),
                     "",
                     "This is not a tax invoice.",
-                    "JOURNEX, Kolhapur to Pune"));
+                    "VAYORA, Kolhapur to Pune"));
             return lines;
         }
         lines.addAll(List.of(
@@ -185,7 +185,7 @@ public class ReceiptService {
             lines.add("TEST MODE: paid in Razorpay's test mode, where no real money moves. This is a student project.");
         }
         lines.add("This is not a tax invoice.");
-        lines.add("JOURNEX, Kolhapur to Pune");
+        lines.add("VAYORA, Kolhapur to Pune");
         return lines;
     }
 

@@ -231,7 +231,7 @@ public class TripService {
         if (others.isEmpty()) {
             List<Text> buses = buses(rideId, booking);
             return buses.isEmpty() ? Text.of("No other ride with seats leaves near that time.")
-                    : Text.of("No other ride with seats leaves near that time. Buses listed by JOURNEX staff"
+                    : Text.of("No other ride with seats leaves near that time. Buses listed by VAYORA staff"
                             + " (check with the operator before travelling): {buses}.", "buses", buses);
         }
         DateTimeFormatter time = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH).withZone(CORRIDOR_ZONE);

@@ -46,6 +46,9 @@ export const formatFullDateTime = (iso: string): string =>
 
 export const formatTime = (iso: string): string => dateFormat('time', { hour: 'numeric', minute: '2-digit' }).format(new Date(iso));
 
+/** A short day name on its own, for a compact card that has no room for the full date. */
+export const formatWeekday = (iso: string): string => dateFormat('weekday', { weekday: 'short' }).format(new Date(iso));
+
 export const formatDate = (iso: string): string =>
   dateFormat('date', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(iso));
 

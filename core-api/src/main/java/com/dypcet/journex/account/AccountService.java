@@ -210,7 +210,7 @@ public class AccountService {
                 VALUES (?, ?, ?, ?, ?, ?)""",
                 userId, channel.name(), destination, encoder.encode(code), utc(now.plus(codeTtl)),
                 utc(now));
-        sender.send(channel, destination, "Your JOURNEX verification code is " + code
+        sender.send(channel, destination, "Your VAYORA verification code is " + code
                 + ". It works for " + codeTtl.toMinutes() + " minutes. Do not share it.");
     }
 

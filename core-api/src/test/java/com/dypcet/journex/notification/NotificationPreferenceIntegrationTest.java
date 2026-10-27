@@ -73,7 +73,7 @@ class NotificationPreferenceIntegrationTest extends PostgresIntegrationTest {
         assertThat(mock.outbox()).filteredOn(m -> m.to().equals(email)).singleElement()
                 .satisfies(m -> {
                     assertThat(m.channel()).isEqualTo(Channel.EMAIL);
-                    assertThat(m.text()).isEqualTo("JOURNEX: third");
+                    assertThat(m.text()).isEqualTo("VAYORA: third");
                 });
         assertThat(copiesTo(phone)).isEqualTo(1);
         // In-app is always kept.

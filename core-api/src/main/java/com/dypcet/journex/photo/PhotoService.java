@@ -115,7 +115,7 @@ public class PhotoService {
         try (ImageInputStream in = ImageIO.createImageInputStream(new ByteArrayInputStream(upload))) {
             Iterator<ImageReader> readers = in == null ? null : ImageIO.getImageReaders(in);
             if (readers == null || !readers.hasNext()) {
-                throw bad("That is not a photo JOURNEX can read: use a JPEG or PNG");
+                throw bad("That is not a photo VAYORA can read: use a JPEG or PNG");
             }
             ImageReader reader = readers.next();
             try {
@@ -132,7 +132,7 @@ public class PhotoService {
             if (e instanceof ResponseStatusException status) {
                 throw status;
             }
-            throw bad("That is not a photo JOURNEX can read: use a JPEG or PNG");
+            throw bad("That is not a photo VAYORA can read: use a JPEG or PNG");
         }
     }
 

@@ -1,6 +1,6 @@
 # Running and deploying
 
-How to run JOURNEX on one machine, which is the only way it has ever been run. Nothing
+How to run VAYORA on one machine, which is the only way it has ever been run. Nothing
 here describes a production deployment, because there has not been one; the last
 section lists what one would need.
 

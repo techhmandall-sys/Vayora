@@ -20,6 +20,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -75,6 +76,9 @@ public class RideController {
 
     public record RoutePreviewRequest(
             @NotNull @Size(min = 2, max = 10) List<@Valid @NotNull PointRequest> stops) {
+    }
+
+    public record LastMileSelectedRequest(@NotBlank @Pattern(regexp = "walk|rickshaw|bus") String mode) {
     }
 
     private final RideService rides;
@@ -150,5 +154,16 @@ public class RideController {
     @GetMapping("/{id}")
     public Ride get(@PathVariable long id) {
         return rides.get(id);
+    }
+
+    /**
+     * A passenger tapped a last-mile access option shown with a search result (feature
+     * 91's walk, or a rickshaw estimate). Opens nothing: this is telemetry only.
+     */
+    @PostMapping("/{id}/last-mile-selected")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void lastMileSelected(@AuthenticationPrincipal Jwt jwt, @PathVariable long id,
+            @Valid @RequestBody LastMileSelectedRequest request) {
+        rides.lastMileOptionSelected(CurrentUser.id(jwt), id, request.mode());
     }
 }

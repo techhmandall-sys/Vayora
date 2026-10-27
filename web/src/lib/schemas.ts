@@ -33,7 +33,7 @@ export const registerSchema = z
     email: z.string().trim().max(254).optional(),
     phone: z.string().trim().max(20).optional(),
     password: z.string().min(8, msg('Use at least 8 characters')).max(72, msg('Use at most 72 characters')),
-    role: z.enum(['PASSENGER', 'DRIVER'], { message: msg('Choose how you will use JOURNEX') }),
+    role: z.enum(['PASSENGER', 'DRIVER'], { message: msg('Choose how you will use VAYORA') }),
     // The code of whoever invited them. Optional; an unknown code is refused by the server.
     referralCode: z.string().trim().max(20).optional(),
   })

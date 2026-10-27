@@ -367,7 +367,7 @@ function IdDeclaration({ declared }: { declared: IdDocument | null }) {
   return (
     <div className="space-y-3 text-sm">
       <p className="text-slate-600">
-        {t('You can say which identity document you hold. JOURNEX does not ask for its number or a copy and checks nothing: your profile will say it was declared, not checked.')}
+        {t('You can say which identity document you hold. VAYORA does not ask for its number or a copy and checks nothing: your profile will say it was declared, not checked.')}
       </p>
       {declared && <p>{t('You have declared: {document}.', { document: t(idDocumentLabels[declared]) })}</p>}
       {error && <Notice tone="error">{error.message}</Notice>}

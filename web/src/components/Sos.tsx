@@ -44,7 +44,7 @@ export function SosPanel({ onClose }: { onClose: () => void }) {
         </p>
         {!raised && (
           <>
-            <p>{t('You can also alert the JOURNEX administrators. They see it in a queue; they are not an emergency service.')}</p>
+            <p>{t('You can also alert the VAYORA administrators. They see it in a queue; they are not an emergency service.')}</p>
             {raise.error && <p role="alert">{raise.error.message}</p>}
             <div className="flex flex-wrap gap-2">
               <Button tone="danger" disabled={raise.isPending} onClick={() => raise.mutate()}>

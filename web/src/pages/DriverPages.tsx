@@ -272,7 +272,7 @@ function RoutePlanner({ stops, rangeKm, onMove, onUse }: {
             preview.data.distanceKm > rangeKm && (
               <div className="mt-2">
                 <Notice tone="info">
-                  {t('This route is longer than the {range} km your vehicle covers on a full charge, by your own figures. Plan a charging stop: JOURNEX does not plan one for you.', { range: rangeKm })}{' '}
+                  {t('This route is longer than the {range} km your vehicle covers on a full charge, by your own figures. Plan a charging stop: VAYORA does not plan one for you.', { range: rangeKm })}{' '}
                   {chargers}
                 </Notice>
               </div>
@@ -295,7 +295,7 @@ function RoutePlanner({ stops, rangeKm, onMove, onUse }: {
                   </li>
                 ))}
               </ul>
-              <p className="mt-1 text-slate-500">{t('Listed by JOURNEX staff. Nothing checks that a stop is open or a charger works.')}</p>
+              <p className="mt-1 text-slate-500">{t('Listed by VAYORA staff. Nothing checks that a stop is open or a charger works.')}</p>
             </section>
           )}
         </div>

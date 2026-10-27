@@ -1,4 +1,4 @@
-"""JOURNEX intel service: inference, and simulation on request, with no state."""
+"""VAYORA intel service: inference, and simulation on request, with no state."""
 
 import os
 

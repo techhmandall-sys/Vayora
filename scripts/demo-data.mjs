@@ -1,4 +1,4 @@
-// Fills a local JOURNEX with demo data, through the public API as any client would: four
+// Fills a local VAYORA with demo data, through the public API as any client would: four
 // drivers with vehicles, the coming six days of rides on the Kolhapur to Pune corridor,
 // and two passengers with two seats booked each. Every demo account says in its profile
 // that it is made up, and uses an address under demo.journex.test, a reserved name that

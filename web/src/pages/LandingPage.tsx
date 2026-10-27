@@ -1,3 +1,4 @@
+import { AnimatePresence, animate, motion, useInView, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
   BatteryCharging,
@@ -10,25 +11,32 @@ import {
   MessagesSquare,
   Search,
   ShieldCheck,
+  Star,
   Ticket,
   Undo2,
   type LucideIcon,
 } from 'lucide-react';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
 import { CountUp } from '../components/countup';
 import { useT } from '../lib/i18n';
+import { formatOneDecimal, formatRupees, formatTime, formatWeekday } from '../lib/format';
 
 // The corridor as drawn on the front page: north up, each town where it lies, so Pune sits
 // above and a little west of Kolhapur. Decoration only; the real route comes from OSRM.
+// typicalSeats is illustrative too: a round number for the tooltip, not a measured figure.
 const TOWNS = [
-  { name: 'Kolhapur', x: 146, y: 228 },
-  { name: 'Karad', x: 132, y: 164 },
-  { name: 'Satara', x: 92, y: 121 },
-  { name: 'Pune', x: 54, y: 29 },
+  { name: 'Kolhapur', x: 146, y: 228, typicalSeats: 42 },
+  { name: 'Karad', x: 132, y: 164, typicalSeats: 15 },
+  { name: 'Satara', x: 92, y: 121, typicalSeats: 21 },
+  { name: 'Pune', x: 54, y: 29, typicalSeats: 46 },
 ] as const;
 const ROAD = 'M146 228 C 152 202, 126 186, 132 164 S 98 140, 92 121 S 48 64, 54 29';
+// The towns are not evenly spaced along the curve; this approximates where each one falls
+// as a fraction of it, for staggering the markers and pausing the travelling dot.
+const TOWN_FRACTIONS = [0, 1 / 3, 2 / 3, 1];
+const DRAW_SECONDS = 1.4;
 
 /** A section that rises into place the first time it is scrolled to; shown at once where that cannot be told. */
 function Reveal({ children, className = '' }: { children: ReactNode; className?: string }) {
@@ -55,14 +63,69 @@ function Reveal({ children, className = '' }: { children: ReactNode; className?:
   );
 }
 
+/** The thin line that draws itself along the road once, then settles into a slow, looping
+ * dashed flow. One element does both: a transition from a single full-length dash down to
+ * zero offset draws it in, then a class swap hands off to the looping keyframe. */
+function TravelLine({ reduce }: { reduce: boolean }) {
+  const pathRef = useRef<SVGPathElement>(null);
+  const [length, setLength] = useState<number | null>(null);
+  const [drawn, setDrawn] = useState(false);
+  const [introDone, setIntroDone] = useState(false);
+
+  useLayoutEffect(() => {
+    if (pathRef.current) setLength(pathRef.current.getTotalLength());
+  }, []);
+
+  useEffect(() => {
+    if (reduce || length == null) return undefined;
+    const id = requestAnimationFrame(() => setDrawn(true));
+    return () => cancelAnimationFrame(id);
+  }, [length, reduce]);
+
+  useEffect(() => {
+    if (reduce) {
+      setIntroDone(true);
+      return undefined;
+    }
+    if (!drawn) return undefined;
+    const timer = setTimeout(() => setIntroDone(true), DRAW_SECONDS * 1000);
+    return () => clearTimeout(timer);
+  }, [drawn, reduce]);
+
+  const style = introDone
+    ? { strokeDasharray: '7 7', strokeDashoffset: 0 }
+    : length == null
+      ? { visibility: 'hidden' as const }
+      : {
+          strokeDasharray: length,
+          strokeDashoffset: drawn ? 0 : length,
+          transition: `stroke-dashoffset ${DRAW_SECONDS}s cubic-bezier(0.16, 1, 0.3, 1)`,
+        };
+
+  return (
+    <path
+      ref={pathRef}
+      d={ROAD}
+      fill="none"
+      stroke="#fff"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      className={introDone && !reduce ? 'animate-route-dash' : ''}
+      style={style}
+    />
+  );
+}
+
 function CorridorArt() {
   const t = useT();
-  const still = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = useReducedMotion() ?? false;
+  const [hovered, setHovered] = useState<(typeof TOWNS)[number] | null>(null);
+
   return (
-    <div aria-hidden="true" className="relative mx-auto w-full max-w-[19rem]">
-      <svg viewBox="0 0 200 260" className="w-full drop-shadow-[0_10px_30px_rgb(0_0_0_/_0.25)]">
+    <div className="relative mx-auto w-full max-w-[19rem]">
+      <svg aria-hidden="true" viewBox="0 0 200 260" className="w-full drop-shadow-[0_10px_30px_rgb(0_0_0_/_0.25)]">
         <path d={ROAD} fill="none" stroke="rgb(255 255 255 / 0.18)" strokeWidth="16" strokeLinecap="round" />
-        <path d={ROAD} fill="none" stroke="#fff" strokeWidth="2.5" strokeDasharray="7 7" strokeLinecap="round" className="animate-route-dash" />
+        <TravelLine reduce={reduce} />
         {TOWNS.map((town, index) => {
           const end = index === 0 || index === TOWNS.length - 1;
           // Kolhapur's name goes under it, leaving the corner beside it for a note.
@@ -70,32 +133,87 @@ function CorridorArt() {
             : town.x > 100 ? { x: town.x - 14, y: town.y + 4, anchor: 'end' as const }
               : { x: town.x + 14, y: town.y + 4, anchor: 'start' as const };
           return (
-            <g key={town.name}>
+            <motion.g
+              key={town.name}
+              initial={reduce ? false : { opacity: 0, scale: 0.4 }}
+              animate={{ opacity: 1, scale: 1 }}
+              whileHover={{ scale: 1.3 }}
+              onHoverStart={() => setHovered(town)}
+              onHoverEnd={() => setHovered((current) => (current?.name === town.name ? null : current))}
+              transition={
+                reduce
+                  ? { duration: 0 }
+                  : { delay: TOWN_FRACTIONS[index] * DRAW_SECONDS, type: 'spring', stiffness: 320, damping: 14 }
+              }
+              style={{ transformOrigin: `${town.x}px ${town.y}px`, cursor: 'pointer' }}
+            >
+              <circle cx={town.x} cy={town.y} r={14} fill="transparent" />
               <circle cx={town.x} cy={town.y} r={end ? 8 : 5.5} fill="#fff" />
               <circle cx={town.x} cy={town.y} r={end ? 3.5 : 2.5} fill="#0f766e" />
               <text x={label.x} y={label.y} textAnchor={label.anchor} className="fill-white text-[11px] font-semibold">
                 {t(town.name)}
               </text>
-            </g>
+            </motion.g>
           );
         })}
-        <circle r="6" fill="#fef08a" stroke="#fff" strokeWidth="2" cx={still ? 92 : 0} cy={still ? 121 : 0}>
-          {!still && (
-            <animateMotion dur="6s" repeatCount="indefinite" path={ROAD} keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines="0.45 0 0.25 1" />
-          )}
-        </circle>
+        <VehicleDot reduce={reduce} />
       </svg>
-      {/* Each note in a corner the road and the names leave free. */}
-      <FloatingChip icon={Undo2} className="-right-2 top-[24%] sm:-right-8" delay="0.5s">
+      <AnimatePresence>
+        {hovered && (
+          <motion.div
+            key={hovered.name}
+            initial={{ opacity: 0, scale: 0.9, y: 4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 4 }}
+            transition={{ duration: 0.15 }}
+            style={{ left: `${(hovered.x / 200) * 100}%`, top: `${(hovered.y / 260) * 100}%` }}
+            className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-[135%] whitespace-nowrap rounded-xl bg-[#0f172a] px-2.5 py-1.5 text-center text-[11px] font-semibold text-white shadow-float"
+          >
+            <p>{t(hovered.name)}</p>
+            <p className="text-white/70">{t('About {seats} seats published here, typically', { seats: hovered.typicalSeats })}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Each note in a corner the road and the names leave free, after the line finishes drawing. */}
+      <FloatingChip icon={Undo2} className="-right-2 top-[24%] sm:-right-8" delay={`${DRAW_SECONDS}s`}>
         {t('The earlier you cancel, the more comes back')}
       </FloatingChip>
-      <FloatingChip icon={Ticket} className="-left-3 top-[47%] sm:-left-10" delay="0.8s">
+      <FloatingChip icon={Ticket} className="-left-3 top-[47%] sm:-left-10" delay={`${DRAW_SECONDS + 0.15}s`}>
         {t('Your seat is held while you pay')}
       </FloatingChip>
-      <FloatingChip icon={ShieldCheck} className="-left-3 bottom-[2%] sm:-left-6" delay="1.1s">
+      <FloatingChip icon={ShieldCheck} className="-left-3 bottom-[2%] sm:-left-6" delay={`${DRAW_SECONDS + 0.3}s`}>
         {t('An emergency button on every trip')}
       </FloatingChip>
     </div>
+  );
+}
+
+/** The vehicle travelling the corridor: a loop with a short dwell at each stop, standing
+ * still at Satara (never moving) when motion is reduced, as it did before this. */
+function VehicleDot({ reduce }: { reduce: boolean }) {
+  if (reduce) return <circle r="6" fill="#fef08a" stroke="#fff" strokeWidth="2" cx={92} cy={121} />;
+  // 400ms dwell at each of the four stops; the rest of the 12s is travel, split evenly
+  // across the three legs between them (TOWN_FRACTIONS approximates each stop's position).
+  const dwell = 0.4 / 12;
+  const travel = (1 - dwell * TOWN_FRACTIONS.length) / (TOWN_FRACTIONS.length - 1);
+  const keyTimes: number[] = [];
+  const keyPoints: number[] = [];
+  TOWN_FRACTIONS.forEach((fraction, index) => {
+    const arrive = index === 0 ? 0 : keyTimes[keyTimes.length - 1] + travel;
+    keyTimes.push(arrive, arrive + dwell);
+    keyPoints.push(fraction, fraction);
+  });
+  return (
+    <circle r="6" fill="#fef08a" stroke="#fff" strokeWidth="2" cx={0} cy={0}>
+      <animateMotion
+        dur="12s"
+        repeatCount="indefinite"
+        path={ROAD}
+        calcMode="linear"
+        keyTimes={keyTimes.join(';')}
+        keyPoints={keyPoints.join(';')}
+      />
+    </circle>
   );
 }
 
@@ -133,7 +251,7 @@ function Hero() {
             {t('Share the road between Kolhapur and Pune')}
           </h1>
           <p className="max-w-xl text-[17px] leading-relaxed text-white/85">
-            {t('Book a seat in a car already making the trip, or fill the empty seats in yours. If your plans change, JOURNEX reminds you to give the seat back while someone else can still take it.')}
+            {t('Book a seat in a car already making the trip, or fill the empty seats in yours. If your plans change, VAYORA reminds you to give the seat back while someone else can still take it.')}
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
@@ -160,7 +278,63 @@ function Hero() {
         </div>
         <CorridorArt />
       </div>
+      <ReliabilityCard />
     </section>
+  );
+}
+
+/** A live-looking example booking, to show what the durability model's number means
+ * before anyone signs up. Decoration: the figures are illustrative, not from any booking. */
+function ReliabilityCard() {
+  const t = useT();
+  const reduce = useReducedMotion() ?? false;
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-10% 0px' });
+  const [percent, setPercent] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return undefined;
+    if (reduce) {
+      setPercent(92);
+      return undefined;
+    }
+    const controls = animate(0, 92, { duration: 1, ease: [0.22, 1, 0.36, 1], onUpdate: setPercent });
+    return () => controls.stop();
+  }, [inView, reduce]);
+
+  // Friday evening, a week out from a fixed date: illustrative only, not a real booking.
+  const departure = '2026-10-30T18:30:00+05:30';
+  const driverName = 'Rahul S.';
+  return (
+    <div
+      ref={ref}
+      aria-hidden="true"
+      className="relative z-10 mt-6 hidden w-[15rem] rounded-2xl bg-white/95 p-3.5 text-[#0f172a] shadow-float backdrop-blur sm:ml-auto sm:block"
+    >
+      <div className="flex items-center justify-between gap-1.5 text-[13px] font-semibold">
+        <span className="truncate">{driverName}</span>
+        <span className="flex flex-none items-center gap-1">
+          <Star aria-hidden="true" className="h-3.5 w-3.5 flex-none fill-amber-400 text-amber-400" />
+          {formatOneDecimal(4.8)}
+        </span>
+      </div>
+      <div className="mt-0.5 flex items-center justify-between gap-1.5 text-[12px] text-slate-500">
+        <span className="truncate">{`${formatWeekday(departure)} ${formatTime(departure)}`}</span>
+        <span className="flex-none font-semibold text-slate-700">{formatRupees(420)}</span>
+      </div>
+      <div className="mt-2.5 space-y-1">
+        <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wide text-slate-500">
+          <span>{t('Reliability')}</span>
+          <span className="tabular-nums text-teal-700">{`${Math.round(percent)}%`}</span>
+        </div>
+        <div className="h-2 overflow-hidden rounded-full bg-slate-900/[0.08]">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500"
+            style={{ transform: `scaleX(${percent / 100})`, transformOrigin: 'left' }}
+          />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -240,7 +414,7 @@ function EarlyMatters() {
         <div className="space-y-3">
           <SectionTitle>{t('Why giving a seat back early matters')}</SectionTitle>
           <p className="text-[15px] leading-relaxed text-slate-600">
-            {t('A seat given back three days before departure can still be booked by someone else. Given back two hours before, it usually travels empty. So JOURNEX asks early, gives back more of the fare the earlier you cancel, and never cancels anyone on a guess.')}
+            {t('A seat given back three days before departure can still be booked by someone else. Given back two hours before, it usually travels empty. So VAYORA asks early, gives back more of the fare the earlier you cancel, and never cancels anyone on a guess.')}
           </p>
           <p className="text-[15px] font-medium leading-relaxed text-slate-800">
             {t('The project measures what counts: rides completed for every 100 searches, not bookings made.')}
@@ -275,7 +449,7 @@ function Features() {
   const features: { icon: LucideIcon; title: string; body: string }[] = [
     { icon: Footprints, title: t('Pickups on the way'), body: t('A driver can take a few minutes out of the way to pick you up where the road passes.') },
     { icon: HeartHandshake, title: t('Women-only rides'), body: t('A driver can offer a ride to women only; only women see it or can book it.') },
-    { icon: CalendarClock, title: t('Flexible bookings'), body: t('Choose a window of time. If your driver withdraws, JOURNEX looks for another ride in it, at the same price.') },
+    { icon: CalendarClock, title: t('Flexible bookings'), body: t('Choose a window of time. If your driver withdraws, VAYORA looks for another ride in it, at the same price.') },
     { icon: BatteryCharging, title: t('Electric cars'), body: t('A route an electric car cannot cover on one charge is caught before it is published, with chargers along the way.') },
     { icon: Bus, title: t('Buses when no car goes'), body: t('When no ride fits, buses on the same stretch are suggested.') },
     { icon: Languages, title: t('Three languages'), body: t('Every screen in English, Hindi and Marathi, receipts included.') },
@@ -348,7 +522,7 @@ function TwoSides() {
   );
 }
 
-/** What a signed-out visitor sees first: what JOURNEX is, and the ways in. */
+/** What a signed-out visitor sees first: what VAYORA is, and the ways in. */
 export function LandingPage() {
   const t = useT();
   return (

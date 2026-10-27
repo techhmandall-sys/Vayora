@@ -3,7 +3,7 @@
 # The model is trained and validated on simulator seeds that the experiments never use
 # (research integrity rule 3). Experiments run seeds 1-30; nothing here may overlap them
 # or each other, and the training code refuses to run if they do.
-version: h2
+version: h3
 world: world.yaml
 variant: variants/B0.yaml
 train_seeds: {first: 1001, last: 1020}

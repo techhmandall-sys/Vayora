@@ -107,12 +107,12 @@ public class CallService {
                 throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
                         "The call could not be placed. Try again, or use the ride's chat.");
             }
-            notifications.send(calleeId, Type.CALL_REQUESTED, Text.of("{name} is calling you through JOURNEX, "
+            notifications.send(calleeId, Type.CALL_REQUESTED, Text.of("{name} is calling you through VAYORA, "
                     + "from the platform's number. Neither of you sees the other's number.", "name", callerName), bookingId);
             return new Relay(TwilioVoice.NAME, calleeName);
         }
         notifications.send(calleeId, Type.CALL_REQUESTED,
-                Text.of("{name} tried to call you through JOURNEX. Calls are simulated, so no call came through. "
+                Text.of("{name} tried to call you through VAYORA. Calls are simulated, so no call came through. "
                         + "Reply in the ride's chat.", "name", callerName),
                 bookingId);
         return new Relay("mock", calleeName);

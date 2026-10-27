@@ -10,6 +10,7 @@ FROZEN_VOCABULARY = [
     "booking_cancelled", "seat_refilled", "recovery_search", "recovery_booked",
     "supply_gap_detected", "nudge_issued", "nudge_dismissed", "nudge_converted",
     "trip_started", "trip_completed", "trip_failed",
+    "last_mile_shown", "last_mile_option_selected",
 ]
 
 JAVA_ENUM = (
