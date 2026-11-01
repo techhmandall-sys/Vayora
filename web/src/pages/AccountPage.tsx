@@ -9,6 +9,7 @@ import { initialsOf, PhotoEditor } from '../components/photo';
 import { PushChoice } from '../components/push';
 import { useAuth } from '../lib/auth';
 import { msg, useT } from '../lib/i18n';
+import { DocumentCheckStatus } from '../components/documentCheck';
 import { idDocumentLabels } from '../lib/idDocuments';
 import { passKindLabels } from '../lib/passes';
 import type { Chattiness, EmergencyContact, Gender, IdDocument, MyProfile, PassKind } from '../lib/types';
@@ -344,8 +345,8 @@ function Invitations() {
 }
 
 /**
- * Which identity document a driver says they hold (feature 7, a labelled mock). Only the
- * kind: there is no field for a number or a copy, and nothing is checked.
+ * Which identity document a driver says they hold (feature 7). Only the kind: there is no field
+ * for a number or a copy. Staff may be asked to see the original, and only the result is kept.
  */
 function IdDeclaration({ declared }: { declared: IdDocument | null }) {
   const t = useT();
@@ -367,9 +368,10 @@ function IdDeclaration({ declared }: { declared: IdDocument | null }) {
   return (
     <div className="space-y-3 text-sm">
       <p className="text-slate-600">
-        {t('You can say which identity document you hold. VAYORA does not ask for its number or a copy and checks nothing: your profile will say it was declared, not checked.')}
+        {t('You can say which identity document you hold. VAYORA never asks for its number or keeps a copy. Your profile says it was declared and not checked, until VAYORA staff have seen it.')}
       </p>
       {declared && <p>{t('You have declared: {document}.', { document: t(idDocumentLabels[declared]) })}</p>}
+      {declared && <DocumentCheckStatus kind="IDENTITY" />}
       {error && <Notice tone="error">{error.message}</Notice>}
       <div className="flex flex-wrap items-end gap-3">
         <div className="max-w-xs">

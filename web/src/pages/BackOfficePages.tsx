@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Bus, Flag, Fuel, type LucideIcon, Route as RouteIcon, Scale, Ticket, TrendingUp, Users } from 'lucide-react';
+import { BadgeCheck, Bus, Flag, Fuel, type LucideIcon, Route as RouteIcon, Scale, Ticket, TrendingUp, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -8,8 +8,9 @@ import { CountUp } from '../components/countup';
 import { Button, Card, ConfirmButton, Notice, Page, QueryState, SelectField, StatusBadge, TextField } from '../components/ui';
 import { api } from '../lib/api';
 import { msg, useT } from '../lib/i18n';
+import { idDocumentLabels } from '../lib/idDocuments';
 import { formatDate, formatDateTime, formatRupees } from '../lib/format';
-import type { AdminOverview, AuditEntry, BookingStatus, BusService, DisputedTrip, Stopover, SupplyGap, Member, MemberReport, ReportOutcome, RideStatus, Role } from '../lib/types';
+import type { AdminOverview, AuditEntry, BookingStatus, BusService, DisputedTrip, Stopover, SupplyGap, Member, MemberReport, ReportOutcome, RideStatus, Role, WaitingCheck } from '../lib/types';
 
 // The server's own codes, in words. A code with no entry here is shown as it is.
 const codeLabels: Record<string, string> = {
@@ -429,6 +430,77 @@ export function BusServicesPage() {
 }
 
 /** Days ahead where passengers searched a stretch and found no ride. */
+export function DocumentChecksPage() {
+  const t = useT();
+  const queryClient = useQueryClient();
+  const [notes, setNotes] = useState<Record<number, string>>({});
+  const waiting = useQuery({ queryKey: ['admin', 'document-checks'], queryFn: () => api<WaitingCheck[]>('/admin/document-checks') });
+  const decide = useMutation({
+    mutationFn: ({ id, outcome }: { id: number; outcome: 'CHECKED' | 'REFUSED' }) =>
+      api(`/admin/document-checks/${id}/decide`, { method: 'POST', body: { outcome, note: notes[id] ?? '' } }),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['admin', 'document-checks'] }),
+  });
+  return (
+    <Page title={t('Document checks')}>
+      <p className="text-sm text-slate-600">
+        {t('Ask the driver to show you the original, in person or on a video call, then record what you saw. Do not write down its number or keep a copy. This says a person saw it, not that its issuer stands behind it.')}
+      </p>
+      {decide.error && <Notice tone="error">{decide.error.message}</Notice>}
+      <QueryState
+        isPending={waiting.isPending}
+        error={waiting.error}
+        isEmpty={waiting.data?.length === 0}
+        empty={t('No document is waiting to be checked.')}
+        icon={BadgeCheck}
+        onRetry={() => void waiting.refetch()}
+      />
+      {waiting.data?.map((check) => (
+        <Card key={check.id}>
+          <div className="space-y-3 text-sm">
+            <p className="font-semibold text-slate-900">
+              <Link to={`/users/${check.driverId}`} className="underline">
+                {check.driverName}
+              </Link>
+            </p>
+            <p>
+              {check.kind === 'IDENTITY' && check.document
+                ? t('Identity document: {document}', { document: t(idDocumentLabels[check.document]) })
+                : t('Insurance for {vehicle}: {insurer}, until {date}', {
+                    vehicle: check.vehicle ?? '',
+                    insurer: check.insurer ?? '',
+                    date: check.insuredUntil ? formatDate(check.insuredUntil) : '',
+                  })}
+            </p>
+            <p className="text-slate-500">{t('Asked {when}', { when: formatDateTime(check.requestedAt) })}</p>
+            <TextField
+              label={t('Note for the driver (needed to refuse)')}
+              maxLength={500}
+              value={notes[check.id] ?? ''}
+              onChange={(event) => setNotes({ ...notes, [check.id]: event.target.value })}
+            />
+            <div className="flex flex-wrap gap-2">
+              <ConfirmButton
+                label={t('Mark as checked')}
+                confirmLabel={t('Yes, I saw the original')}
+                tone="primary"
+                disabled={decide.isPending}
+                onConfirm={() => decide.mutate({ id: check.id, outcome: 'CHECKED' })}
+              />
+              <Button
+                tone="secondary"
+                disabled={decide.isPending || (notes[check.id] ?? '').trim() === ''}
+                onClick={() => decide.mutate({ id: check.id, outcome: 'REFUSED' })}
+              >
+                {t('Could not confirm')}
+              </Button>
+            </div>
+          </div>
+        </Card>
+      ))}
+    </Page>
+  );
+}
+
 export function SupplyGapsPage() {
   const t = useT();
   const gaps = useQuery({ queryKey: ['admin', 'supply-gaps'], queryFn: () => api<SupplyGap[]>('/admin/supply-gaps') });

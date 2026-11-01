@@ -31,6 +31,8 @@ public class RatingService {
      *                       themselves; null for a passenger or until there are enough
      * @param responseMinutes typical (median) minutes from a request to the driver's answer;
      *                        null as above
+     * @param idCheckedAt    when VAYORA staff saw that document, if they have: a person saw it,
+     *                       not its issuer; null if not
      * @param declaredId     the kind of identity document a driver says they hold; declared,
      *                       never checked, and counted towards nothing; null if not said
      */
@@ -38,7 +40,8 @@ public class RatingService {
             int completedTrips, Double averageStars, int ratingCount, List<Review> reviews,
             boolean emailVerified, boolean phoneVerified, String bio, Integer age,
             Boolean smoking, Boolean pets, Boolean music, String chattiness,
-            Double responseRate, Integer responseMinutes, String level, String declaredId) {
+            Double responseRate, Integer responseMinutes, String level, String declaredId,
+            Instant idCheckedAt) {
     }
 
     /**
@@ -128,7 +131,9 @@ public class RatingService {
                        u.email_verified_at IS NOT NULL AS email_verified,
                        u.phone_verified_at IS NOT NULL AS phone_verified,
                        p.bio, EXTRACT(YEAR FROM now())::int - p.birth_year AS age,
-                       p.smoking, p.pets, p.music, p.chattiness, u.id_document
+                       p.smoking, p.pets, p.music, p.chattiness, u.id_document,
+                       (SELECT c.decided_at FROM document_checks c
+                        WHERE c.driver_id = u.id AND c.kind = 'IDENTITY' AND c.status = 'CHECKED') AS id_checked_at
                 FROM users u LEFT JOIN profiles p ON p.user_id = u.id
                 WHERE u.id = ? AND u.role <> 'ADMIN'""",
                 (rs, n) -> new Profile(rs.getLong("id"), rs.getString("full_name"),
@@ -144,7 +149,7 @@ public class RatingService {
                         levels.levelFor(rs.getInt("completed"), (Double) rs.getObject("average"),
                                 rs.getInt("rating_count"), rs.getBoolean("email_verified"),
                                 rs.getBoolean("phone_verified")),
-                        rs.getString("id_document")),
+                        rs.getString("id_document"), idCheckedAt(rs.getObject("id_checked_at", OffsetDateTime.class))),
                 userId);
         if (found.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found");
@@ -159,7 +164,11 @@ public class RatingService {
                 profile.reviews(), profile.emailVerified(), profile.phoneVerified(), profile.bio(),
                 profile.age(), profile.smoking(), profile.pets(), profile.music(),
                 profile.chattiness(), answers.rate(), answers.minutes(), profile.level(),
-                profile.declaredId());
+                profile.declaredId(), profile.idCheckedAt());
+    }
+
+    private static Instant idCheckedAt(OffsetDateTime at) {
+        return at == null ? null : at.toInstant();
     }
 
     /** The driver's own record. */

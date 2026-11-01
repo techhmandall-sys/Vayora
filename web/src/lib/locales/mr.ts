@@ -45,6 +45,69 @@ export const mr: Record<string, string> = {
     'डिव्हाइसप्रमाणे',
   'Theme: {name}':
     'थीम: {name}',
+  // Staff checks of identity documents and insurance
+  'Declare an identity document first':
+    'आधी ओळखपत्र जाहीर करा',
+  "Declare this car's insurance first":
+    'आधी या कारचा विमा जाहीर करा',
+  'Say which car the insurance is for':
+    'विमा कोणत्या कारसाठी आहे ते सांगा',
+  'This is already waiting for VAYORA staff':
+    'हे आधीच VAYORA कर्मचाऱ्यांकडे प्रतीक्षेत आहे',
+  'VAYORA staff have already checked this':
+    'VAYORA कर्मचाऱ्यांनी हे आधीच तपासले आहे',
+  'No check is waiting with that id':
+    'या आयडीची कोणतीही तपासणी प्रतीक्षेत नाही',
+  'Say why it could not be confirmed':
+    'याची पुष्टी का होऊ शकली नाही ते सांगा',
+  'VAYORA staff have checked your identity document.':
+    'VAYORA कर्मचाऱ्यांनी तुमचे ओळखपत्र तपासले आहे.',
+  'VAYORA staff could not confirm your identity document: {note}':
+    'VAYORA कर्मचारी तुमच्या ओळखपत्राची पुष्टी करू शकले नाहीत: {note}',
+  'VAYORA staff have checked the insurance for {vehicle}.':
+    'VAYORA कर्मचाऱ्यांनी {vehicle} चा विमा तपासला आहे.',
+  'VAYORA staff could not confirm the insurance for {vehicle}: {note}':
+    'VAYORA कर्मचारी {vehicle} च्या विम्याची पुष्टी करू शकले नाहीत: {note}',
+  'Ask VAYORA staff to check it':
+    'VAYORA कर्मचाऱ्यांना हे तपासण्यास सांगा',
+  'You show the original to VAYORA staff, in person or on a video call. They record only the result: no number and no copy is kept.':
+    'तुम्ही मूळ कागदपत्र VAYORA कर्मचाऱ्यांना दाखवता, प्रत्यक्ष किंवा व्हिडिओ कॉलवर. ते फक्त निकाल नोंदवतात: कोणताही क्रमांक किंवा प्रत ठेवली जात नाही.',
+  'Waiting for VAYORA staff. They will contact you to see the original.':
+    'VAYORA कर्मचाऱ्यांची प्रतीक्षा आहे. मूळ कागदपत्र पाहण्यासाठी ते तुमच्याशी संपर्क साधतील.',
+  'Checked by VAYORA staff on {date}. A person saw it; it was not checked with its issuer.':
+    '{date} रोजी VAYORA कर्मचाऱ्यांनी तपासले. एका व्यक्तीने ते पाहिले; ते देणाऱ्या संस्थेकडे तपासलेले नाही.',
+  'VAYORA staff could not confirm it: {note}':
+    'VAYORA कर्मचारी याची पुष्टी करू शकले नाहीत: {note}',
+  '{document}, checked by VAYORA staff':
+    '{document}, VAYORA कर्मचाऱ्यांनी तपासलेले',
+  'A person at VAYORA saw this document. It was not checked with its issuer.':
+    'VAYORA मधील एका व्यक्तीने हे कागदपत्र पाहिले. ते देणाऱ्या संस्थेकडे तपासलेले नाही.',
+  'Identity checked by staff':
+    'कर्मचाऱ्यांनी ओळख तपासली',
+  'Insurance: {insurer}, until {date}. VAYORA staff saw the policy; it was not checked with the insurer.':
+    'विमा: {insurer}, {date} पर्यंत. VAYORA कर्मचाऱ्यांनी पॉलिसी पाहिली; विमा कंपनीकडे तपासलेली नाही.',
+  'Have a driver whose identity VAYORA staff have checked':
+    'ज्याची ओळख VAYORA कर्मचाऱ्यांनी तपासली आहे असा चालक असावा',
+  'Document checks':
+    'कागदपत्र तपासणी',
+  'Ask the driver to show you the original, in person or on a video call, then record what you saw. Do not write down its number or keep a copy. This says a person saw it, not that its issuer stands behind it.':
+    'चालकाला मूळ कागदपत्र दाखवण्यास सांगा, प्रत्यक्ष किंवा व्हिडिओ कॉलवर, मग तुम्ही काय पाहिले ते नोंदवा. त्याचा क्रमांक लिहू नका किंवा प्रत ठेवू नका. यावरून एका व्यक्तीने ते पाहिले हे कळते, ते देणारी संस्था त्याची हमी देते असे नाही.',
+  'No document is waiting to be checked.':
+    'कोणतेही कागदपत्र तपासणीच्या प्रतीक्षेत नाही.',
+  'Identity document: {document}':
+    'ओळखपत्र: {document}',
+  'Insurance for {vehicle}: {insurer}, until {date}':
+    '{vehicle} चा विमा: {insurer}, {date} पर्यंत',
+  'Asked {when}':
+    '{when} रोजी विनंती केली',
+  'Note for the driver (needed to refuse)':
+    'चालकासाठी टीप (नाकारण्यासाठी आवश्यक)',
+  'Mark as checked':
+    'तपासले म्हणून नोंदवा',
+  'Yes, I saw the original':
+    'होय, मी मूळ कागदपत्र पाहिले',
+  'Could not confirm':
+    'पुष्टी होऊ शकली नाही',
   // Publishing a ride, in numbered parts
   'When, and in which car':
     'कधी, आणि कोणत्या कारने',
@@ -1574,8 +1637,8 @@ export const mr: Record<string, string> = {
     'तुम्ही जाहीर केले आहे: {document}.',
   'Declared: {document}, not checked':
     'त्यांच्याकडे {document} असल्याचे ते सांगतात, तपासलेले नाही',
-  'You can say which identity document you hold. VAYORA does not ask for its number or a copy and checks nothing: your profile will say it was declared, not checked.':
-    'तुमच्याकडे कोणते ओळखपत्र आहे ते तुम्ही सांगू शकता. VAYORA त्याचा क्रमांक किंवा प्रत मागत नाही आणि काहीही तपासत नाही: तुमच्या प्रोफाइलवर ते जाहीर केले आहे, तपासलेले नाही, असे लिहिलेले असेल.',
+  'You can say which identity document you hold. VAYORA never asks for its number or keeps a copy. Your profile says it was declared and not checked, until VAYORA staff have seen it.':
+    'तुमच्याकडे कोणते ओळखपत्र आहे ते तुम्ही सांगू शकता. VAYORA त्याचा क्रमांक कधीही मागत नाही किंवा प्रत ठेवत नाही. VAYORA कर्मचाऱ्यांनी ते पाहीपर्यंत तुमच्या प्रोफाइलवर ते जाहीर केलेले आहे, तपासलेले नाही, असे दिसते.',
   'Sign in first':
     'आधी साइन इन करा',
   'Your session has ended. Sign in again.':

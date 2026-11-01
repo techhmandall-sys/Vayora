@@ -194,9 +194,13 @@ export interface Candidate {
   underWay: boolean;
   /** The driver has completed enough rides and withdrawn none lately, so the service fee is lower: from their record only. */
   keptRides: boolean;
-  /** Insurance the driver declares, never checked: only while it covers the trip's date. */
+  /** Insurance the driver declares: only while it covers the trip's date. */
   insurer: string | null;
   insuredUntil: string | null;
+  /** VAYORA staff saw the policy; never checked with the insurer. */
+  insuranceChecked?: boolean;
+  /** VAYORA staff saw the identity document the driver declared; never checked with its issuer. */
+  driverIdChecked?: boolean;
   /** Out of 100, for both people, from what they said, distance, price and the driver's record; never a prediction. */
   matchScore: number;
   matchReasons: MatchReason[];
@@ -360,8 +364,37 @@ export interface Profile {
   responseMinutes?: number | null;
   /** NEWCOMER up to AMBASSADOR; see levelLabels. */
   level?: string;
-  /** The identity document a driver says they hold. Declared, never checked, counts for nothing. */
+  /** The identity document a driver says they hold. Declared, unless staff have seen it; counts for no level. */
   declaredId?: IdDocument | null;
+  /** When VAYORA staff saw that document: a person saw it, not its issuer. */
+  idCheckedAt?: string | null;
+}
+
+export type DocumentCheckKind = 'IDENTITY' | 'INSURANCE';
+
+/** A person's check of what a driver declared. No number or copy of anything is kept. */
+export interface DocumentCheck {
+  id: number;
+  kind: DocumentCheckKind;
+  vehicleId: number | null;
+  status: 'WAITING' | 'CHECKED' | 'REFUSED' | 'WITHDRAWN';
+  requestedAt: string;
+  decidedAt: string | null;
+  note: string | null;
+}
+
+/** What an administrator asks to see, and from whom. */
+export interface WaitingCheck {
+  id: number;
+  kind: DocumentCheckKind;
+  driverId: number;
+  driverName: string;
+  requestedAt: string;
+  document: IdDocument | null;
+  vehicleId: number | null;
+  vehicle: string | null;
+  insurer: string | null;
+  insuredUntil: string | null;
 }
 
 /** A driver's own record, for them alone. */

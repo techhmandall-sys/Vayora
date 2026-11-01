@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   Activity,
   Award,
+  BadgeCheck,
   BadgePercent,
   Bell,
   Bus,
@@ -71,6 +72,7 @@ const links: Record<Role, Section[]> = {
     { to: '/admin', label: msg('Overview'), icon: LayoutDashboard },
     { to: '/admin/reports', label: msg('Reports'), icon: Flag },
     { to: '/admin/emergencies', label: msg('Emergencies'), icon: Siren },
+    { to: '/admin/document-checks', label: msg('Document checks'), icon: BadgeCheck },
     { to: '/admin/users', label: msg('Members'), icon: Users },
     { to: '/admin/rides', label: msg('Rides'), icon: Route },
     { to: '/admin/bookings', label: msg('Bookings'), icon: Ticket },

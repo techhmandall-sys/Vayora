@@ -45,6 +45,69 @@ export const hi: Record<string, string> = {
     'डिवाइस जैसा',
   'Theme: {name}':
     'थीम: {name}',
+  // Staff checks of identity documents and insurance
+  'Declare an identity document first':
+    'पहले कोई पहचान पत्र घोषित करें',
+  "Declare this car's insurance first":
+    'पहले इस कार का बीमा घोषित करें',
+  'Say which car the insurance is for':
+    'बताएँ कि बीमा किस कार के लिए है',
+  'This is already waiting for VAYORA staff':
+    'यह पहले से VAYORA कर्मचारियों के पास प्रतीक्षा में है',
+  'VAYORA staff have already checked this':
+    'VAYORA कर्मचारी इसकी जाँच पहले ही कर चुके हैं',
+  'No check is waiting with that id':
+    'इस आईडी की कोई जाँच प्रतीक्षा में नहीं है',
+  'Say why it could not be confirmed':
+    'बताएँ कि इसकी पुष्टि क्यों नहीं हो सकी',
+  'VAYORA staff have checked your identity document.':
+    'VAYORA कर्मचारियों ने आपके पहचान पत्र की जाँच कर ली है।',
+  'VAYORA staff could not confirm your identity document: {note}':
+    'VAYORA कर्मचारी आपके पहचान पत्र की पुष्टि नहीं कर सके: {note}',
+  'VAYORA staff have checked the insurance for {vehicle}.':
+    'VAYORA कर्मचारियों ने {vehicle} के बीमे की जाँच कर ली है।',
+  'VAYORA staff could not confirm the insurance for {vehicle}: {note}':
+    'VAYORA कर्मचारी {vehicle} के बीमे की पुष्टि नहीं कर सके: {note}',
+  'Ask VAYORA staff to check it':
+    'VAYORA कर्मचारियों से इसकी जाँच करने को कहें',
+  'You show the original to VAYORA staff, in person or on a video call. They record only the result: no number and no copy is kept.':
+    'आप मूल दस्तावेज़ VAYORA कर्मचारियों को दिखाते हैं, आमने-सामने या वीडियो कॉल पर। वे केवल परिणाम दर्ज करते हैं: कोई नंबर और कोई प्रति नहीं रखी जाती।',
+  'Waiting for VAYORA staff. They will contact you to see the original.':
+    'VAYORA कर्मचारियों की प्रतीक्षा है। वे मूल दस्तावेज़ देखने के लिए आपसे संपर्क करेंगे।',
+  'Checked by VAYORA staff on {date}. A person saw it; it was not checked with its issuer.':
+    '{date} को VAYORA कर्मचारियों ने जाँचा। एक व्यक्ति ने इसे देखा; जारी करने वाले से इसकी जाँच नहीं हुई।',
+  'VAYORA staff could not confirm it: {note}':
+    'VAYORA कर्मचारी इसकी पुष्टि नहीं कर सके: {note}',
+  '{document}, checked by VAYORA staff':
+    '{document}, VAYORA कर्मचारियों द्वारा जाँचा गया',
+  'A person at VAYORA saw this document. It was not checked with its issuer.':
+    'VAYORA के एक व्यक्ति ने यह दस्तावेज़ देखा। जारी करने वाले से इसकी जाँच नहीं हुई।',
+  'Identity checked by staff':
+    'कर्मचारियों ने पहचान जाँची',
+  'Insurance: {insurer}, until {date}. VAYORA staff saw the policy; it was not checked with the insurer.':
+    'बीमा: {insurer}, {date} तक। VAYORA कर्मचारियों ने पॉलिसी देखी; बीमा कंपनी से इसकी जाँच नहीं हुई।',
+  'Have a driver whose identity VAYORA staff have checked':
+    'ऐसा चालक हो जिसकी पहचान VAYORA कर्मचारियों ने जाँची हो',
+  'Document checks':
+    'दस्तावेज़ जाँच',
+  'Ask the driver to show you the original, in person or on a video call, then record what you saw. Do not write down its number or keep a copy. This says a person saw it, not that its issuer stands behind it.':
+    'चालक से मूल दस्तावेज़ दिखाने को कहें, आमने-सामने या वीडियो कॉल पर, फिर दर्ज करें कि आपने क्या देखा। उसका नंबर न लिखें और प्रति न रखें। इससे पता चलता है कि एक व्यक्ति ने उसे देखा, यह नहीं कि जारी करने वाला उसकी पुष्टि करता है।',
+  'No document is waiting to be checked.':
+    'कोई दस्तावेज़ जाँच की प्रतीक्षा में नहीं है।',
+  'Identity document: {document}':
+    'पहचान पत्र: {document}',
+  'Insurance for {vehicle}: {insurer}, until {date}':
+    '{vehicle} का बीमा: {insurer}, {date} तक',
+  'Asked {when}':
+    '{when} को अनुरोध किया',
+  'Note for the driver (needed to refuse)':
+    'चालक के लिए टिप्पणी (मना करने के लिए ज़रूरी)',
+  'Mark as checked':
+    'जाँचा हुआ चिह्नित करें',
+  'Yes, I saw the original':
+    'हाँ, मैंने मूल दस्तावेज़ देखा',
+  'Could not confirm':
+    'पुष्टि नहीं हो सकी',
   // Publishing a ride, in numbered parts
   'When, and in which car':
     'कब, और किस कार में',
@@ -1574,8 +1637,8 @@ export const hi: Record<string, string> = {
     'आपने घोषित किया है: {document}।',
   'Declared: {document}, not checked':
     'कहते हैं कि उनके पास {document} है, जाँचा नहीं गया',
-  'You can say which identity document you hold. VAYORA does not ask for its number or a copy and checks nothing: your profile will say it was declared, not checked.':
-    'आप बता सकते हैं कि आपके पास कौन-सा पहचान पत्र है। VAYORA उसका नंबर या प्रति नहीं माँगता और कुछ नहीं जाँचता: आपकी प्रोफ़ाइल पर लिखा होगा कि यह घोषित किया गया है, जाँचा नहीं गया।',
+  'You can say which identity document you hold. VAYORA never asks for its number or keeps a copy. Your profile says it was declared and not checked, until VAYORA staff have seen it.':
+    'आप बता सकते हैं कि आपके पास कौन-सा पहचान पत्र है। VAYORA उसका नंबर कभी नहीं माँगता और न ही प्रति रखता है। जब तक VAYORA कर्मचारी उसे देख न लें, आपकी प्रोफ़ाइल में लिखा रहता है कि वह घोषित है, जाँचा नहीं गया।',
   'Sign in first':
     'पहले साइन इन करें',
   'Your session has ended. Sign in again.':

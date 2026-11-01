@@ -64,6 +64,7 @@ interface Filters {
   quietRide: boolean;
   instantOnly: boolean;
   confirmedDriver: boolean;
+  idCheckedDriver: boolean;
   maxTwoInBack: boolean;
   womenOnly: boolean;
   smokeFree: boolean;
@@ -80,6 +81,7 @@ const NO_FILTERS: Filters = {
   quietRide: false,
   instantOnly: false,
   confirmedDriver: false,
+  idCheckedDriver: false,
   maxTwoInBack: false,
   womenOnly: false,
   smokeFree: false,
@@ -96,7 +98,7 @@ function filterParams(filters: Filters): Record<string, string> {
   if (filters.minPrice.trim() !== '' && Number(filters.minPrice) >= 0) params.minPrice = String(Number(filters.minPrice));
   if (filters.comfortAtLeast) params.comfortAtLeast = filters.comfortAtLeast;
   if (filters.luggageAtLeast) params.luggageAtLeast = filters.luggageAtLeast;
-  for (const flag of ['instantOnly', 'confirmedDriver', 'maxTwoInBack', 'womenOnly', 'smokeFree', 'petsWelcome', 'musicWelcome', 'quietRide'] as const) {
+  for (const flag of ['instantOnly', 'confirmedDriver', 'idCheckedDriver', 'maxTwoInBack', 'womenOnly', 'smokeFree', 'petsWelcome', 'musicWelcome', 'quietRide'] as const) {
     if (filters[flag]) params[flag] = 'true';
   }
   return params;
@@ -474,6 +476,7 @@ export function SearchPage() {
                   [
                     ['instantOnly', msg('Confirm instantly')],
                     ['confirmedDriver', msg('Have a driver with a confirmed email or phone')],
+                    ['idCheckedDriver', msg('Have a driver whose identity VAYORA staff have checked')],
                     ['maxTwoInBack', msg('Promise at most two in the back')],
                     ['smokeFree', msg('Have a driver who said no smoking')],
                     ['petsWelcome', msg('Have a driver who said pets are welcome')],
@@ -673,6 +676,7 @@ export function SearchPage() {
                   )}
                   {candidate.payAfterRide && <Chip icon={Wallet} tone="teal">{t('Pay after the ride')}</Chip>}
                   {candidate.driverConfirmed && <Chip icon={BadgeCheck} tone="teal">{t('Contact confirmed')}</Chip>}
+                  {candidate.driverIdChecked && <Chip icon={BadgeCheck} tone="emerald">{t('Identity checked by staff')}</Chip>}
                   {candidate.maxTwoInBack && <Chip icon={Armchair}>{t('At most two in the back')}</Chip>}
                   {candidate.womenOnly && <Chip icon={UserRound} tone="red">{t('Women only')}</Chip>}
                 </div>
@@ -695,10 +699,15 @@ export function SearchPage() {
                   {candidate.vehicle && <Detail icon={Car}>{[candidate.vehicle, ...vehiclePhrases(candidate, t)].join(' · ')}</Detail>}
                   {candidate.insurer && candidate.insuredUntil && (
                     <Detail icon={ShieldCheck}>
-                      {t('Insurance declared by the driver: {insurer}, until {date}. Not checked.', {
-                        insurer: candidate.insurer,
-                        date: formatDate(candidate.insuredUntil),
-                      })}
+                      {candidate.insuranceChecked
+                        ? t('Insurance: {insurer}, until {date}. VAYORA staff saw the policy; it was not checked with the insurer.', {
+                            insurer: candidate.insurer,
+                            date: formatDate(candidate.insuredUntil),
+                          })
+                        : t('Insurance declared by the driver: {insurer}, until {date}. Not checked.', {
+                            insurer: candidate.insurer,
+                            date: formatDate(candidate.insuredUntil),
+                          })}
                     </Detail>
                   )}
                   <button

@@ -126,6 +126,7 @@ public class RideController {
             @RequestParam(required = false) @DecimalMin("0") BigDecimal maxPrice,
             @RequestParam(defaultValue = "false") boolean instantOnly,
             @RequestParam(defaultValue = "false") boolean confirmedDriver,
+            @RequestParam(defaultValue = "false") boolean idCheckedDriver,
             @RequestParam(defaultValue = "false") boolean smokeFree,
             @RequestParam(defaultValue = "false") boolean petsWelcome,
             @RequestParam(defaultValue = "false") boolean maxTwoInBack,
@@ -139,7 +140,7 @@ public class RideController {
                 new Point(destLat, destLon), date, seats, sort,
                 new Filters(earliestHour, latestHour, maxPrice, instantOnly, confirmedDriver,
                         smokeFree, petsWelcome, maxTwoInBack, womenOnly, minPrice, musicWelcome,
-                        quietRide, comfortAtLeast, luggageAtLeast));
+                        quietRide, comfortAtLeast, luggageAtLeast, idCheckedDriver));
     }
 
     @GetMapping("/mine")

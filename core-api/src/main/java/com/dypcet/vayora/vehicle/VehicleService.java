@@ -1,5 +1,6 @@
 package com.dypcet.vayora.vehicle;
 
+import com.dypcet.vayora.check.DocumentCheckService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Clock;
@@ -80,10 +81,12 @@ public class VehicleService {
 
     private final JdbcTemplate jdbc;
     private final Clock clock;
+    private final DocumentCheckService checks;
 
-    public VehicleService(JdbcTemplate jdbc, Clock clock) {
+    public VehicleService(JdbcTemplate jdbc, Clock clock, DocumentCheckService checks) {
         this.jdbc = jdbc;
         this.clock = clock;
+        this.checks = checks;
     }
 
     public Vehicle create(long ownerId, String make, String model, Integer year, String colour,
@@ -111,7 +114,8 @@ public class VehicleService {
 
     /**
      * Records the insurance the driver says covers this car (feature 58). Nothing is checked
-     * with the insurer, and no policy number is asked for.
+     * with the insurer, and no policy number is asked for. Staff may be asked to see the policy
+     * (DocumentCheckService); declaring again starts that over.
      */
     public Vehicle declareInsurance(long vehicleId, long ownerId, String insurer, LocalDate insuredUntil) {
         if (insuredUntil.isBefore(LocalDate.now(clock.withZone(CORRIDOR_ZONE)))) {
@@ -121,6 +125,7 @@ public class VehicleService {
                 insurer.strip(), insuredUntil, vehicleId, ownerId) == 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found");
         }
+        checks.withdrawInsurance(vehicleId);
         return findOwned(vehicleId, ownerId);
     }
 
@@ -129,6 +134,7 @@ public class VehicleService {
                 vehicleId, ownerId) == 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found");
         }
+        checks.withdrawInsurance(vehicleId);
         return findOwned(vehicleId, ownerId);
     }
 

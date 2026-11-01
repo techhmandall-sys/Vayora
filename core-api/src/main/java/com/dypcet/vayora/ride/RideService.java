@@ -63,6 +63,9 @@ public class RideService {
             "EXISTS (SELECT 1 FROM profiles w WHERE w.user_id = :passenger AND w.gender = 'FEMALE')";
     private static final String DRIVER_CONFIRMED =
             "(u.email_verified_at IS NOT NULL OR u.phone_verified_at IS NOT NULL)";
+    private static final String DRIVER_ID_CHECKED = """
+            EXISTS (SELECT 1 FROM document_checks c
+                    WHERE c.driver_id = u.id AND c.kind = 'IDENTITY' AND c.status = 'CHECKED')""";
 
     /** @param offsetMinutes minutes after the ride's departure at which it leaves this stop */
     public record StopInput(String name, double lat, double lon, int offsetMinutes) {
@@ -160,6 +163,9 @@ public class RideService {
      * @param comfort           the driver's own description of the car; null, like luggage,
      *                          if not said
      * @param payAfterRide      the driver lets passengers pay once the booking ends
+     * @param driverIdChecked   VAYORA staff have seen the identity document the driver declared
+     * @param insuranceChecked  VAYORA staff have seen the policy for the insurance shown; neither
+     *                          of these two is a check with the issuer
      */
     public record Candidate(long rideId, String driverName, boolean instantBooking,
             int fromSeq, int toSeq, String fromStop, String toStop, Instant boardingTime,
@@ -172,7 +178,7 @@ public class RideService {
             boolean underWay, boolean keptRides, String insurer, LocalDate insuredUntil,
             int matchScore, List<MatchScore.Reason> matchReasons, Integer detourMinutes,
             boolean walkOnFootpaths, Rickshaws.Estimate pickupRickshaw, Rickshaws.Estimate dropoffRickshaw,
-            boolean payAfterRide) {
+            boolean payAfterRide, boolean driverIdChecked, boolean insuranceChecked) {
 
         Candidate withSeatsAvailable(int seats) {
             return new Candidate(rideId, driverName, instantBooking, fromSeq, toSeq, fromStop, toStop,
@@ -181,7 +187,7 @@ public class RideService {
                     driverConfirmed, maxTwoInBack, vehicle, comfort, luggage, electric, womenOnly,
                     driverRidesCompleted, driverRidesWithdrawn, pickupWalkMinutes, dropoffWalkMinutes, suggestFlexible,
                     underWay, keptRides, insurer, insuredUntil, matchScore, matchReasons, detourMinutes,
-                    walkOnFootpaths, pickupRickshaw, dropoffRickshaw, payAfterRide);
+                    walkOnFootpaths, pickupRickshaw, dropoffRickshaw, payAfterRide, driverIdChecked, insuranceChecked);
         }
 
         Candidate withMatch(MatchScore.Match match) {
@@ -191,7 +197,7 @@ public class RideService {
                     driverConfirmed, maxTwoInBack, vehicle, comfort, luggage, electric, womenOnly,
                     driverRidesCompleted, driverRidesWithdrawn, pickupWalkMinutes, dropoffWalkMinutes, suggestFlexible,
                     underWay, keptRides, insurer, insuredUntil, match.score(), match.reasons(), detourMinutes,
-                    walkOnFootpaths, pickupRickshaw, dropoffRickshaw, payAfterRide);
+                    walkOnFootpaths, pickupRickshaw, dropoffRickshaw, payAfterRide, driverIdChecked, insuranceChecked);
         }
 
         /** Picked up at the passenger's own point: no walk, later than the stop, and a detour for the driver. */
@@ -202,7 +208,7 @@ public class RideService {
                     dropoffDistanceM, driverConfirmed, maxTwoInBack, vehicle, comfort, luggage, electric, womenOnly,
                     driverRidesCompleted, driverRidesWithdrawn, 0, dropoffWalkMinutes, suggestFlexible,
                     underWay, keptRides, insurer, insuredUntil, matchScore, matchReasons, pickup.detourMinutes(),
-                    walkOnFootpaths, null, dropoffRickshaw, payAfterRide);
+                    walkOnFootpaths, null, dropoffRickshaw, payAfterRide, driverIdChecked, insuranceChecked);
         }
 
         /** Walking times worked out on footpaths, in place of the straight-line estimates. */
@@ -213,7 +219,7 @@ public class RideService {
                     driverConfirmed, maxTwoInBack, vehicle, comfort, luggage, electric, womenOnly,
                     driverRidesCompleted, driverRidesWithdrawn, pickupMinutes, dropoffMinutes, suggestFlexible,
                     underWay, keptRides, insurer, insuredUntil, matchScore, matchReasons, detourMinutes, true,
-                    pickupRickshaw, dropoffRickshaw, payAfterRide);
+                    pickupRickshaw, dropoffRickshaw, payAfterRide, driverIdChecked, insuranceChecked);
         }
 
         /** An auto-rickshaw estimate for either end where the walk is long; null where not offered. */
@@ -224,7 +230,7 @@ public class RideService {
                     driverConfirmed, maxTwoInBack, vehicle, comfort, luggage, electric, womenOnly,
                     driverRidesCompleted, driverRidesWithdrawn, pickupWalkMinutes, dropoffWalkMinutes, suggestFlexible,
                     underWay, keptRides, insurer, insuredUntil, matchScore, matchReasons, detourMinutes,
-                    walkOnFootpaths, pickup, dropoff, payAfterRide);
+                    walkOnFootpaths, pickup, dropoff, payAfterRide, driverIdChecked, insuranceChecked);
         }
     }
 
@@ -262,19 +268,29 @@ public class RideService {
      * @param latestHour      boarding before this hour, 1 to 24
      * @param maxPricePerSeat for the stretch the passenger would travel
      * @param confirmedDriver the driver has confirmed an email address or a phone number
+     * @param idCheckedDriver VAYORA staff have seen the identity document the driver declared
      */
     public record Filters(Integer earliestHour, Integer latestHour, BigDecimal maxPricePerSeat,
             boolean instantOnly, boolean confirmedDriver, boolean smokeFree, boolean petsWelcome,
             boolean maxTwoInBack, boolean womenOnly, BigDecimal minPricePerSeat, boolean musicWelcome,
-            boolean quietRide, Comfort comfortAtLeast, Luggage luggageAtLeast) {
+            boolean quietRide, Comfort comfortAtLeast, Luggage luggageAtLeast, boolean idCheckedDriver) {
 
         public static final Filters NONE = new Filters(null, null, null, false, false, false, false);
+
+        public Filters(Integer earliestHour, Integer latestHour, BigDecimal maxPricePerSeat,
+                boolean instantOnly, boolean confirmedDriver, boolean smokeFree, boolean petsWelcome,
+                boolean maxTwoInBack, boolean womenOnly, BigDecimal minPricePerSeat, boolean musicWelcome,
+                boolean quietRide, Comfort comfortAtLeast, Luggage luggageAtLeast) {
+            this(earliestHour, latestHour, maxPricePerSeat, instantOnly, confirmedDriver, smokeFree,
+                    petsWelcome, maxTwoInBack, womenOnly, minPricePerSeat, musicWelcome, quietRide,
+                    comfortAtLeast, luggageAtLeast, false);
+        }
 
         public Filters(Integer earliestHour, Integer latestHour, BigDecimal maxPricePerSeat,
                 boolean instantOnly, boolean confirmedDriver, boolean smokeFree,
                 boolean petsWelcome, boolean maxTwoInBack, boolean womenOnly) {
             this(earliestHour, latestHour, maxPricePerSeat, instantOnly, confirmedDriver, smokeFree,
-                    petsWelcome, maxTwoInBack, womenOnly, null, false, false, null, null);
+                    petsWelcome, maxTwoInBack, womenOnly, null, false, false, null, null, false);
         }
 
         public Filters(Integer earliestHour, Integer latestHour, BigDecimal maxPricePerSeat,
@@ -762,6 +778,7 @@ public class RideService {
                 + (filters.maxPricePerSeat() == null ? "" : " AND legs.price <= :maxPrice")
                 + (filters.instantOnly() ? " AND r.instant_booking" : "")
                 + (filters.confirmedDriver() ? " AND " + DRIVER_CONFIRMED : "")
+                + (filters.idCheckedDriver() ? " AND " + DRIVER_ID_CHECKED : "")
                 + (filters.smokeFree() ? " AND p.smoking IS FALSE" : "")
                 + (filters.petsWelcome() ? " AND p.pets IS TRUE" : "")
                 + (filters.maxTwoInBack() ? " AND r.max_two_in_back" : "")
@@ -826,6 +843,10 @@ public class RideService {
                            p.chattiness AS driver_chattiness,
                            ST_Y(o.location::geometry) AS from_lat, ST_X(o.location::geometry) AS from_lon,
                            ST_Y(d.location::geometry) AS to_lat, ST_X(d.location::geometry) AS to_lon,
+                           EXISTS (SELECT 1 FROM document_checks c
+                                   WHERE c.vehicle_id = v.id AND c.status = 'CHECKED') AS insurance_checked,
+                           """ + DRIVER_ID_CHECKED + """
+                                AS driver_id_checked,
                            """ + DRIVER_CONFIRMED + """
                                 AS driver_confirmed
                     FROM want
@@ -889,7 +910,8 @@ public class RideService {
                             weakRecord(rs.getInt("driver_completed"), rs.getInt("driver_withdrawn")),
                             rs.getBoolean("under_way"), kept, rs.getString("insurer"),
                             rs.getObject("insured_until", LocalDate.class), 0, List.of(), null, false, null, null,
-                            rs.getBoolean("pay_after_ride"));
+                            rs.getBoolean("pay_after_ride"), rs.getBoolean("driver_id_checked"),
+                            rs.getBoolean("insurance_checked"));
                 });
 
         List<Candidate> candidates = boardingAt.apply("ST_DWithin(o.location, want.origin, :radius)");

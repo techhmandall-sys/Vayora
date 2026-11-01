@@ -1,6 +1,7 @@
 package com.dypcet.vayora.account;
 
 import com.dypcet.vayora.account.MessageSender.Channel;
+import com.dypcet.vayora.check.DocumentCheckService;
 import com.dypcet.vayora.identity.Phones;
 import java.security.SecureRandom;
 import java.time.Clock;
@@ -70,6 +71,7 @@ public class AccountService {
     private final PasswordEncoder encoder;
     private final MessageSender sender;
     private final Clock clock;
+    private final DocumentCheckService checks;
     private final Duration codeTtl;
     private final Duration resendAfter;
     private final int maxAttempts;
@@ -77,7 +79,7 @@ public class AccountService {
     private final SecureRandom random = new SecureRandom();
 
     public AccountService(JdbcTemplate jdbc, PasswordEncoder encoder, MessageSender sender,
-            Clock clock,
+            Clock clock, DocumentCheckService checks,
             @Value("${vayora.verification.code-ttl}") Duration codeTtl,
             @Value("${vayora.verification.resend-after}") Duration resendAfter,
             @Value("${vayora.verification.max-attempts}") int maxAttempts,
@@ -86,6 +88,7 @@ public class AccountService {
         this.encoder = encoder;
         this.sender = sender;
         this.clock = clock;
+        this.checks = checks;
         this.codeTtl = codeTtl;
         this.resendAfter = resendAfter;
         this.maxAttempts = maxAttempts;
@@ -123,12 +126,15 @@ public class AccountService {
                 document.name(), userId) == 0) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only a driver can declare an identity document");
         }
+        // Whatever staff saw was the document declared before.
+        checks.withdrawIdentity(userId);
         return profile(userId);
     }
 
     @Transactional
     public MyProfile withdrawId(long userId) {
         jdbc.update("UPDATE users SET id_document = NULL WHERE id = ?", userId);
+        checks.withdrawIdentity(userId);
         return profile(userId);
     }
 

@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
@@ -48,6 +48,7 @@ function serve(routes: Record<string, () => Response>) {
     if (!match && key === 'GET /notifications/preferences') return json({ email: false, sms: false });
     if (!match && key === 'GET /bus-alternatives') return json([]);
     if (!match && key === 'GET /me/push') return json({ publicKey: null, subscribed: false });
+    if (!match && key === 'GET /me/document-checks') return json([]);
     if (!match && key === 'GET /auth/google') return json({ clientId: null });
     if (!match && key.startsWith('GET ') && key.endsWith('/photo')) return json({ detail: 'No photo' }, 404);
     if (!match && key === 'GET /me/referral') return json({ code: 'K7QX2M', signedUp: 0, qualified: 0 });
@@ -1013,7 +1014,7 @@ describe('my account', () => {
     open('/account');
 
     const section = within(await screen.findByRole('region', { name: 'Identity document' }));
-    expect(section.getByText(/does not ask for its number or a copy and checks nothing/)).toBeInTheDocument();
+    expect(section.getByText(/never asks for its number or keeps a copy/)).toBeInTheDocument();
     expect(section.queryByRole('textbox')).not.toBeInTheDocument();
     await userEvent.selectOptions(section.getByRole('combobox'), 'Driving licence');
     await userEvent.click(section.getByRole('button', { name: 'Declare' }));
@@ -2870,6 +2871,147 @@ describe('declared insurance: the driver’s word, never checked', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Search' }));
 
     expect(await screen.findByText(/Insurance declared by the driver: New India Assurance, until .*2027\. Not checked\./)).toBeInTheDocument();
+  });
+});
+
+describe('staff checks of what a driver declared', () => {
+  const declared = { email: 'ravi@example.test', emailVerified: false, phone: null, phoneVerified: false, bio: null, birthYear: null, gender: null, smoking: null, pets: null, music: null, chattiness: null, declaredId: 'PASSPORT' };
+  const check = { id: 5, kind: 'IDENTITY', vehicleId: null, status: 'WAITING', requestedAt: '2026-11-01T04:00:00Z', decidedAt: null, note: null };
+  const bodyOf = (fetchMock: ReturnType<typeof serve>, method: string, path: string) => {
+    const call = fetchMock.mock.calls.find(([url, init]) => init?.method === method && String(url).endsWith(path));
+    return JSON.parse(String(call?.[1]?.body ?? 'null'));
+  };
+
+  it('lets a driver ask staff to see the document, and says no number or copy is kept', async () => {
+    signIn('DRIVER');
+    let asked = false;
+    const fetchMock = serve({
+      'GET /me/profile': () => json(declared),
+      'GET /me/emergency-contacts': () => json([]),
+      'GET /me/document-checks': () => json(asked ? [check] : []),
+      'POST /me/document-checks': () => {
+        asked = true;
+        return json(check, 201);
+      },
+    });
+    open('/account');
+
+    const section = within(await screen.findByRole('region', { name: 'Identity document' }));
+    expect(await section.findByText(/They record only the result: no number and no copy is kept/)).toBeInTheDocument();
+    await userEvent.click(section.getByRole('button', { name: 'Ask VAYORA staff to check it' }));
+
+    expect(await section.findByText(/Waiting for VAYORA staff/)).toBeInTheDocument();
+    expect(bodyOf(fetchMock, 'POST', '/me/document-checks')).toEqual({ kind: 'IDENTITY', vehicleId: null });
+    expect(section.queryByRole('button', { name: 'Ask VAYORA staff to check it' })).not.toBeInTheDocument();
+  });
+
+  it('says a person saw it once checked, and why not when refused, with a way to ask again', async () => {
+    signIn('DRIVER');
+    let answer: unknown = { ...check, status: 'CHECKED', decidedAt: '2026-11-02T04:00:00Z' };
+    serve({
+      'GET /me/profile': () => json(declared),
+      'GET /me/emergency-contacts': () => json([]),
+      'GET /me/document-checks': () => json([answer]),
+    });
+    open('/account');
+
+    expect(await screen.findByText(/Checked by VAYORA staff on .*2026\. A person saw it; it was not checked with its issuer\./)).toBeInTheDocument();
+    cleanup();
+
+    answer = { ...check, status: 'REFUSED', decidedAt: '2026-11-02T04:00:00Z', note: 'The photo was too dark.' };
+    open('/account');
+    expect(await screen.findByText('VAYORA staff could not confirm it: The photo was too dark.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Ask VAYORA staff to check it' })).toBeInTheDocument();
+  });
+
+  it('asks for the insurance of the right car', async () => {
+    signIn('DRIVER');
+    const fetchMock = serve({
+      'GET /vehicles': () => json([{ id: 3, make: 'Maruti', model: 'Ertiga', year: 2022, colour: 'Silver', seats: 7, insurer: 'New India Assurance', insuredUntil: '2027-03-12' }]),
+      'GET /me/document-checks': () => json([]),
+      'POST /me/document-checks': () => json({ ...check, kind: 'INSURANCE', vehicleId: 3 }, 201),
+    });
+    open('/vehicles');
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Ask VAYORA staff to check it' }));
+
+    await waitFor(() => expect(bodyOf(fetchMock, 'POST', '/me/document-checks')).toEqual({ kind: 'INSURANCE', vehicleId: 3 }));
+  });
+
+  it('shows on a profile that staff saw the document, not that its issuer stands behind it', async () => {
+    signIn('PASSENGER');
+    serve({
+      'GET /users/7/profile': () =>
+        json({ id: 7, fullName: 'Ravi Jadhav', role: 'DRIVER', memberSince: '2026-03-14T08:00:00Z', completedTrips: 0, averageStars: null, ratingCount: 0, reviews: [],
+          emailVerified: false, phoneVerified: false, declaredId: 'DRIVING_LICENCE', idCheckedAt: '2026-11-02T04:00:00Z' }),
+    });
+    open('/users/7');
+
+    const about = within(await screen.findByRole('list', { name: 'About this member' }));
+    expect(about.getByText('Driving licence, checked by VAYORA staff')).toBeInTheDocument();
+    expect(about.queryByText(/not checked/)).not.toBeInTheDocument();
+    expect(screen.getByText('A person at VAYORA saw this document. It was not checked with its issuer.')).toBeInTheDocument();
+    expect(screen.queryByText('VAYORA has not checked any identity documents.')).not.toBeInTheDocument();
+  });
+
+  it('shows a result as checked by staff, and lets a passenger ask only for such drivers', async () => {
+    signIn('PASSENGER');
+    const fetchMock = serve({
+      'GET /rides/search': () => json([{ ...candidate, driverIdChecked: true, insuranceChecked: true, insurer: 'New India Assurance', insuredUntil: '2027-03-12' }]),
+    });
+    open('/search');
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Search' }));
+
+    expect(await screen.findByText('Identity checked by staff')).toBeInTheDocument();
+    expect(screen.getByText(/Insurance: New India Assurance, until .*2027\. VAYORA staff saw the policy; it was not checked with the insurer\./)).toBeInTheDocument();
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Filters' }));
+    await userEvent.click(screen.getByLabelText('Have a driver whose identity VAYORA staff have checked'));
+    await userEvent.click(screen.getByRole('button', { name: 'Search' }));
+
+    await waitFor(() => {
+      const last = fetchMock.mock.calls.map(([url]) => String(url)).filter((url) => url.includes('/rides/search')).at(-1)!;
+      expect(new URL(last).searchParams.get('idCheckedDriver')).toBe('true');
+    });
+  });
+
+  it('lets an administrator record what they saw: a refusal needs a note, a check is confirmed first', async () => {
+    signIn('ADMIN');
+    const fetchMock = serve({
+      'GET /admin/document-checks': () =>
+        json([
+          { id: 5, kind: 'IDENTITY', driverId: 7, driverName: 'Ravi Jadhav', requestedAt: '2026-11-01T04:00:00Z', document: 'PASSPORT', vehicleId: null, vehicle: null, insurer: null, insuredUntil: null },
+          { id: 6, kind: 'INSURANCE', driverId: 8, driverName: 'Sneha Kulkarni', requestedAt: '2026-11-01T05:00:00Z', document: null, vehicleId: 3, vehicle: 'Maruti Ertiga', insurer: 'New India Assurance', insuredUntil: '2027-03-12' },
+        ]),
+      'POST /admin/document-checks/5/decide': () => json({}),
+      'POST /admin/document-checks/6/decide': () => json({}),
+    });
+    open('/admin/document-checks');
+
+    expect(await screen.findByRole('heading', { name: 'Document checks' })).toBeInTheDocument();
+    expect(await screen.findByText('Identity document: Passport')).toBeInTheDocument();
+    expect(screen.getByText(/Insurance for Maruti Ertiga: New India Assurance, until .*2027/)).toBeInTheDocument();
+    expect(screen.getByText(/Do not write down its number or keep a copy/)).toBeInTheDocument();
+
+    const refuse = screen.getAllByRole('button', { name: 'Could not confirm' });
+    expect(refuse[0]).toBeDisabled();
+    await userEvent.type(screen.getAllByLabelText('Note for the driver (needed to refuse)')[0], 'Too dark to read');
+    await userEvent.click(screen.getAllByRole('button', { name: 'Could not confirm' })[0]);
+    await waitFor(() => expect(bodyOf(fetchMock, 'POST', '/admin/document-checks/5/decide')).toEqual({ outcome: 'REFUSED', note: 'Too dark to read' }));
+
+    await userEvent.click(screen.getAllByRole('button', { name: 'Mark as checked' })[1]);
+    expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith('/document-checks/6/decide'))).toBe(false);
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Yes, I saw the original' }));
+    await waitFor(() => expect(bodyOf(fetchMock, 'POST', '/admin/document-checks/6/decide')).toEqual({ outcome: 'CHECKED', note: '' }));
+  });
+
+  it('keeps the queue from drivers', async () => {
+    signIn('DRIVER');
+    serve({ 'GET /rides/mine': () => json([]) });
+    open('/admin/document-checks');
+
+    expect(await screen.findByRole('heading', { name: 'My rides' })).toBeInTheDocument();
   });
 });
 

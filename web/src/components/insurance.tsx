@@ -5,11 +5,13 @@ import { api } from '../lib/api';
 import { formatDate } from '../lib/format';
 import { useT } from '../lib/i18n';
 import type { Vehicle } from '../lib/types';
+import { DocumentCheckStatus } from './documentCheck';
 import { Button, Notice, TextField } from './ui';
 
 /**
- * The insurance a driver declares for a car (feature 58). Nothing is checked with the
- * insurer and no policy number is asked for, and every place it is shown says so.
+ * The insurance a driver declares for a car (feature 58). Nothing is checked with the insurer
+ * and no policy number is asked for, and every place it is shown says so. Staff may be asked to
+ * see the policy.
  */
 export function InsuranceEditor({ vehicle }: { vehicle: Vehicle }) {
   const t = useT();
@@ -40,6 +42,7 @@ export function InsuranceEditor({ vehicle }: { vehicle: Vehicle }) {
             date: formatDate(vehicle.insuredUntil),
           })}
         </p>
+        <DocumentCheckStatus kind="INSURANCE" vehicleId={vehicle.id} />
         <Button tone="secondary" disabled={clear.isPending} onClick={() => clear.mutate()}>
           {t('Remove the insurance')}
         </Button>

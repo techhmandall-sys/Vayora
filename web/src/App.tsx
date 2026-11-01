@@ -43,6 +43,7 @@ const AdminBookingsPage = page(backOffice, 'AdminBookingsPage');
 const BusServicesPage = page(backOffice, 'BusServicesPage');
 const StopoversPage = page(backOffice, 'StopoversPage');
 const SupplyGapsPage = page(backOffice, 'SupplyGapsPage');
+const DocumentChecksPage = page(backOffice, 'DocumentChecksPage');
 const EmergenciesPage = page(load.safety, 'EmergenciesPage');
 const DurabilityPage = page(load.durability, 'DurabilityPage');
 const WhatIfPage = page(load.whatIf, 'WhatIfPage');
@@ -106,6 +107,7 @@ export function AppRoutes() {
           <Route path="admin/buses" element={<BusServicesPage />} />
           <Route path="admin/stopovers" element={<StopoversPage />} />
           <Route path="admin/supply-gaps" element={<SupplyGapsPage />} />
+          <Route path="admin/document-checks" element={<DocumentChecksPage />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Route>
