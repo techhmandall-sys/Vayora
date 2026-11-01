@@ -319,6 +319,8 @@ describe('finding and booking a ride', () => {
       seats: 2,
       paymentMethod: 'CARD',
       tier: 'EXACT',
+      lastMileDistanceM: candidate.pickupDistanceM,
+      lastMileModeShown: 'walk',
     });
     expect((post[1]!.headers as Record<string, string>)['Idempotency-Key']).toMatch(/^[0-9a-f-]{36}$/);
   });
@@ -3113,6 +3115,8 @@ describe('paying through Razorpay', () => {
         ...stretch,
         razorpay: { orderId: 'order_T', paymentId: 'pay_T', signature: 'sig_T' },
         tier: 'EXACT',
+        lastMileDistanceM: candidate.pickupDistanceM,
+        lastMileModeShown: 'walk',
       });
     } finally {
       Reflect.deleteProperty(window, 'Razorpay');

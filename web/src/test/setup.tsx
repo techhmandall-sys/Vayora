@@ -11,6 +11,25 @@ import { setToken } from '../lib/api';
 // Animations finish at once in tests, so an element leaving the page is gone when asserted.
 MotionGlobalConfig.skipAnimations = true;
 
+// jsdom lays nothing out, so it has neither of these. Nothing ever scrolls into view, and a
+// drawn line has no length: the front page's route and counting figures then rest as they start.
+if (!('IntersectionObserver' in globalThis)) {
+  globalThis.IntersectionObserver = class {
+    readonly root = null;
+    readonly rootMargin = '';
+    readonly thresholds = [];
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() {
+      return [];
+    }
+  } as unknown as typeof IntersectionObserver;
+}
+if (!('getTotalLength' in SVGElement.prototype)) {
+  Object.defineProperty(SVGElement.prototype, 'getTotalLength', { value: () => 0 });
+}
+
 // Leaflet needs a real browser to draw. This stand-in renders what the map was given as
 // plain elements a test can read, and a button that clicks the map at a fixed place.
 vi.mock('react-leaflet', () => {
