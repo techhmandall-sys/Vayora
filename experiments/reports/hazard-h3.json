@@ -1,0 +1,337 @@
+{
+  "version": "h3",
+  "feature_version": "f2",
+  "data": "synthetic: simulator output under experiments/configs/world.yaml",
+  "config": {
+    "version": "h3",
+    "world": "world.yaml",
+    "variant": "variants/B0.yaml",
+    "train_seeds": {
+      "first": 1001,
+      "last": 1020
+    },
+    "validation_seeds": {
+      "first": 2001,
+      "last": 2010
+    },
+    "cox": {
+      "penalizer": 0.01
+    },
+    "gradient_boosting": {
+      "max_train_rows": 5000,
+      "params": {
+        "n_estimators": 200,
+        "learning_rate": 0.1,
+        "max_depth": 3,
+        "subsample": 0.8,
+        "random_state": 0
+      }
+    },
+    "brier_times_hours": [
+      6,
+      12,
+      24,
+      48,
+      72,
+      96,
+      120
+    ],
+    "calibration_bins": 10
+  },
+  "train": {
+    "seeds": [
+      1001,
+      1002,
+      1003,
+      1004,
+      1005,
+      1006,
+      1007,
+      1008,
+      1009,
+      1010,
+      1011,
+      1012,
+      1013,
+      1014,
+      1015,
+      1016,
+      1017,
+      1018,
+      1019,
+      1020
+    ],
+    "bookings": 27176,
+    "cancelled_by_passenger": 4573,
+    "censored_at_departure": 22054,
+    "censored_by_driver_withdrawal": 549
+  },
+  "validation": {
+    "seeds": [
+      2001,
+      2002,
+      2003,
+      2004,
+      2005,
+      2006,
+      2007,
+      2008,
+      2009,
+      2010
+    ],
+    "bookings": 13576,
+    "cancelled_by_passenger": 2331,
+    "censored_at_departure": 10996,
+    "censored_by_driver_withdrawal": 249
+  },
+  "models": [
+    {
+      "model": "kaplan_meier",
+      "concordance": 0.5,
+      "integrated_brier_score": 0.1588573039038458,
+      "brier_times_hours": [
+        6,
+        12,
+        24,
+        48,
+        72,
+        96,
+        120
+      ],
+      "departure": {
+        "bookings": 13327,
+        "observed_survival": 0.8250919186613641,
+        "mean_predicted_survival": 0.8259647697498004,
+        "brier_score": 0.12275299821705433,
+        "calibration": [
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.5800874207600226,
+            "observed": 0.5356339084771192
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.6669289828686354,
+            "observed": 0.6249062265566392
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.7297647458142925,
+            "observed": 0.7119279819954989
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.7875702017483582,
+            "observed": 0.805701425356339
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.8345105237330891,
+            "observed": 0.8477119279819955
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.8747146171818329,
+            "observed": 0.894973743435859
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.9074603988859132,
+            "observed": 0.9129782445611403
+          },
+          {
+            "bookings": 1332,
+            "mean_predicted": 0.9356777792330617,
+            "observed": 0.9534534534534534
+          },
+          {
+            "bookings": 1332,
+            "mean_predicted": 0.9595229342749059,
+            "observed": 0.972972972972973
+          },
+          {
+            "bookings": 1332,
+            "mean_predicted": 0.9837109312090454,
+            "observed": 0.990990990990991
+          }
+        ]
+      }
+    },
+    {
+      "model": "cox_ph",
+      "concordance": 0.6380705405663882,
+      "integrated_brier_score": 0.1608736094647345,
+      "brier_times_hours": [
+        6,
+        12,
+        24,
+        48,
+        72,
+        96,
+        120
+      ],
+      "departure": {
+        "bookings": 13327,
+        "observed_survival": 0.8250919186613641,
+        "mean_predicted_survival": 0.8286578388261487,
+        "brier_score": 0.11689915546238568,
+        "calibration": [
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.48303124349402043,
+            "observed": 0.46211552888222057
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.6613718948036535,
+            "observed": 0.641410352588147
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.7454143082228676,
+            "observed": 0.7261815453863466
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.8092794801747767,
+            "observed": 0.8012003000750187
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.8584661862026446,
+            "observed": 0.8514628657164292
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.8957377035384619,
+            "observed": 0.9009752438109527
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.9259319065761359,
+            "observed": 0.9332333083270817
+          },
+          {
+            "bookings": 1332,
+            "mean_predicted": 0.9496780009051943,
+            "observed": 0.9662162162162162
+          },
+          {
+            "bookings": 1332,
+            "mean_predicted": 0.9697776600697842,
+            "observed": 0.978978978978979
+          },
+          {
+            "bookings": 1332,
+            "mean_predicted": 0.9882063497309839,
+            "observed": 0.9894894894894894
+          }
+        ]
+      }
+    },
+    {
+      "model": "gradient_boosting",
+      "concordance": 0.621472346229726,
+      "integrated_brier_score": 0.16312028636240936,
+      "brier_times_hours": [
+        6,
+        12,
+        24,
+        48,
+        72,
+        96,
+        120
+      ],
+      "departure": {
+        "bookings": 13327,
+        "observed_survival": 0.8250919186613641,
+        "mean_predicted_survival": 0.8171645195506749,
+        "brier_score": 0.1181503695343644,
+        "calibration": [
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.4328112152044211,
+            "observed": 0.477119279819955
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.643105053845798,
+            "observed": 0.63615903975994
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.7372870011900902,
+            "observed": 0.7254313578394599
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.8022642533466041,
+            "observed": 0.7981995498874719
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.8533419887248523,
+            "observed": 0.8642160540135033
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.8901748682428386,
+            "observed": 0.8882220555138785
+          },
+          {
+            "bookings": 1333,
+            "mean_predicted": 0.9201763695039527,
+            "observed": 0.9332333083270817
+          },
+          {
+            "bookings": 1332,
+            "mean_predicted": 0.9440969764409588,
+            "observed": 0.9579579579579579
+          },
+          {
+            "bookings": 1332,
+            "mean_predicted": 0.9640760672131321,
+            "observed": 0.9834834834834835
+          },
+          {
+            "bookings": 1332,
+            "mean_predicted": 0.9846424760334385,
+            "observed": 0.9872372372372372
+          }
+        ]
+      }
+    }
+  ],
+  "cox": {
+    "coefficients": {
+      "lead_hours": 0.003750918419043359,
+      "seats": 0.009384944736639743,
+      "departure_hour": -0.005296730606695957,
+      "desired_gap_hours": -0.006372344825483105,
+      "prior_accepted": -0.04005738149244811,
+      "prior_cancellations": 0.51021199294834,
+      "prior_completed": -0.1297888947484975,
+      "prior_no_shows": 0.3179303418303261,
+      "prior_cancel_share": 0.22102007321302092,
+      "last_mile_distance_m": 7.243039791206445e-05,
+      "last_mile_mode_available": 0.12690508523282198
+    },
+    "proportional_hazards_test_p": {
+      "lead_hours": 0.007641635353656696,
+      "seats": 0.5427344434839682,
+      "departure_hour": 0.9406505400302969,
+      "desired_gap_hours": 0.968411487409071,
+      "prior_accepted": 0.3044414458384775,
+      "prior_cancellations": 0.003325285786416726,
+      "prior_completed": 0.5647693297027391,
+      "prior_no_shows": 0.06964209996367386,
+      "prior_cancel_share": 0.5984621000725595,
+      "last_mile_distance_m": 1.0532736606529172e-06,
+      "last_mile_mode_available": 0.8679332706432551
+    }
+  },
+  "last_mile_ablation": {
+    "with_last_mile": 0.6380705405663882,
+    "without_last_mile": 0.6209749131806185
+  }
+}

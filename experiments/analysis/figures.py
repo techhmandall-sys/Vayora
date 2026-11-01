@@ -34,7 +34,7 @@ ROBUSTNESS = "7a1c0de0-0000-4000-8000-000000000004"
 SWEEPS = [("departure-tolerance", "5eeb0000-0000-4000-8000-000000000004"),
           ("publish-lead", "5eeb0000-0000-4000-8000-000000000005"),
           ("contact-budget", "5eeb0000-0000-4000-8000-000000000003")]
-MODEL = "h2"
+MODEL = "h3"
 
 # Three categorical slots, checked for colour-blind separation; the third is low-contrast
 # on white, so wherever it is used its series is labelled directly.

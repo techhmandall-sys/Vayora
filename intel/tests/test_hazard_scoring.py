@@ -1,5 +1,7 @@
+import json
 import math
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,6 +12,7 @@ from intel.app.main import app
 
 NOW = datetime(2026, 1, 5, 9, 0, tzinfo=timezone(timedelta(hours=5, minutes=30)))
 ZERO = dict.fromkeys(FEATURES, 0.0)
+REPORTS = Path(__file__).resolve().parents[2] / "experiments" / "reports"
 
 
 def _features(tracker, passenger=7, lead_hours=30):
@@ -140,15 +143,34 @@ def test_a_model_survives_a_round_trip_through_its_file(tmp_path):
 
 
 @pytest.mark.parametrize("name", ["h3-km", "h3-cox"])
-def test_the_shipped_models_load_and_give_sane_decreasing_probabilities(name):
+def test_the_shipped_models_load_and_give_valid_decreasing_probabilities(name):
     model = HazardModel.load(MODEL_DIR / f"{name}.json")
     typical = {**ZERO, "lead_hours": 48.0, "seats": 1.0, "departure_hour": 8.0}
+    # Up to the last cancellation seen in training, and past it, where the curve is held flat:
+    # no booking can last 168 hours, so a value there is never more than the last one carried on.
+    hours = (0, 6, 24, 48, 72, model.times[-1], 168)
 
-    curve = [model.survival(typical, hours) for hours in (0, 6, 24, 72, 168)]
+    curve = [model.survival(typical, h) for h in hours]
 
     assert curve[0] == 1.0
     assert curve == sorted(curve, reverse=True)
-    assert 0.5 < curve[-1] < 1.0
+    assert all(0.0 < s < 1.0 for s in curve[1:])
+    assert curve[-1] == curve[-2]
+    # Booked two days ahead, a typical booking is more likely than not to last until it leaves.
+    assert model.survival(typical, typical["lead_hours"]) > 0.5
+
+
+@pytest.mark.parametrize("version", ["h3"])
+def test_the_shipped_models_are_calibrated_on_the_held_out_seeds(version):
+    report = json.loads((REPORTS / f"hazard-{version}.json").read_text(encoding="utf-8"))
+    cox = HazardModel.load(MODEL_DIR / f"{version}-cox.json")
+    # The report describes the shipped files: the served model has the reported coefficients.
+    assert dict(zip(cox.features, cox.coef, strict=True)) == pytest.approx(report["cox"]["coefficients"])
+    for result in (r for r in report["models"] if r["model"] in ("kaplan_meier", "cox_ph")):
+        departure = result["departure"]
+        assert departure["mean_predicted_survival"] == pytest.approx(departure["observed_survival"], abs=0.01)
+        # A tenth of the validation bookings is about 1,330: 0.05 is over three standard errors of its rate.
+        assert all(abs(b["mean_predicted"] - b["observed"]) <= 0.05 for b in departure["calibration"])
 
 
 def test_the_shipped_cox_model_treats_past_cancellations_as_a_risk():
@@ -222,7 +244,7 @@ def test_contributions_are_exact_and_add_up_to_the_log_relative_risk():
 
 
 def test_the_served_model_explains_every_score_it_gives():
-    model = HazardModel.load(MODEL_DIR / "h2-cox.json")
+    model = HazardModel.load(MODEL_DIR / "h3-cox.json")
     x = {name: 1.0 for name in FEATURES}
 
     body = TestClient(app).post("/v1/hazard/score", json={
@@ -233,5 +255,5 @@ def test_the_served_model_explains_every_score_it_gives():
 
 
 def test_a_model_with_no_covariates_has_nothing_to_explain():
-    km = HazardModel.load(MODEL_DIR / "h2-km.json")
+    km = HazardModel.load(MODEL_DIR / "h3-km.json")
     assert set(km.contributions({name: 3.0 for name in FEATURES}).values()) == {0.0}

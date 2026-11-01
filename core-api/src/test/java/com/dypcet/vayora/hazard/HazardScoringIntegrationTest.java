@@ -121,7 +121,10 @@ class HazardScoringIntegrationTest extends PostgresIntegrationTest {
         assertThat(features.get("seats").asDouble()).isEqualTo(2.0);
         assertThat(features.get("lead_hours").asDouble()).isBetween(119.0, 120.01);
         assertThat(features.get("desired_gap_hours").asDouble()).isZero();
-        assertThat(features).hasSize(9);
+        // Booked with no last-mile details sent: none is recorded as none.
+        assertThat(features.get("last_mile_distance_m").asDouble()).isZero();
+        assertThat(features.get("last_mile_mode_available").asDouble()).isZero();
+        assertThat(features).hasSize(11);
         // The very first booking saw no history, not even itself.
         assertThat(features(cancelled).get("prior_accepted").asDouble()).isZero();
         assertThat(withdrawn.status()).isEqualTo(BookingStatus.CONFIRMED);
@@ -155,7 +158,8 @@ class HazardScoringIntegrationTest extends PostgresIntegrationTest {
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Map<String, Double>> sent = ArgumentCaptor.forClass(Map.class);
         verify(scorer).score(sent.capture(), anyDouble(), anyDouble());
-        assertThat(sent.getValue()).containsKeys("lead_hours", "prior_cancel_share").hasSize(9);
+        assertThat(sent.getValue()).containsKeys("lead_hours", "prior_cancel_share", "last_mile_distance_m")
+                .hasSize(11);
     }
 
     @Test
