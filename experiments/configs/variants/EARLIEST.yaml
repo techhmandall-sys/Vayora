@@ -1,0 +1,6 @@
+# EARLIEST: B0's search, with rides offered soonest-leaving first inside the passenger's
+# time window. No model. B3-KM ranks by a survival curve that falls with nothing but hours to
+# departure, so it orders rides the same way up to ties within one step of that curve; this
+# variant states the heuristic outright, to show whether B3's gain needs any prediction.
+name: EARLIEST
+ranking: earliest_departure

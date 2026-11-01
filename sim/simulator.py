@@ -136,7 +136,12 @@ class Passenger:
     attempt: int = 0
 
 
-RANKINGS = ("departure_time", "predicted_survival")
+# departure_time      closest to the time the passenger asked for
+# predicted_survival  most likely to last until departure, by the variant's hazard model
+# earliest_departure  soonest to leave, within the passenger's window: no model at all. With
+#                     the no-feature model, predicted_survival orders rides the same way,
+#                     since its survival falls with nothing but hours to departure.
+RANKINGS = ("departure_time", "predicted_survival", "earliest_departure")
 
 
 class Simulation:
@@ -371,6 +376,9 @@ class Simulation:
                     self._features(passenger, ride), elapsed_hours=0.0,
                     horizon_hours=ride.departure - self.env.now)
                 return (-survival, gap(ride), ride.id)
+        elif self.variant.ranking == "earliest_departure":
+            def key(ride: Ride):
+                return (ride.departure, gap(ride), ride.id)
         else:
             def key(ride: Ride):
                 return (gap(ride), ride.id)

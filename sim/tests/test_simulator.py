@@ -488,6 +488,26 @@ def test_every_variant_faces_the_same_searches_and_the_same_rides(baseline, inte
         assert offered(sim) == offered(baseline[0])
 
 
+EARLIEST = load_variant(CONFIGS / "variants" / "EARLIEST.yaml")
+
+
+def test_earliest_needs_no_model_faces_the_same_world_and_offers_the_soonest_ride_first(baseline):
+    assert EARLIEST.hazard_model is None
+    sim, events = _run(variant=EARLIEST)
+
+    assert [(e.sim_time, e.payload) for e in events if e.event_type == "search_issued"] == \
+        [(e.sim_time, e.payload) for e in baseline[1] if e.event_type == "search_issued"]
+    assert [(r.id, r.departure, r.seats) for r in sim.rides] == [(r.id, r.departure, r.seats) for r in baseline[0].rides]
+
+    departure = {ride.id: ride.departure for ride in sim.rides}
+    ranked: dict[tuple, list[tuple[int, int]]] = {}
+    for e in events:
+        if e.event_type == "candidate_ranked":
+            ranked.setdefault((e.payload["search_id"], e.sim_time), []).append((e.payload["rank"], e.payload["ride_id"]))
+    orders = [[departure[ride] for _, ride in sorted(offers)] for offers in ranked.values() if len(offers) > 1]
+    assert orders and all(order == sorted(order) for order in orders)
+
+
 def test_model_variants_keep_every_invariant_and_leak_nothing(intervened):
     sim, events = intervened
     counts = _counts(events)
