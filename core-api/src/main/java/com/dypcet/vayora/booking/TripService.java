@@ -234,10 +234,10 @@ public class TripService {
         List<Candidate> others = rides.alternatives(booking.passengerId(), rideId, from, ends.get(1),
                 booking.boardingTime(), booking.seats(), ALTERNATIVES_WINDOW, 3);
         if (others.isEmpty()) {
-            List<Text> buses = buses(rideId, booking);
-            return buses.isEmpty() ? Text.of("No other ride with seats leaves near that time.")
+            List<Text> listed = buses(rideId, booking);
+            return listed.isEmpty() ? Text.of("No other ride with seats leaves near that time.")
                     : Text.of("No other ride with seats leaves near that time. Buses listed by VAYORA staff"
-                            + " (check with the operator before travelling): {buses}.", "buses", buses);
+                            + " (check with the operator before travelling): {buses}.", "buses", listed);
         }
         DateTimeFormatter time = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH).withZone(CORRIDOR_ZONE);
         return Text.of("Other rides that could take you: {rides}. Search again to book one.", "rides",
