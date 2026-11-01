@@ -1,7 +1,7 @@
 # Known limitations
 
 What the project does not do, does only in part, or does in a way a reader could
-mistake for more. Updated 2026-10-29.
+mistake for more. Updated 2026-11-01.
 
 ## Nothing here is evidence about real people
 
@@ -118,7 +118,7 @@ mistake for more. Updated 2026-10-29.
   who disputes a completed trip still owes it until an administrator acts, and the dispute
   page does not show what is owed. The simulator does not model paying later, so whether
   it changes when people cancel is not known.
-- Receipts are not tax invoices: there is no GST. The PDF is in English only; the receipt page is in the reader's language.
+- Receipts are not tax invoices unless a GST registration is configured, and none has been, so tax invoices have never been used for real. They cover only what VAYORA itself charges, on real payments. The rate, the SAC code and leaving the fare out are the authors' reading, for a tax adviser to confirm, and there are no credit notes. The PDF is in English only; the receipt page is in the reader's language.
 - A payout is recorded the moment a trip completes. There is no settlement delay,
   dispute window or bank detail.
 - **A seat hold is a courtesy, not a guarantee.** It lives only in Redis. If Redis is
@@ -180,8 +180,10 @@ mistake for more. Updated 2026-10-29.
   and nothing measures whether matched rides go better.
 - Search filters for smoking and pets leave out every driver who has not said either
   way, which today is nearly all of them. Filters are not recorded in the event log.
-- No identity document is checked. A driver may say which one they hold; the profile
-  shows it as declared and not checked, and it counts towards nothing.
+- Identity documents are checked only by a person. A driver may say which one they hold and
+  ask VAYORA staff to see the original; nothing is checked with its issuer, a good forgery
+  would pass, and it counts towards no level. Until then the profile shows it as declared and
+  not checked. How carefully staff look is up to them: the app records only the outcome.
 - With MongoDB down, a booking still succeeds but its response waits about two seconds
   for the notification write to time out.
 - **Chat is one room per ride.** Every booked passenger sees every message; there is no
@@ -214,8 +216,10 @@ mistake for more. Updated 2026-10-29.
 - **A referral earns a driver nothing.** The reward is a pass, which only waives a
   passenger's fee; nothing has been decided for drivers. The weekly pass itself is an
   assumption.
-- **Insurance and calling are labelled mocks by default.** A driver's insurance is their
-  own declaration, never checked with an insurer. Without a Twilio account a call is never
+- **Calling is a labelled mock by default, and insurance is checked only by a person.** A
+  driver's insurance is their own declaration unless staff have seen the policy, and is never
+  checked with an insurer. A policy cancelled after staff saw it would still show as checked.
+  Without a Twilio account a call is never
   placed and the other side only gets a notification saying someone tried; both say so
   wherever they appear. With an account, calls are bridged through Twilio, which has never
   been tried: each call is two paid legs, and calls to Indian numbers from a Twilio number
@@ -234,8 +238,8 @@ mistake for more. Updated 2026-10-29.
   the same receipt in the reader's language with names as written, and the browser prints
   it or saves it as PDF. That was printed to PDF by headless Microsoft Edge, never on
   paper or through a person's own print dialog, and its Hindi and Marathi have had no
-  native review. Neither is a tax invoice: the platform handles no GST. Drivers get no
-  payout statement.
+  native review. Neither is a tax invoice unless a GST registration is configured. Drivers get
+  no payout statement.
 - **Women-only rides rest on what members say about themselves.** Anyone can choose
   "Woman" on their profile, and nothing checks it. Changing the profile later changes
   what they can see and book, but does not touch a booking already made.

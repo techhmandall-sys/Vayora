@@ -36,6 +36,7 @@ test. It must not be put on the public internet as it stands; the last section s
 | Search positions are coarsened in the research log | Three decimals, about 100 metres | `RoutingIntegrationTest` |
 | The model never sees a passenger's latent type | And scores are visible to administrators only | `sim/tests`, `HazardScoringIntegrationTest` |
 | GPS points expire | 7 days, by a database TTL | Gateway live check |
+| Staff checks of a document keep no number and no copy | The driver shows the original to an administrator, who records only the outcome: there is no field for either, and a number sent along is kept nowhere. Every decision is audited. It is a person's check, not the issuer's | `DocumentCheckIntegrationTest` |
 | A photo keeps only its pixels | Every upload is decoded and written again as a JPEG, which drops metadata such as where a phone photo was taken. Files over 5 MB, or claiming over 40 million pixels, are refused before decoding | `PhotoIntegrationTest` |
 
 ### Integrity

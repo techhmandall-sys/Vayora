@@ -46,6 +46,8 @@ territory.
 | `GET /api/v1/users/{id}/photo`, `GET /api/v1/vehicles/{id}/photo` | any | The photo as `image/jpeg`, or 404 |
 | `PUT /api/v1/me/photo`, `DELETE /api/v1/me/photo` | any | Own photo. The body is the image itself (JPEG or PNG, up to 5 MB) |
 | `PUT/DELETE /api/v1/vehicles/{id}/photo` | DRIVER, owner | A vehicle's photo; someone else's vehicle is a 404 |
+| `POST /api/v1/me/document-checks`, `GET /api/v1/me/document-checks` | D | `{kind, vehicleId}`: ask VAYORA staff to see the identity document declared (`IDENTITY`) or a car's declared insurance (`INSURANCE`, with its `vehicleId`); the current check of each. 409 when nothing is declared or one is already waiting or checked |
+| `GET /api/v1/admin/document-checks`, `POST /api/v1/admin/document-checks/{id}/decide` | ADMIN | The queue, oldest first; `{outcome: CHECKED or REFUSED, note}` records what was seen, audited, and tells the driver. A refusal needs a note |
 | `GET /api/v1/admin/supply-gaps` | ADMIN | Days in the coming week where at least three searches on one stretch found no ride, with how many drivers were told |
 | `GET /api/v1/me/push` | any | `publicKey` (null when push is off) and whether any of the member's browsers is subscribed |
 | `POST /api/v1/me/push-subscriptions`, `DELETE /api/v1/me/push-subscriptions?endpoint=` | any | A browser's push subscription, as `PushSubscription.toJSON()` gives it |
@@ -131,7 +133,7 @@ returns the booking the first request made instead of making another.
 | `POST /api/v1/passes` | P | Buy a pass; one bought while another runs starts when it ends. With Razorpay, `razorpay: {orderId, paymentId, signature}` from its checkout in place of `paymentMethod` |
 | `GET /api/v1/bookings/{id}/receipt` | P | PDF receipt for the payment on own booking |
 | `GET /api/v1/passes/{id}/receipt` | P | PDF receipt for own pass |
-| `GET /api/v1/bookings/{id}/receipt-data` | P | The same receipt as JSON, names and stops as written, for the app to show in the reader's language: `{bookingId, passenger, driver, fromStop, toStop, seats, boarding, status, paidAt, method, fare, serviceFee, total, refunded, refundReason, provider}` |
+| `GET /api/v1/bookings/{id}/receipt-data` | P | Carries `taxInvoice` once one is due (see DEPLOYMENT.md). The same receipt as JSON, names and stops as written, for the app to show in the reader's language: `{bookingId, passenger, driver, fromStop, toStop, seats, boarding, status, paidAt, method, fare, serviceFee, total, refunded, refundReason, provider}` |
 | `GET /api/v1/passes/{id}/receipt-data` | P | The same for own pass: `{passId, passenger, kind, price, startsAt, endsAt, paidAt, method, provider, reward}`; `method` is null for a reward |
 
 ### After the trip, and safety

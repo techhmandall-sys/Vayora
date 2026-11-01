@@ -56,6 +56,7 @@ Every setting has a working default in `docker-compose.yml`. To change one, copy
 | `VAYORA_MAIL_FROM` | empty | The sender address. Required once an SMTP server is set; core-api will not start without it |
 | `VAYORA_PUSH_SUBJECT` | `mailto:vayora@example.invalid` | A contact push services can use about this server's messages. Set a real one before turning push on |
 | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` | empty | Payments through Razorpay. Both or neither; neither is the simulated provider. A test key (`rzp_test_...`) is Razorpay's test mode, where no real money moves; get one from the Razorpay dashboard in Test Mode, under API Keys. Keep the secret out of git |
+| `VAYORA_GSTIN`, `VAYORA_LEGAL_NAME`, `VAYORA_LEGAL_ADDRESS` | empty | Tax invoices for what VAYORA itself charges, on real payments only. All three or none; none means receipts say they are not one. Needs a real GST registration, and a tax adviser to confirm the rate and SAC code in `application.yml` first. core-api will not start on half of them or on a GSTIN of the wrong form |
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` | empty | Text messages and masked calls through Twilio. All three or none; none sends texts to the simulated outbox and simulates calls. `TWILIO_FROM` must be able to text and call. Twilio's test credentials with `TWILIO_FROM=+15005550006` are answered as if sent and send nothing. Real texts to Indian numbers need DLT registration |
 
 The web app's addresses for core-api, the gateway and intel are fixed when its image is

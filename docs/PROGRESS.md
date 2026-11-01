@@ -1,5 +1,27 @@
 # Progress
 
+## 2026-11-01 (last) — staff checks, tax invoices, and what code cannot finish
+
+- **Features 7, 8, 35 and 58 are now real, as checks by a person.** A driver can ask, an
+  administrator sees the original in person or on a video call and records the outcome, audited,
+  and the driver is told. Only the outcome is kept: still no number and no copy. Profiles and
+  search results say a person saw it, not that its issuer stands behind it, and passengers can
+  filter for such drivers. No identity provider or insurer is connected. Driven end to end in
+  headless Edge against a throwaway stack.
+- **Tax invoices (50), off until a GST registration is configured.** For what VAYORA itself
+  charges, on real payments only, numbered without a gap and unchangeable once issued. No price
+  changes. It stays Partial: no registration exists, a tax adviser has to confirm the rate and
+  SAC code, and there are no credit notes.
+- **Left as they were, because code cannot finish them.** Google sign-in (2) and SMS (64) need
+  the team's own accounts. Hindi and Marathi (71) need a native speaker: the review page was
+  rebuilt with all 1,106 lines and no review has been submitted. The model (77) needs real ride
+  data, which does not exist and will not be made up.
+- Features: 87 verified, 7 partial, 1 not started of 95, about 95% counting a partial as half.
+- A near miss worth keeping: the throwaway stack would have attached to the real database,
+  because that volume has a fixed name, had `PG_VOLUME` not been set. Set it before starting any
+  second copy of the stack.
+- Tests: 340 Java, 255 web, 28 gateway, all passing. Python not rerun: nothing in it changed.
+
 ## 2026-11-01 (later) — CI's one failure found, warnings cleared, caches removed
 
 - **CI had never passed.** The web tests could not start on GitHub's Node 20: jsdom's undici

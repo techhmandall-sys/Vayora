@@ -21,7 +21,7 @@ more bookings and still move fewer people.
 
 | | |
 |---|---|
-| Features | 83 of 95 verified, 11 partial, 1 not started: about 93% counting a partial feature as half ([feature matrix](docs/FEATURE_MATRIX.md)) |
+| Features | 87 of 95 verified, 7 partial, 1 not started: about 95% counting a partial feature as half ([feature matrix](docs/FEATURE_MATRIX.md)) |
 | Tests | 324 Java, 246 web, 210 Python, 28 gateway, all passing ([what each covers](docs/TESTING.md)) |
 | Languages | English, Hindi and Marathi, on every screen, notification and error message |
 | Research | A SimPy simulator of the corridor: 60 simulated days, 30 seeds per variant, train and validation on disjoint seeds |
