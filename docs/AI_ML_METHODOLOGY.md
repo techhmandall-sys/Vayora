@@ -70,9 +70,13 @@ key appears in any payload or in a training row.
 
 | Set | Simulator seeds | Accepted bookings | Passenger cancellations |
 |---|---|---|---|
-| Training | 1001-1020 | 25,272 | 3,196 |
-| Validation | 2001-2010 | 12,595 | 1,611 |
+| Training | 1001-1020 | 27,176 | 4,573 |
+| Validation | 2001-2010 | 13,576 | 2,331 |
 | Experiments | 1-30 | not used for fitting or model choice | |
+
+Counts are for world h3 and model `h3` (`experiments/reports/hazard-h3.json`), the current
+ones. Earlier worlds, kept in the repository's history, gave 25,272 / 3,196 (h1) and 26,583 /
+3,581 (h2) training bookings / cancellations.
 
 The three sets are disjoint and `experiments/hazard/train.py` refuses to run if they
 are not. All are generated under variant B0, so the model learns from a world in which
@@ -80,41 +84,53 @@ no intervention has yet changed behaviour.
 
 ## 5. Models compared
 
-Source: `experiments/reports/hazard-h1.json`, produced by
-`python -m experiments.hazard.train`. Validation set, 12,369 bookings with a known
-outcome for the departure measures (the 226 driver-withdrawn bookings are excluded
+Source: `experiments/reports/hazard-h3.json`, produced by
+`python -m experiments.hazard.train`. Validation set, 13,327 bookings with a known
+outcome for the departure measures (the 249 driver-withdrawn bookings are excluded
 there because whether the passenger would have lasted is unknown).
 
 | Model | Concordance | Brier score, survives to departure | Integrated Brier score |
 |---|---|---|---|
-| Kaplan-Meier, no features | 0.500 | 0.0991 | 0.1325 |
-| Cox proportional hazards | 0.589 | **0.0978** | 0.1375 |
-| Gradient-boosted survival | 0.556 | 0.0995 | 0.1447 |
+| Kaplan-Meier, no features | 0.500 | 0.1228 | 0.1589 |
+| Cox proportional hazards | 0.638 | **0.1169** | 0.1609 |
+| Gradient-boosted survival | 0.621 | 0.1182 | 0.1631 |
+
+Earlier models, same measures, in the repository's history: h1 Cox 0.589 / 0.0978 / 0.1375,
+h2 Cox 0.595 / 0.1018 / 0.1391.
 
 Reading these honestly:
 
 - **The gain from features is small.** Cox improves the departure Brier score by about
-  1.3% over a curve that uses no features. Most of what can be predicted about whether
+  5% over a curve that uses no features. Most of what can be predicted about whether
   a booking lasts is how long it has to last, which the no-feature curve already uses.
   The rest is driven by latent type and unobservable shocks, which is the design.
-- **Concordance of 0.59 is weak discrimination.** It is above chance, and nowhere near
+- **Part of the gain since h2 was put there.** World h3 makes the last-mile gap, which the
+  platform can see, shorten time to cancellation. Fitted without the two last-mile
+  features, Cox reaches 0.621; with them 0.638 (`last_mile_ablation` in the report). The
+  model finding an effect the generator was given is expected, not a discovery.
+- **Concordance of 0.64 is weak discrimination.** It is above chance, and nowhere near
   what would let the platform single out individual bookings with confidence.
-- **Gradient boosting did not beat Cox** on any measure, and was trained on a 5,000-row
-  sample because scikit-survival's loss is quadratic in rows. It is not served.
+- **Gradient boosting did not beat Cox** on any measure, but the comparison favours Cox:
+  boosting was trained on a 5,000-row sample, because scikit-survival's loss is quadratic
+  in rows, with fixed settings. It is not served.
 - **The integrated Brier score is not reliable here** and is reported only for
   completeness. It reweights by the censoring distribution assuming censoring is
   independent of the features; here censoring time is a feature. It ranks the
   no-feature curve first, the opposite of the departure Brier score.
 - **Calibration is good for all three.** In ten equal-count bins of predicted survival,
-  Cox's mean prediction and the observed rate differ by at most 0.026 (0.741 predicted,
-  0.715 observed, in the second-lowest bin). Mean predicted survival is 0.871 against
-  0.870 observed.
+  Cox's mean prediction and the observed rate differ by at most 0.021 (0.483 predicted,
+  0.462 observed, in the lowest bin). Mean predicted survival is 0.829 against 0.825
+  observed. The no-feature curve is the least calibrated at long horizons (0.580 against
+  0.536 in its lowest bin): bookings made far ahead come mostly from the passenger types
+  that cancel most, which a curve without features cannot see.
 
 ### Proportional-hazards check
 
 Schoenfeld-residual test (lifelines, rank time transform) on the training set. The
-assumption is rejected for `lead_hours` (p = 0.003) and marginal for `prior_no_shows`
-(p = 0.035); it is not rejected for the other seven features (p from 0.28 to 0.99).
+assumption is rejected for `last_mile_distance_m` (p < 0.001), `prior_cancellations`
+(p = 0.003) and `lead_hours` (p = 0.008); it is not rejected for the other eight features
+(p from 0.07 to 0.97). The last-mile effect is built into each passenger type's Weibull
+scale, and the types have different shapes, so it cannot be proportional.
 
 A violation is expected. The generator is a mixture of Weibull hazards with different
 shapes, so hazards for different passengers are not proportional over time, and
@@ -124,11 +140,38 @@ not something that was fixed.
 
 ### Choice
 
-**Cox PH (`h1-cox`) is served.** It has the best departure Brier score and concordance
+**Cox PH (`h3-cox`) is served.** It has the best departure Brier score and concordance
 of the three, sensible coefficient signs (prior cancellations and no-shows raise the
-hazard, prior completed trips lower it), and it exports to a small file scored in pure
-Python. The Kaplan-Meier curve (`h1-km`) is exported too, as the reference a variant can
-be run against.
+hazard, prior completed trips lower it, a longer last-mile gap raises it), and it exports
+to a small file scored in pure Python. The Kaplan-Meier curve (`h3-km`) is exported too, as
+the reference a variant can be run against. The choice was made the same way for `h1` and
+`h2`.
+
+### Against the truth
+
+The simulator knows each booking's real chance of lasting: its hidden type, last-mile gap
+and the shock process. Re-simulating the validation seeds and comparing
+(`research_audit/scripts/truth_recovery.py`, output `research_audit/data/truth_recovery.json`):
+
+| | Mean chance of lasting to departure | Brier score | AUC, lasted vs cancelled |
+|---|---|---|---|
+| What happened | 0.825 | | |
+| The truth (no model could know it) | 0.826 | 0.0865 | 0.898 |
+| Cox `h3-cox` | 0.829 | 0.1169 | 0.808 |
+| Kaplan-Meier `h3-km` | 0.826 | 0.1228 | 0.785 |
+
+- **Cox recovers the generating survival on average**, in its lowest tenth too (0.483
+  predicted, 0.480 true, 0.462 observed), but not booking by booking: its predictions
+  differ from the truth by 0.12 on average, and rank bookings with a Spearman correlation
+  of 0.77 to it.
+- **Of the discrimination any model could reach** (the truth's AUC above 0.5), Cox has 77%
+  and the no-feature curve, timing alone, 71%. The other 23% is the hidden type and the
+  shocks, by design.
+- The no-feature curve overstates long-horizon survival (0.580 predicted, 0.543 true).
+- **The curve's last days rest on few bookings.** Of 13,576 validation bookings, 171 were
+  still standing 144 hours after acceptance, 24 at 160 hours and 8 at 163. A probability
+  read off the curve beyond about 150 hours is fragile; no booking can stand 168 hours,
+  since rides are booked at most 7 days ahead and the clock starts at acceptance.
 
 ## 6. Serving
 

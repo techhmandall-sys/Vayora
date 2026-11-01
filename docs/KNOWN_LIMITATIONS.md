@@ -1,7 +1,7 @@
 # Known limitations
 
 What the project does not do, does only in part, or does in a way a reader could
-mistake for more. Updated 2026-10-24.
+mistake for more. Updated 2026-10-29.
 
 ## Nothing here is evidence about real people
 
@@ -10,20 +10,29 @@ mistake for more. Updated 2026-10-24.
 - Every number in `experiments/configs/world.yaml` is an assumption chosen to be
   plausible. None is estimated from data.
 - The only real data is a public set of hotel bookings (EXPERIMENT_PROTOCOL.md section
-  18). Over the last week before arrival they cancel at about a half (city) and a quarter
-  (resort) of the simulator's rate, with similar timing. So every simulated result rests
-  on a world that cancels more than these hotels; `world.yaml` has not been changed,
-  because hotels are not evidence about passengers.
+  18). The current world (h3) cancels far more in the last week than they do: of bookings
+  standing six days out, 59% reach departure in the simulator against 80% (city) and 90%
+  (resort). The world was not changed to match, because hotels are not evidence about
+  passengers; instead the results were rerun with cancellations three times rarer, where
+  the simulated week looks like the hotels', and they did not change (section 23).
+- The last-mile effect of world h3 (a passenger far from the stop cancels sooner) is an
+  assumption like the rest; its strength per passenger type has no evidence behind it.
 
 ## The research result so far
 
 - The central hypothesis is not supported on the primary metric. The intervention moves
-  cancellations earlier but adds at most +0.06 completed rides per 100 searches, even
-  when every passenger destined to cancel releases the moment they are asked. See
-  EXPERIMENT_PROTOCOL.md sections 5 and 6.
+  cancellations earlier but adds nothing measurable at the assumed responses (+0.03,
+  −0.02 to +0.07), and at most +0.10 completed rides per 100 searches even when every
+  passenger destined to cancel releases the moment they are asked and nobody is put off.
+  See EXPERIMENT_PROTOCOL.md sections 20 and 22 (sections 5 and 6 for earlier worlds).
 - It held when passengers' responses were varied, when unserved passengers were allowed
-  to search again, across supply densities of 6, 12 and 20 rides a day, and at every
-  survival threshold tried (section 14). Why refills add so little is section 11.
+  to search again, across supply densities of 6, 12 and 20 rides a day (an earlier world,
+  section 7), at every survival threshold tried (section 14), and at every cancellation
+  rate tried, down to one like the hotels' (section 23). Why refills add so little is
+  section 11.
+- **Counted in seats rather than bookings, asking does add a little** (+0.14 seats per 100
+  searches, section 20). This was found after the fact and is not a result; the primary
+  metric counts a booking once whatever its party size.
 - A contact budget (B5) reduces the effect on the late share roughly in proportion to
   the requests withheld. The scheduler's choice of whom to ask concentrates nothing,
   and choosing at random does as well (section 14). Its worth formula is an
@@ -34,27 +43,35 @@ mistake for more. Updated 2026-10-24.
 - Over half of all searches are offered no ride. Neither a wider window nor earlier
   publishing changes that much, so in this world most are full rides: about 31 seats a day
   are offered against about 84 wanted. Early releases are refilled far more often than
-  late ones (94% against 68%), but B4 moves only about 10 of 67 late releases per seed,
-  worth at most about 0.07 completed rides per 100 searches before losses
-  (EXPERIMENT_PROTOCOL.md sections 9 to 11).
-- Even an oracle that asks exactly the bookings that will cancel late gains only +0.10
-  completed rides per 100 searches (section 12). The ceiling depends on the assumed
-  response: +0.05 to +0.22 as the chance of releasing at once goes from 0.25 to 1.0
-  (section 15).
+  late ones (92% against 62% in world h3), but B4 moves only about 16 of 98 late releases
+  per seed (EXPERIMENT_PROTOCOL.md sections 9 to 11, 20, and docs/figures Figure 6).
+- Even an oracle that asks exactly the bookings that will cancel late gains only +0.13
+  completed rides per 100 searches (section 20). The ceiling depends on the assumed
+  response: +0.06 to +0.26 as the chance of releasing at once goes from 0.25 to 1.0
+  (section 15's sweep, rebuilt in world h3).
 - It is one synthetic corridor. It is not evidence that the idea fails in reality.
 - **A live what-if run is an exploration, not a result.** It gives means and the mean
   paired difference with no interval, on as few as 5 seeds; only the saved sweeps carry
   intervals. intel checks the administrator's token but cannot see a suspension made
   after it was issued, and it answers browsers on that one path.
-- Variants B1, B2 and B6 to B11 are not built.
-- The one gain found, B3's ranking (+0.34), needs no booking features: a model that knows
-  only the time to departure does as well (section 14). The scheduler does no better than
-  sending the same requests at random, and no threshold for asking helps.
-- The model discriminates weakly (concordance 0.59) and violates the
-  proportional-hazards assumption for lead time. On real hotel cancellations the same
-  kinds of model do gain from booking features (EXPERIMENT_PROTOCOL.md section 19), which
-  suggests the simulated world understates what features can tell; the served model is
-  still trained on simulated data only.
+- Variants B1, B2 and B6 to B11 are not built. B7 and B8 price on a prediction, which the
+  project's rules forbid; the others need a simulator with geography, prices and repeat
+  drivers that does not exist.
+- The one gain found, B3's ranking (+0.32), needs no model at all: offering the
+  soonest-leaving ride first does exactly as well (−0.001, −0.021 to +0.018; section 21),
+  and so does a model that knows only the time to departure (section 14). The scheduler
+  does no better than sending the same requests at random, and no threshold for asking
+  helps.
+- The model discriminates weakly (concordance 0.64) and violates the
+  proportional-hazards assumption for lead time, past cancellations and the last-mile gap.
+  Its gain since h2 is largely the last-mile effect the simulator was given. It matches
+  the generating survival on average but not booking by booking, and captures 77% of the
+  discrimination any model could reach (AI_ML_METHODOLOGY.md section 5). On real hotel
+  cancellations the same kinds of model do gain from booking features
+  (EXPERIMENT_PROTOCOL.md section 19), which suggests the simulated world understates
+  what features can tell; the served model is still trained on simulated data only.
+- The survival curve's last days rest on few bookings (24 still standing at 160 hours in
+  the validation seeds, 8 at 163), so a probability read beyond about 150 hours is fragile.
 
 ## Platform
 
@@ -93,6 +110,14 @@ mistake for more. Updated 2026-10-24.
   the checkout but never presented (the browser closed at the wrong moment) is captured
   by nobody and left for Razorpay to return. Drivers are never paid through Razorpay,
   which would need its separate payouts product: a payout is recorded, not sent.
+- **Paying after the ride rests on the driver's word and on blocking.** Nothing is held,
+  so a passenger who never pays loses nothing but the right to book again; there is no
+  collection, reminder or write-off. Cash is recorded by the driver alone, and a driver
+  who forgets leaves the passenger unable to book until they do. The platform's fee inside
+  cash is shown to the driver as held for the platform; nothing collects it. A passenger
+  who disputes a completed trip still owes it until an administrator acts, and the dispute
+  page does not show what is owed. The simulator does not model paying later, so whether
+  it changes when people cancel is not known.
 - Receipts are not tax invoices: there is no GST. The PDF is in English only; the receipt page is in the reader's language.
 - A payout is recorded the moment a trip completes. There is no settlement delay,
   dispute window or bank detail.

@@ -22,7 +22,7 @@ more bookings and still move fewer people.
 | | |
 |---|---|
 | Features | 83 of 95 verified, 11 partial, 1 not started: about 93% counting a partial feature as half ([feature matrix](docs/FEATURE_MATRIX.md)) |
-| Tests | 304 Java, 232 web, 206 Python, 28 gateway, all passing ([what each covers](docs/TESTING.md)) |
+| Tests | 324 Java, 246 web, 210 Python, 28 gateway, all passing ([what each covers](docs/TESTING.md)) |
 | Languages | English, Hindi and Marathi, on every screen, notification and error message |
 | Research | A SimPy simulator of the corridor: 60 simulated days, 30 seeds per variant, train and validation on disjoint seeds |
 | Data | All synthetic, plus one public dataset of real hotel cancellations used as a check |
@@ -36,21 +36,30 @@ way.
 
 | Variant | What it does | Completed rides per 100 searches |
 |---|---|---|
-| B0 | Shows rides closest to the passenger's preferred time | 30.77 |
-| B3 | Ranks rides by how likely each booking is to last | 31.11 (+0.34) |
-| B4 | As B3, and asks passengers whose booking looks shaky to release it early | 31.10 |
-| B5 | As B4, within a contact budget, a CP-SAT scheduler choosing whom to ask | 31.10 |
-| ORACLE | Asks exactly the bookings that will cancel late | +0.10 over B3 |
+| B0 | Shows rides closest to the passenger's preferred time | 30.22 |
+| B3 | Ranks rides by how likely each booking is to last | 30.54 (+0.32) |
+| EARLIEST | Shows the soonest-leaving ride first, with no model | 30.54 (+0.32) |
+| B4 | As B3, and asks passengers whose booking looks shaky to release it early | 30.56 |
+| B5 | As B4, within a contact budget, a CP-SAT scheduler choosing whom to ask | 30.53 |
+| ORACLE | Asks exactly the bookings that will cancel late | +0.13 over B3 |
+
+Current world (h3, with a last-mile effect), 30 paired seeds. Switching that effect off
+reproduces the earlier world's committed numbers (B0 30.77, B3 31.11) to every digit.
 
 - **Asking works on timing but not on rides.** B4 cuts the share of late cancellations by
-  5.6 points, but completed rides do not move (−0.01, 95% interval −0.04 to +0.03).
+  6.7 points, but completed rides do not move measurably (+0.03, 95% interval −0.02 to
+  +0.07). Even if every passenger who would cancel released at once and nobody were put
+  off, the gain would be +0.10.
 - **Even perfect targeting adds little.** An oracle that knows who will cancel late gains
-  only +0.10, because late releases are already refilled 68% of the time against 94% for
+  only +0.13, because late releases are already refilled 62% of the time against 92% for
   early ones, and supply, not timing, is what runs out: over half of all searches find no
   ride.
-- **The one gain needs no personal data.** B3's +0.34 comes from timing alone; a model that
-  knows nothing about the passenger does as well, and the scheduler does no better than
-  choosing at random.
+- **The one gain needs no model.** Offering the soonest-leaving ride first does exactly
+  what B3 does (−0.001 against B3); a model that knows nothing about the passenger does as
+  well, and the scheduler does no better than choosing at random.
+- **It does not depend on the assumed cancellation rate.** With cancellations three times
+  rarer, where the simulated week looks like real hotels', ranking still gains +0.34 and
+  asking still nothing.
 - **On real hotel cancellations, features do help.** The same kinds of model rank who
   cancels better than lead time alone (concordance 0.597 for Cox and 0.653 for gradient
   boosting, against 0.544), which suggests the simulated world understates what booking
@@ -232,7 +241,7 @@ code. Latent passenger types drive behaviour in the simulator and are never mode
 
 Every number in the report is a SQL aggregate over one table, `events`, through
 [`experiments/analysis/metrics.sql`](experiments/analysis/metrics.sql). Two writers share
-it and a fixed vocabulary of 22 event types: core-api's `EventLogService`, which never
+it and a fixed vocabulary of 24 event types: core-api's `EventLogService`, which never
 throws into its caller, and the Python `vayora_events` writer, which fails loudly. The
 platform and the simulator speak the same vocabulary; the platform's own rows sit outside
 every simulation run.

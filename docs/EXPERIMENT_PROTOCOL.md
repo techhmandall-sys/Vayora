@@ -27,14 +27,21 @@ This is a hypothesis under test. Section 5 reports what the first full run found
 | B0 | Closest to the preferred departure time | none | none | Run |
 | B1 | Feasibility filter | | | Not built: the simulated corridor has one origin and one destination, so there is no geography to filter |
 | B2 | Two-sided ranking | | | Not built |
-| B3 | Predicted survival to departure | `h2-cox` (`h1-cox` in section 5) | none | Run |
-| B4 | As B3 | `h2-cox` (`h1-cox` in section 5) | Reconfirmation request when estimated survival is below 0.8, at most once per booking, never within 24 h of departure, scored every 24 h | Run |
-| B5 | As B3 | `h2-cox` | As B4, but at most 2 requests per daily round, 1 per ride, and 4 seats asked about per departure day, chosen by the contact scheduler | Run (section 8) |
-| B3-KM | As B3 | `h2-km`, which uses no booking feature | none | Run (section 14) |
-| B4-KM | As B3-KM | `h2-km` | As B4 | Run (section 14) |
-| ASK-ONLY | As B0 | `h2-cox`, for choosing whom to ask only | As B4 | Run (section 14) |
-| B5-RANDOM | As B3 | `h2-cox` | As B5, but the requests go to eligible bookings in a random order, not the scheduler's choice | Run (section 14) |
+| B3 | Predicted survival to departure | `h3-cox` | none | Run |
+| B4 | As B3 | `h3-cox` | Reconfirmation request when estimated survival is below 0.8, at most once per booking, never within 24 h of departure, scored every 24 h | Run |
+| B5 | As B3 | `h3-cox` | As B4, but at most 2 requests per daily round, 1 per ride, and 4 seats asked about per departure day, chosen by the contact scheduler | Run (section 8) |
+| B3-KM | As B3 | `h3-km`, which uses no booking feature | none | Run (section 14) |
+| B4-KM | As B3-KM | `h3-km` | As B4 | Run (section 14) |
+| ASK-ONLY | As B0 | `h3-cox`, for choosing whom to ask only | As B4 | Run (section 14) |
+| B5-RANDOM | As B3 | `h3-cox` | As B5, but the requests go to eligible bookings in a random order, not the scheduler's choice | Run (section 14) |
+| ORACLE | As B3 | `h3-cox`, for ranking only | As B4, but asks exactly the bookings the simulator knows will cancel within 24 h of departure: an upper bound, not a method | Run (section 12) |
+| EARLIEST | Soonest departure inside the passenger's window | none | none | Run (section 21) |
 | B6-B11 | | | | Not built |
+
+The models named are the current ones, of world h3 (section 20). Sections 5 to 19 record
+runs made under earlier worlds with models `h1` (section 5 and 6) and `h2` (sections 7 to
+19), as each section says; their numbers are kept as they were found, and section 20 gives
+the current ones.
 
 The platform never cancels a booking. An intervention only asks; the passenger decides.
 
@@ -823,3 +830,196 @@ points of what happened.
   fit that does not converge now stops the run rather than reporting numbers. A
   refundable deposit is left out: so few bookings in the week have one that it separates
   the outcomes.
+
+## 20. World h3: the last-mile effect, and every result rebuilt
+
+Rebuilt on 2026-10-28, checked on 2026-10-29. Synthetic data; 30 seeds per variant; model
+`h3-cox`. Reports: `ladder-7a1c0de0-…-003`, `…-004`, the six sweeps `5eeb0000-…-003` to
+`-008`, `hotel-407e1000-…-001`, `hazard-h3.json`.
+
+**What changed.** `world.yaml` gained a last-mile gap for each search (log-normal, mean
+1,200 m) and, per passenger type, a `last_mile_sensitivity` that divides the type's Weibull
+scale by (1 + sensitivity × gap in km): a passenger far from the stop cancels sooner, by an
+amount only the hidden type decides. The platform sees the gap, so the model gained two
+features (version `f2`) and was retrained as `h3` (AI_ML_METHODOLOGY.md section 5). The gap is
+drawn after every earlier random draw, so nothing else in the world moves.
+
+**That is checked exactly.** Run `7a1c0de0-…-009` uses `experiments/configs/worlds/last_mile_off.yaml`,
+world.yaml with every sensitivity set to 0. Its B0 reproduces section 8's committed B0 (world
+h2) to every digit of every measure: 30.773058933333278 completed rides per 100 searches, the
+late share, refills, empty searches, additionality and refill by timing all identical. So
+world h3 differs from world h2 by the last-mile effect and nothing else, and the simulator
+reproduced results committed ten days earlier in a rebuilt container. B3 with the h3 model
+in that world gains +0.30 (+0.22 to +0.39) over B0, close to the +0.34 of section 7 with
+model `h2`.
+
+**The ladder** (`…-003`, differences against B0):
+
+| Measure | B0 | B3 | B4 | B5 | ORACLE |
+|---|---|---|---|---|---|
+| Completed rides per 100 searches | 30.22 | 30.54 | 30.56 | 30.53 | 30.66 |
+| difference vs B0 (95% CI) | | +0.32 (+0.22 to +0.42) | +0.35 (+0.25 to +0.44) | +0.32 (+0.22 to +0.41) | +0.44 (+0.36 to +0.53) |
+| Late share of cancellations | 0.361 | 0.368 | 0.301 | 0.351 | 0.261 |
+| Requests per accepted booking | 0 | 0 | 0.273 | 0.083 | 0.043 |
+| Seats refilled, rides with only early / only late releases | 0.920 / 0.623 | 0.932 / 0.661 | 0.940 / 0.669 | 0.936 / 0.667 | 0.937 / 0.674 |
+| Searches offered no ride (every ride full / none at that time) | 0.537 (0.340 / 0.197) | 0.532 | 0.527 | 0.530 | 0.529 |
+
+**Component removal** (`…-004`, differences against B3, whose figure is 30.54):
+
+| Variant | Completed per 100 vs B3 (95% CI) | Late share vs B3 (95% CI) | Requests per accepted booking |
+|---|---|---|---|
+| B0 | −0.32 (−0.42 to −0.22) | −0.006 (−0.011 to −0.001) | 0 |
+| ASK-ONLY | −0.31 (−0.41 to −0.21) | −0.072 (−0.079 to −0.064) | 0.279 |
+| B3-KM | −0.00 (−0.03 to +0.02) | −0.001 (−0.002 to +0.001) | 0 |
+| B4 | +0.03 (−0.02 to +0.07) | −0.067 (−0.074 to −0.059) | 0.273 |
+| B4-KM | +0.01 (−0.04 to +0.06) | −0.069 (−0.077 to −0.062) | 0.316 |
+| B5 | −0.00 (−0.03 to +0.02) | −0.017 (−0.020 to −0.014) | 0.083 |
+| B5-RANDOM | +0.00 (−0.02 to +0.02) | −0.019 (−0.023 to −0.016) | 0.083 |
+
+**What this shows**
+
+- **Every conclusion of sections 7 to 19 holds in world h3.** Ranking by predicted survival
+  gains about 1% (+0.32); asking passengers to reconfirm adds nothing measurable on top of it
+  (+0.03, −0.02 to +0.07) while moving cancellations earlier (late share −0.067 against B3);
+  even the oracle adds only +0.13 over B3; the features add nothing (B3-KM); the scheduler
+  does no better than chance (B5-RANDOM). The six sweeps keep their conclusions too.
+- **The levels moved, as the change intends.** Passengers far from a stop cancel sooner, so
+  fewer bookings last (B0 30.77 to 30.22 completed per 100 searches) and late releases are
+  refilled less often (0.665 to 0.623).
+- **Statistics.** The research audit (`research_audit/statistical_analysis.md`) recomputed
+  these comparisons from the event log: the means equal the reports to every digit, and
+  Holm-adjusted p-values and bootstrap intervals change no conclusion. Section 3's warning
+  about multiple comparisons stands for the measures it does not cover.
+- **One finding the primary metric hides** (exploratory, chosen after seeing the data):
+  counted in seats travelled rather than bookings completed, asking does add a little, +0.14
+  seats per 100 searches (+0.09 to +0.18) for B4 against B3, and +0.16 for B4-KM. The primary
+  metric counts a booking once whatever its party size; asking slightly favours larger
+  parties. Not pre-specified, so not a result: a question for the next study.
+
+## 21. Earliest departure: the ranking gain needs no model
+
+Run on 2026-10-29. Synthetic data; 30 seeds; world h3. Run `7a1c0de0-…-010`; report
+`experiments/reports/ladder-7a1c0de0-0000-4000-8000-000000000010.md`. (Run `…-005` was the
+first attempt; Docker stopped part-way through it, it has no report and is not used. It was
+left in the database rather than deleted.)
+
+B3-KM ranks rides by a survival curve that depends on nothing but the hours to departure, so
+it offers the soonest-leaving ride first. Variant EARLIEST (`experiments/configs/variants/EARLIEST.yaml`,
+ranking `earliest_departure` in `sim/simulator.py`) does that directly, with no model.
+Written down before the run (`research_audit/REPRODUCIBILITY_NEXT_STEPS.md` section 3):
+EARLIEST within ±0.03 of B3-KM, and about +0.32 over B0.
+
+| Against B3 (30.54), seed by seed | Completed per 100 (95% CI) | Seeds up / down |
+|---|---|---|
+| B0 | −0.32 (−0.42 to −0.22) | 4 / 26 |
+| B3-KM | −0.00 (−0.03 to +0.02) | 10 / 12 |
+| EARLIEST | −0.00 (−0.02 to +0.02) | 11 / 11 |
+
+EARLIEST is 30.536, B3-KM 30.534, B3 30.537: the prediction held. B0, B3 and B3-KM in this run
+equal run `…-004` to every digit.
+
+**What this shows.** The one gain the project found, B3's +0.32, is the gain from offering the
+soonest-leaving ride first. A booking for a ride that leaves sooner has less time in which to
+be cancelled, and that is all the survival model's ranking adds in this world. It needs no
+prediction about the passenger and no model. Whether booking features would add something
+on real data is section 19's question, and there the answer was yes.
+
+## 22. How passengers respond to being asked, in the current world
+
+Run on 2026-10-29. Synthetic data; 30 seeds per cell; world h3; model `h3-cox`. Sweep
+`5eeb0000-0000-4000-8000-000000000009`, same configuration as section 6
+(`experiments/configs/sweeps/intervention_response.yaml`); report
+`experiments/reports/sweep-intervention-response-5eeb0000-0000-4000-8000-000000000009.md`.
+Section 6's run (`…-001`, world h1) is kept as history; its events no longer exist.
+
+Difference in completed rides per 100 searches, B4 on the changed world minus B3 on the
+unchanged one (B3 = 30.54), 95% CI; section 6's figure in brackets:
+
+| Releases when asked | Annoyed: 0 | Annoyed: 0.02 (assumed) | Annoyed: 0.05 |
+|---|---|---|---|
+| 0.25 | +0.04 (+0.02 to +0.07) [+0.02] | +0.00 (−0.03 to +0.03) [−0.02] | −0.05 (−0.09 to −0.02) [−0.06] |
+| 0.5 (assumed) | +0.06 (+0.02 to +0.11) [+0.03] | +0.03 (−0.02 to +0.07) [−0.01] | −0.02 (−0.08 to +0.03) [−0.05] |
+| 1.0 | +0.10 (+0.05 to +0.15) [+0.06] | +0.06 (+0.00 to +0.12) [+0.02] | +0.01 (−0.06 to +0.07) [−0.02] |
+
+The late share is lower than B3's on all 30 seeds in every cell, by 0.030 to 0.131.
+
+**Against what was written down before the run** (`research_audit/REPRODUCIBILITY_NEXT_STEPS.md`
+section 3): the late share held. Two predictions did not:
+
+- "B4 − B3 at most about +0.07 in every cell" was wrong in one cell: +0.10 where every
+  passenger who would cancel releases at once and nobody is put off.
+- "Negative wherever 5% are put off" was wrong at a release chance of 1.0 (+0.01, interval
+  across zero). At 0.5 the estimate is negative (−0.02) but its interval also crosses zero,
+  so only the 0.25 cell is clearly negative.
+
+The world now cancels more (section 20), so there is more for an early release to save.
+
+**What this shows.**
+- At the assumed responses asking still adds nothing measurable (+0.03, −0.02 to +0.07).
+- The best case there can be is now +0.10 completed rides per 100 searches, a third of one
+  percent, about the oracle's ceiling at the assumed response (+0.13, section 20).
+- Putting off 5% of travellers still costs about what asking gains.
+
+Section 6's conclusion stands in the current world: earlier release does not turn into a
+material number of completed rides, whatever passengers do when asked.
+
+## 23. Is the world's cancellation rate believable, and does it matter?
+
+Run on 2026-10-29. Synthetic data; 30 seeds per variant.
+
+### 23.1 The rate
+
+Section 18 found the simulator cancels far more in the final week than two real hotels.
+World h3 cancels more again. Three worlds were built with every passenger type's Weibull
+scale multiplied by 1.5, 2 and 3 (`experiments/configs/worlds/cancellation_scale_*.yaml`,
+nothing else changed): a larger scale means cancellations come later, so fewer before
+departure.
+
+The share of bookings standing 6 days out still standing at departure, counted as section 18
+counts it (`research_audit/scripts/cancellation_benchmark.py`, the same named query and
+pooling as `experiments/hotel/report.py`, which was not run because it always writes the
+committed hotel report):
+
+| | Standing day 6 → departure | Daily cancellation rate, days 6 to 0 |
+|---|---|---|
+| City hotel | 0.800 | 1.6% to 4.3% |
+| Resort hotel | 0.897 | 1.1% to 2.5% |
+| Simulated B0, world h2 (last-mile off) | 0.669 | 4.4% to 6.3% |
+| Simulated B0, world h3 | 0.590 | 5.1% to 8.7% |
+| Simulated B0, scale × 1.5 | 0.692 | 4.2% to 5.6% |
+| Simulated B0, scale × 2 | 0.753 | 3.3% to 4.3% |
+| Simulated B0, scale × 3 | 0.821 | 2.5% to 3.3% |
+
+At three times the scale the simulated week looks like the hotels'. That is a description,
+not a calibration: hotels are not passengers, and world.yaml is unchanged.
+
+### 23.2 Whether the results depend on it
+
+B0, B3 and B4 in each world (runs `7a1c0de0-…-006`, `-007`, `-008`; differences seed by seed):
+
+| Scale | B0 | B3 − B0 (95% CI) | B4 − B3 (95% CI) | Late share, B4 − B3 |
+|---|---|---|---|---|
+| × 1 (section 20) | 30.22 | +0.32 (+0.22 to +0.42) | +0.03 (−0.02 to +0.07) | −0.067 |
+| × 1.5 | 31.02 | +0.28 (+0.20 to +0.37) | −0.02 (−0.07 to +0.02) | −0.073 |
+| × 2 | 31.37 | +0.32 (+0.24 to +0.40) | −0.04 (−0.08 to −0.004) | −0.074 |
+| × 3 | 31.74 | +0.34 (+0.27 to +0.42) | −0.02 (−0.06 to +0.01) | −0.081 |
+
+Written down before the run: B3 − B0 positive at every scale, B4 − B3 no gain. Both held.
+At × 2 asking costs a little (p = 0.033 before correction; across the three new worlds,
+Holm gives 0.10). The model was trained at × 1 and is used outside its world here, as in
+section 7's supply sweep.
+
+**What this shows.** The two findings do not depend on how often passengers cancel, across
+a range from the current world to one that cancels like the hotels:
+- ranking gains about +0.3;
+- asking gains nothing.
+
+The levels change (B0 rises from 30.22 to 31.74 as cancellations fall); the conclusions do
+not.
+
+### 23.3 Does the model recover the truth?
+
+AI_ML_METHODOLOGY.md section 5, "Against the truth":
+- The Cox model's average survival matches the generating survival (0.829 predicted, 0.826
+  true, 0.825 observed).
+- It captures 77% of the discrimination any model could reach; timing alone captures 71%.

@@ -90,7 +90,7 @@ when it ends, and a ledger that a database trigger makes append-only.
 ## The event log
 
 Every research number is a SQL aggregate over one table, `events`, through
-`experiments/analysis/metrics.sql`. Two writers fill it with the same 22 event types:
+`experiments/analysis/metrics.sql`. Two writers fill it with the same 24 event types:
 
 - core-api, from real use of the platform. Its writer never throws into its caller: a
   lost research row must not cost anyone a booking.

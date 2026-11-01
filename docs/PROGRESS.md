@@ -1,5 +1,130 @@
 # Progress
 
+## 2026-11-01 — one codebase in JOURNEX too, and the last old name gone from Docker
+
+- **The code is copied into the `JOURNEX` repository**, as the team asked, with the rename:
+  220 files added, 106 replaced, the old package folders removed, and `run.bat` and
+  `stop.bat` now say VAYORA. Nothing was staged, committed or pushed.
+- **`JOURNEX` turned out to hold an unfinished merge** from 2026-10-27, whose `MERGE_HEAD`
+  is empty. The audit had misread it as a staged change. It is left as it was and needs the
+  team's decision before any commit there (research_audit/REPRODUCIBILITY_NEXT_STEPS.md
+  section 8).
+- **The database volume is now `vayora_pgdata`.** C: had room for the copy this time. Every
+  event row was fingerprinted per run before and after, and the results are identical:
+  51,599,844 events. `journex_pgdata` is kept.
+- **Both folders now drive the same containers and database.** The stack is running from
+  `JOURNEX`; use one folder at a time.
+- `npm audit` flags `minimatch` in the gateway, a new moderate advisory reached only through
+  ESLint. Nothing the gateway or web app runs in production is flagged. npm's only offer is
+  to force ESLint back to version 4, so it stays.
+- Tests, run from `JOURNEX`: 324 Java, 210 Python, 246 web, 28 gateway, all passing; ruff,
+  ESLint, the TypeScript check and the web build clean.
+
+## 2026-10-29 (later) — the project is VAYORA everywhere
+
+- **Renamed as the team decided.** The working name JOURNEX is gone from the code, the
+  configuration and Docker:
+  - the Java package is `com.dypcet.vayora` (`VayoraApplication`) and the settings are
+    `vayora.*`;
+  - the Python event writer is `vayora_events` and its database URL `VAYORA_DB_URL`;
+  - the environment variables are `VAYORA_*`;
+  - the token issuer is `vayora-core-api`;
+  - the browser keeps its settings under `vayora.*`;
+  - the Docker project, containers, images and network are `vayora`, and the database,
+    its user and password and the Mongo database are `vayora`.
+  CLAUDE.md's layout table follows. Entries below keep the names in use at the time.
+- **No research result can move.** No random stream, configuration value, migration or
+  report contains the name. Every migration validated unchanged against the renamed
+  database.
+- **No data was lost.** The 20.7 GB database could not be copied, since Docker's disk on C:
+  has 12.5 GB free, so it was renamed in place and stays in its volume, `journex_pgdata`.
+  This machine's `.env` points `PG_VOLUME` at it. New installs get `vayora_pgdata`. The
+  Mongo, road-graph and Maven volumes were copied to `vayora_*`, and the originals were
+  kept. The same 51,599,844 events in 16 runs, and the same users, rides and bookings,
+  were counted before and after. Details: research_audit/REPRODUCIBILITY_NEXT_STEPS.md
+  section 7.
+- Anyone signed in has to sign in again, once: tokens from the old issuer and old browser
+  keys are no longer read. Theme and language choices also reset once.
+- **Found while testing the rename**: VS Code's Java extension rebuilt `core-api/target`
+  while the Java suite ran, and 130 tests failed for classes that vanished mid-run. Run
+  again once the editor had finished, all 324 passed. TESTING.md now warns about it.
+- The `JOURNEX` folder is untouched and, until it receives these changes, cannot log in
+  to the renamed database.
+- Tests: 324 Java, 210 Python, 246 web, 28 gateway, all passing; ruff, ESLint, the
+  TypeScript check and the web build clean.
+
+## 2026-10-29 — every suite green, three bugs fixed, and the questions the audit raised
+
+- **The open test is settled** as the research audit proposed and the team approved. The
+  test that asked a typical booking to last 168 hours with a chance over 0.5 checked one
+  cancellation among about 12 bookings left at that point, and the 0.5 came from nowhere.
+  It now checks what must hold in any world (valid, decreasing curves, held flat past the
+  data) and adds what matters: the shipped Cox file is the one reported, and both shipped
+  models are calibrated on the held-out seeds, overall within 0.01 and every tenth within
+  0.05. `world.yaml` is unchanged.
+- **Found and fixed**: a tab left open across a release showed "Something went wrong" on
+  its next screen, since it asked for code the new build had renamed. It now reloads once,
+  and the error screen offers a real reload (TESTING.md, bugs the tests did not find). A
+  what-if test still expected the h2 sweep. A newly published advisory flagged the
+  gateway's `qs`; it moved to 6.16.2 and nothing is flagged. Two ruff findings in the audit
+  scripts.
+- **Is B3's gain prediction or timing?** A new variant, EARLIEST, offers the soonest-leaving
+  ride first and uses no model. Against B3 it differs by −0.001 (−0.021 to +0.018) completed
+  rides per 100 searches (run `7a1c0de0-…-010`). The gain is timing. EXPERIMENT_PROTOCOL.md
+  section 21.
+- **How much would passengers have to respond?** The response sweep (`5eeb…-009`) now
+  crosses how often an asked passenger releases early with how often asking annoys someone
+  into cancelling. The best cell gains +0.10 (+0.05 to +0.15) over B3, more than the +0.07
+  predicted. The assumed cell gains +0.03 (−0.02 to +0.07). Annoying 5% of those asked did
+  not make the full-release cell negative, as predicted, but +0.01. Late cancellations fall
+  on every seed in every cell. Section 22.
+- **Do the results depend on how often passengers cancel?** The world was rerun with every
+  passenger type's cancellations stretched 1.5, 2 and 3 times later (runs `…-006` to
+  `…-008`). B3 gains +0.28, +0.32 and +0.34. Asking (B4) never helps (−0.02, −0.04,
+  −0.02). With the last-mile effect off (`…-009`), B0 reproduces the h2 result to the
+  last digit. Section 23.
+- **Is the simulated world plausible?** Of bookings still standing six days before
+  departure, 59% reach it in world h3. In published hotel data, 80% (city) and 90%
+  (resort) do. The ×3 world is at 82%, and the conclusions hold there.
+- **How close do the models get to the truth?** The truth here is each booking's actual
+  chance under the simulator. The Cox model reaches 77% of the ranking power that truth
+  allows (AUC 0.808 against 0.898), and the no-feature curve reaches 71%. AI_ML_METHODOLOGY.md.
+- One run (`…-005`) stopped part-way when Docker Desktop stopped. Its events are kept, no
+  report was written, and the run was repeated as `…-010`.
+- README, EXPERIMENT_PROTOCOL, AI_ML_METHODOLOGY, KNOWN_LIMITATIONS, TESTING and the figure
+  notes now quote world h3. The h2 numbers stay in the sections that report them.
+- Not done, pending the team's approval: syncing this copy into the JOURNEX repository and
+  committing, running `scripts/reproduce.sh` end to end, and pushing.
+- All synthetic, from the simulator.
+- Tests: 324 Java, 210 Python, 246 web, 28 gateway, all passing.
+
+## 2026-10-28 — pay after the ride, and the last-mile change finished
+
+- **Pay after the ride**, as the team chose: a driver can let passengers book a ride without
+  paying, ride by ride. When the booking ends it owes exactly what one paid up front would
+  have kept (everything for a trip or a no-show; the fee and the fare the tiers keep for a
+  cancellation; nothing if the driver declined, never answered or withdrew), paid in the app
+  or in cash to the driver, who records it. Nobody with anything due can book again. A
+  flexible booking paid after the ride is rebooked only on rides that allow it. Receipts come
+  once it is paid; a driver's earnings show what was taken in cash and the platform's fee
+  inside it. Migration V36; no new event type (`booking_requested` carries `pay_after_ride`).
+  In English, Hindi and Marathi. Outside the 95-feature backlog, so the matrix is unchanged.
+- **The last-mile change was half done**, and is now finished: the model it called for,
+  `h3`, had never been trained, so the platform's durability scores failed with a server
+  error and 31 Python, 2 Java and 2 web tests failed. `h3` is trained (Cox concordance
+  0.638, against 0.595 for `h2`); tests that still expected nine features or `h2` were
+  updated; the figures now draw `h3`. The web test setup gained stand-ins for two browser
+  features the front page uses, which had failed one test since 2026-10-24 (CI was red).
+- **Every simulator result was rebuilt** under the new world, as the team chose: the ladder,
+  the robustness runs, the hotel comparison, all six sweeps and the figures. Every
+  conclusion stands; the levels moved (B0 30.77 to 30.22 completed rides per 100 searches,
+  B3's gain +0.34 to +0.32). The reports in `experiments/reports/` are the new ones; the
+  README and EXPERIMENT_PROTOCOL still quote the old numbers until the team has read them.
+- Open: one test asks that a typical booking's chance of lasting 168 hours be over 0.5, and
+  the `h3` no-feature model gives 0.49, because the new world cancels more. Loosening the
+  test or weakening `last_mile_sensitivity` in `world.yaml` is the team's choice.
+- Tests: 324 Java, 207 of 208 Python, 241 web, 28 gateway.
+
 ## 2026-10-24 — engineering to industry practice, and a front door
 
 - **Every suite runs on GitHub Actions** on each push and pull request: web (types, lint,

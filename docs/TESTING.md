@@ -1,6 +1,7 @@
 # Testing
 
-Counts are from the latest run of each suite, the last on 2026-10-24. Every suite passed with no failures.
+Counts are from the latest run of each suite, on 2026-11-01. Every suite passed with no failures,
+and `ruff check`, ESLint, the TypeScript check and the production web build were clean.
 
 Every push and pull request runs all of them on GitHub Actions (`.github/workflows/ci.yml`),
 with the lint checks below: `npm run lint` in `web/` and `gateway/` (ESLint), and
@@ -8,13 +9,19 @@ with the lint checks below: `npm run lint` in `web/` and `gateway/` (ESLint), an
 
 | Suite | Command, from the repository root | Tests |
 |---|---|---|
-| core-api | `docker compose --profile test run --rm core-api-tests` | 311 |
-| Python (events, simulator, model, scheduler, experiments, intel API) | `docker compose --profile research run --rm research` | 206 |
-| web | `cd web && npm ci && npm test` | 236 |
+| core-api | `docker compose --profile test run --rm core-api-tests` | 324 |
+| Python (events, simulator, model, scheduler, experiments, intel API) | `docker compose --profile research run --rm research` | 210 |
+| web | `cd web && npm ci && npm test` | 246 |
 | gateway | `cd gateway && npm ci && npm test` | 28 |
 
 The first two need only Docker. The Python suite also needs PostgreSQL running:
 `docker compose up -d --wait postgres core-api` (core-api's Flyway creates the tables).
+
+The core-api suite compiles into `core-api/target`, which an editor's Java extension (VS
+Code's, IntelliJ's) also builds into. If the editor rebuilds while the tests run, as it does
+after many files change, classes vanish under the running tests and about a third of them
+fail with `NoClassDefFoundError`. Let the editor finish, then run the suite again without
+`clean`.
 
 ## What each suite covers
 
@@ -76,6 +83,17 @@ The first two need only Docker. The Python suite also needs PostgreSQL running:
 | `ApiDocsIntegrationTest` | 2 | The OpenAPI description and Swagger UI are public and name real endpoints and the bearer sign-in; the endpoints still demand a token |
 | `EventLogService*` | 11 | The event writer never throws into its caller; events commit with the business change |
 
+`PayAfterRideIntegrationTest` (11) covers paying after the ride: **a booking takes nothing and
+says what it will cost**; refused on a ride whose driver takes payment when booking; **a
+completed trip owes everything and nothing else can be booked until it is paid**, paid in the
+app with the driver's share paid out; **cash recorded only by the ride's own driver, nothing
+paid out, the fee shown as held by the driver**, and never settled twice; **a cancellation owes
+what a booking paid up front would have kept** (fee only, fee and half the fare, everything,
+nothing if never accepted); nothing owed when the driver declines or withdraws; a no-show
+owes everything; only the passenger pays, only once due, and a declined payment changes
+nothing; a receipt only once paid, showing what was paid; a flexible booking rebooked only on
+a ride that allows paying later; the HTTP API for each side.
+
 Also in the suite, not described above (39 tests): `PhoneSignUpIntegrationTest` (5),
 `EmailDeliveryIntegrationTest` (4), `TextTest` (5), `FlexTierIntegrationTest` (3),
 `BusIntegrationTest` (3), `GoogleSignInIntegrationTest` (3), `PhotoIntegrationTest` (3),
@@ -87,8 +105,8 @@ Also in the suite, not described above (39 tests): `PhoneSignUpIntegrationTest` 
 
 | Path | Tests | Covers |
 |---|---|---|
-| `sim/tests` | 73 | **A flexible passenger rebooked at once, on a ride within the window, and only the flexible share**, nobody rebooked with no share, trips still all accounted for, the new settings refused out of range, **An empty search says whether no ride ran then or every one was full, and an unpublished ride is not counted**, **The oracle asks exactly the late cancellers and leaks nothing**, **A contact budget is never exceeded and, when too large to bind, reproduces the threshold policy exactly**, **the scheduler is given no ground truth**, reproducibility by seed, frozen vocabulary, **no latent type in any payload**, legal booking paths, no overselling, paired environments, each variant's rules, repeat search, strict config, the hazard sampler |
-| `intel/tests` | 76 | **A live what-if run only for an administrator with a token core-api signed** (none, another role, another secret, another issuer, expired, no secret set), the sweeps offered and their bounds, refusals outside them, a small run answering means with no interval, Exact per-feature explanations that reproduce the score, Feature tracker, model maths, shipped models, scoring API and its validation; the contact scheduler: each limit, **the plan equals the best of every subset on 25 random instances**, ties, order-independence, a 400-booking round, its API |
+| `sim/tests` | 77 | **EARLIEST needs no model, faces the same world as B0 and offers the soonest-leaving ride first**, **A flexible passenger rebooked at once, on a ride within the window, and only the flexible share**, nobody rebooked with no share, trips still all accounted for, the new settings refused out of range, **An empty search says whether no ride ran then or every one was full, and an unpublished ride is not counted**, **The oracle asks exactly the late cancellers and leaks nothing**, **A contact budget is never exceeded and, when too large to bind, reproduces the threshold policy exactly**, **the scheduler is given no ground truth**, reproducibility by seed, frozen vocabulary, **no latent type in any payload**, legal booking paths, no overselling, paired environments, each variant's rules, repeat search, strict config, the hazard sampler |
+| `intel/tests` | 76 | **A live what-if run only for an administrator with a token core-api signed** (none, another role, another secret, another issuer, expired, no secret set), the sweeps offered and their bounds, refusals outside them, a small run answering means with no interval, Exact per-feature explanations that reproduce the score, Feature tracker, model maths, **shipped models give valid, decreasing probabilities within the data's support, held flat beyond it**, **the shipped Cox file is the one reported, and both shipped models are calibrated on the held-out seeds (overall within 0.01, every tenth within 0.05)**, scoring API and its validation; the contact scheduler: each limit, **the plan equals the best of every subset on 25 random instances**, ties, order-independence, a 400-booking round, its API |
 | `experiments/tests` | 46 | **Hotel bookings as survival data: times, outcomes and only what is known at booking**, years disjoint, **A live run's measures equal the metric queries on the same events**, **a 30-seed live run at a value a sweep covered reproduces that sweep exactly**, **Real hotel bookings read as seat bookings, and the file refused unless its hash matches**, the daily cancellation hazard against hand-computed values, Why searches find nothing against hand-computed values, Refill share by release timing against hand-computed values, The refill-additionality metric against hand-computed values, sweeps over a variant's parameters, metric queries against hand-computed values, the training set, **disjoint seeds**, exported Cox model against lifelines, paired comparison statistics, parameter sweeps |
 | `vayora_events/tests` | 11 | Event writer and vocabulary |
 
@@ -96,8 +114,9 @@ Also in the suite, not described above (39 tests): `PhoneSignUpIntegrationTest` 
 
 | File | Tests | Covers |
 |---|---|---|
-| `App.test.tsx` | 155 | **the front page for a signed-out visitor, its footer saying what is simulated, and sign-up with driver already chosen from it**, a member taken past it to their own page, **the command palette opened with Ctrl+K, narrowed by typing, offering only the member's own pages, and choosing with Enter**, a theme chosen from it, focus returned on Escape, **an irreversible action asked in a dialog titled with what is being done**, **A receipt opened from the payments page, said to be simulated and no tax invoice**, **a receipt in Marathi with a Devanagari name as written, printed from the browser**, a reward pass said not to be paid for and naming no provider, why a receipt cannot be shown, **A call through a real phone service says the phone will ring from the platform's number, and shows no number**, **Paying at Razorpay's checkout before booking and sending its proof**, test mode said, no method or tier offered; **a checkout closed unpaid books nothing**; a pass bought through it; drivers told payouts are recorded, not sent; **An auto-rickshaw offered where the walk is long, with a fare only where one is published, and whose**, none where none was estimated, **the emergency panel tells the member to call any contact a real text missed**, A value no sweep covered simulated live and labelled an exploration, sent to intel, **a refusal from intel shows its reason and signs nobody out**, **An electric car's stretch longer than its range named as unpublishable**, a longer route whose stretches fit only warned, An identity document declared by kind only and taken back, none offered to a passenger, **shown on a profile as not checked, never as confirmed**, A walk said to be on footpaths only when it was, The detour allowance sent, a pickup offered and booked with its point, none sent for a stop, a pickup shown on the booking, **a pickup's own point marked on the map as where the passenger boards**, Best match asked for and its reasons shown only then, What an invitation earns, a reward pass shown as free, Declared insurance sent, shown as not checked and removed, a simulated call that says no call was placed and shows no number, Why a fee is lower, A ride already on the road said so, Invitations, Withdrawing a series, browsing rides and bookings, Notification preferences, Levels on profiles, the driver's record page, more search filters, Confirming or disputing a trip, disputed trips for administrators, Boarding codes for passenger and driver, A driver's response rate on the profile, The two main reasons for a durability estimate, Downloading a receipt with the session token, Buying a pass, running, waiting and ended passes, Women-only rides offered and filtered only where the profile allows, A passenger's payments and refunds, Publishing a ride through the page, a driver accepting and declining requests, starting, marking a no-show and completing, each irreversible step only after confirming, The deadline shown on a pending request, Holding seats and being told it is not a booking, Adding a vehicle through the page, the car named on a search result, How many rides a form will publish, driver notes shown as text, Search filters sent only when set and only on Search, the account page, confirmation by code, emergency contacts, **the emergency panel puts 112 first and says the contacts were not messaged**, the administrator emergency queue and simulated outbox, route protection by role, sign-in, search and booking with fee and payment method, idempotency key reuse, refund terms, earnings, ratings and profiles, notifications, reporting and moderation, the back office, maps and location search, the route planner, failure and retry states |
-| `lib/schemas.test.ts` | 27 | Vehicle details and their request mapping, A return that leaves before arrival is refused, repeat and notes limits, Form validation and the publish request mapping |
+| `App.test.tsx` | 159 | **booking to pay after the ride where the driver allows it, with nothing taken and no payment method sent**, none offered elsewhere, **what is due shown and paid by the method chosen**, **cash recorded by the driver only after confirming**, **the front page for a signed-out visitor, its footer saying what is simulated, and sign-up with driver already chosen from it**, a member taken past it to their own page, **the command palette opened with Ctrl+K, narrowed by typing, offering only the member's own pages, and choosing with Enter**, a theme chosen from it, focus returned on Escape, **an irreversible action asked in a dialog titled with what is being done**, **A receipt opened from the payments page, said to be simulated and no tax invoice**, **a receipt in Marathi with a Devanagari name as written, printed from the browser**, a reward pass said not to be paid for and naming no provider, why a receipt cannot be shown, **A call through a real phone service says the phone will ring from the platform's number, and shows no number**, **Paying at Razorpay's checkout before booking and sending its proof**, test mode said, no method or tier offered; **a checkout closed unpaid books nothing**; a pass bought through it; drivers told payouts are recorded, not sent; **An auto-rickshaw offered where the walk is long, with a fare only where one is published, and whose**, none where none was estimated, **the emergency panel tells the member to call any contact a real text missed**, A value no sweep covered simulated live and labelled an exploration, sent to intel, **a refusal from intel shows its reason and signs nobody out**, **An electric car's stretch longer than its range named as unpublishable**, a longer route whose stretches fit only warned, An identity document declared by kind only and taken back, none offered to a passenger, **shown on a profile as not checked, never as confirmed**, A walk said to be on footpaths only when it was, The detour allowance sent, a pickup offered and booked with its point, none sent for a stop, a pickup shown on the booking, **a pickup's own point marked on the map as where the passenger boards**, Best match asked for and its reasons shown only then, What an invitation earns, a reward pass shown as free, Declared insurance sent, shown as not checked and removed, a simulated call that says no call was placed and shows no number, Why a fee is lower, A ride already on the road said so, Invitations, Withdrawing a series, browsing rides and bookings, Notification preferences, Levels on profiles, the driver's record page, more search filters, Confirming or disputing a trip, disputed trips for administrators, Boarding codes for passenger and driver, A driver's response rate on the profile, The two main reasons for a durability estimate, Downloading a receipt with the session token, Buying a pass, running, waiting and ended passes, Women-only rides offered and filtered only where the profile allows, A passenger's payments and refunds, Publishing a ride through the page, a driver accepting and declining requests, starting, marking a no-show and completing, each irreversible step only after confirming, The deadline shown on a pending request, Holding seats and being told it is not a booking, Adding a vehicle through the page, the car named on a search result, How many rides a form will publish, driver notes shown as text, Search filters sent only when set and only on Search, the account page, confirmation by code, emergency contacts, **the emergency panel puts 112 first and says the contacts were not messaged**, the administrator emergency queue and simulated outbox, route protection by role, sign-in, search and booking with fee and payment method, idempotency key reuse, refund terms, earnings, ratings and profiles, notifications, reporting and moderation, the back office, maps and location search, the route planner, failure and retry states |
+| `components/ErrorBoundary.test.tsx` | 5 | **A tab left open across a release reloads once to fetch the new one, and not again straight away**, again for a later release, a screen whose code failed to load told from one that failed to render, **a real reload offered for missing code**, try again offered for anything else |
+| `lib/schemas.test.ts` | 28 | Whether passengers may pay after the ride sent, off unless chosen, Vehicle details and their request mapping, A return that leaves before arrival is refused, repeat and notes limits, Form validation and the publish request mapping |
 | `components/RideChat.test.tsx` | 17 | Joining with the session token, history, sending, **a message shown once and only when relayed**, text rendered as text, refusal and outage states, rejoining after a dropped connection, position shown to passengers, sharing offered to the driver only while under way, including a chat opened before the ride started, **a moment without a fix does not end sharing**, a refused permission does |
 | `lib/i18n.test.tsx` | 30 | **a date and a time inside a notification given in the reader's language**, **Every marked string has a Hindi and a Marathi entry with the same placeholders**, **a message the server builds from a number shown translated with the number kept**, a booking status in one named as a word in English too, fixed and unknown messages unchanged, no unused entries, **no screen has text that bypasses translation**, fallback to English, switching and remembering the language, the same digits for money in every language |
 | `lib/api.test.ts` | 7 | Token header, problem-document errors, unreachable server, sign-out on a rejected token, **no sign-out on a stale rejection** |
@@ -184,6 +203,25 @@ Kept here because each is a class of mistake worth remembering.
   replaced it. Found because a test without a stubbed server reached the running API.
 
 ## Bugs the tests did not find
+
+- **Found by a team member using the app** (2026-10-27): **a tab left open across a release
+  broke on its next screen.** Every screen's code has a name that changes with each build;
+  the open tab asked for the old one, got nothing, and showed "Something went wrong on this
+  screen", and "Try again" could not help because a failed load is remembered. A tab now
+  reloads once when that happens, and the error screen offers a real reload for it
+  (`web/src/lib/staleBuild.ts`).
+- **Found by an audit of the research** (2026-10-29), three test faults rather than code
+  faults:
+  - A model sanity test required a curve value at 168 hours above 0.5. No booking can stand
+    that long, the value rested on a single cancellation among about 12 bookings, and the
+    0.5 was never derived from anything. It failed once the last-mile change made cancelling
+    likelier. It now checks what must hold in any world, plus calibration on held-out seeds
+    (AI_ML_METHODOLOGY.md section 5).
+  - A what-if test still expected the earlier world's sweep numbers.
+  - Two booking tests still expected the request without its last-mile fields.
+
+  All three failed silently for days because nobody ran the suites after the change; CI's
+  web job had been red since 2026-10-24.
 
 - **Found by looking at a map in dark mode** (headless Edge, 2026-10-24): **maps had never
   been dark**. The rules that dimmed the tiles sat inside a Tailwind layer, and Tailwind
