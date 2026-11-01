@@ -189,6 +189,18 @@ class RazorpayIntegrationTest extends PostgresIntegrationTest {
     }
 
     @Test
+    void anEmptyReplyFromRazorpayIsNoAnswerAndBooksNothing() {
+        RAZORPAY.expect(requestTo("https://api.razorpay.com/v1/payments/pay_G")).andRespond(withSuccess());
+
+        assertThatThrownBy(() -> book(new Checkout("order_G", "pay_G", sign("order_G", "pay_G"))))
+                .isInstanceOfSatisfying(ResponseStatusException.class, e -> {
+                    assertThat(e.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+                    assertThat(e.getReason()).startsWith("The payment service did not answer");
+                });
+        assertThat(bookedCount()).isZero();
+    }
+
+    @Test
     void aFlexibleBookingIsRefusedWhileOnlyThePassengerCanPay() {
         assertThatThrownBy(() -> bookings.request(passenger, rideId, 0, 1, 1,
                 PaymentChoice.of(null, null, new Checkout("order_F", "pay_F", sign("order_F", "pay_F"))), null,

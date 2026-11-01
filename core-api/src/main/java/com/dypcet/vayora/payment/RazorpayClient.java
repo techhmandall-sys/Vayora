@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 /**
  * Razorpay's payments API (feature 46), when its keys are set: RAZORPAY_KEY_ID and
@@ -80,16 +81,24 @@ public class RazorpayClient {
 
     /** Opens an order for this many paise and returns its id, which the checkout pays. */
     public String createOrder(long paise, String receipt) {
-        JsonNode order = api().post().uri("/v1/orders").contentType(MediaType.APPLICATION_JSON)
+        JsonNode order = answered(api().post().uri("/v1/orders").contentType(MediaType.APPLICATION_JSON)
                 .body(Map.of("amount", paise, "currency", "INR", "receipt", receipt))
-                .retrieve().body(JsonNode.class);
+                .retrieve().body(JsonNode.class));
         return order.path("id").asText();
     }
 
     public Payment payment(String paymentId) {
-        JsonNode p = api().get().uri("/v1/payments/{id}", paymentId).retrieve().body(JsonNode.class);
+        JsonNode p = answered(api().get().uri("/v1/payments/{id}", paymentId).retrieve().body(JsonNode.class));
         return new Payment(p.path("id").asText(), p.path("amount").asLong(), p.path("currency").asText(),
                 p.path("status").asText(), p.path("order_id").asText(), p.path("method").asText());
+    }
+
+    /** An empty reply is no answer: callers treat it as they treat Razorpay not answering at all. */
+    private static JsonNode answered(JsonNode body) {
+        if (body == null) {
+            throw new RestClientException("Razorpay sent an empty reply");
+        }
+        return body;
     }
 
     public void capture(String paymentId, long paise) {
