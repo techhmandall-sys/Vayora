@@ -49,7 +49,11 @@ public class BookingController {
             FlexTier tier,
             // To be picked up at this point rather than at stop fromSeq (feature 28); both or neither.
             @DecimalMin("-90") @DecimalMax("90") Double pickupLat,
-            @DecimalMin("-180") @DecimalMax("180") Double pickupLon) {
+            @DecimalMin("-180") @DecimalMax("180") Double pickupLon,
+            // The last-mile gap and access option shown on the candidate booked (feature 91);
+            // null when the client sent none. Both or neither.
+            @Min(0) Integer lastMileDistanceM,
+            @Pattern(regexp = "walk|rickshaw|bus") String lastMileModeShown) {
     }
 
     private static final int MAX_IDEMPOTENCY_KEY_LENGTH = 100;
@@ -99,7 +103,8 @@ public class BookingController {
                 PaymentChoice.of(request.paymentMethod(), request.mockOutcome(), request.razorpay()), idempotencyKey,
                 request.tier() == null ? FlexTier.EXACT : request.tier(),
                 request.pickupLat() == null || request.pickupLon() == null ? null
-                        : new Point(request.pickupLat(), request.pickupLon()));
+                        : new Point(request.pickupLat(), request.pickupLon()),
+                request.lastMileDistanceM(), request.lastMileModeShown());
     }
 
     /** How long a driver has to answer a request. The same for everyone, so open to all. */

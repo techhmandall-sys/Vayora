@@ -1,4 +1,4 @@
-"""Python side of the JOURNEX research event log.
+"""Python side of the VAYORA research event log.
 
 Writes to the same `events` table, with the same vocabulary, as core-api's
 EventLogService.

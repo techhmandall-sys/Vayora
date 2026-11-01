@@ -26,7 +26,7 @@ export function CallButton({ bookingId, label }: { bookingId: number; label: str
       {call.data && (
         <Notice tone="info">
           {call.data.provider === 'twilio'
-            ? t("Your phone will ring now from JOURNEX's number. Answer it to be connected to {name}: neither of you sees the other's number.", { name: call.data.calleeName })
+            ? t("Your phone will ring now from VAYORA's number. Answer it to be connected to {name}: neither of you sees the other's number.", { name: call.data.calleeName })
             : t(
             "Calling is simulated. With a real phone service you would now be connected to {name} through a masked number, so neither of you sees the other's number. No call was placed, and {name} has been told you tried.",
             { name: call.data.calleeName },

@@ -1,4 +1,4 @@
-// JOURNEX service worker: shows push notifications, opens the app when one is clicked, and
+// VAYORA service worker: shows push notifications, opens the app when one is clicked, and
 // stands a small "you are offline" page in for a page that cannot be fetched. It caches that
 // page and nothing else: every other request goes to the network as if it were not here.
 
@@ -31,7 +31,7 @@ self.addEventListener('fetch', (event) => {
 });
 
 self.addEventListener('push', (event) => {
-  let message = { title: 'JOURNEX', body: '', url: '/notifications' };
+  let message = { title: 'VAYORA', body: '', url: '/notifications' };
   try {
     message = { ...message, ...event.data.json() };
   } catch {

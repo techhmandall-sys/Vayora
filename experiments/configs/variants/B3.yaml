@@ -5,4 +5,4 @@
 # corridor has a single origin and destination, so there is no geography to filter on.
 name: B3
 ranking: predicted_survival
-hazard_model: h2-cox
+hazard_model: h3-cox

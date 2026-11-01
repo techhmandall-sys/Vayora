@@ -56,6 +56,9 @@ public class RideService {
     private static final ZoneId CORRIDOR_ZONE = ZoneId.of("Asia/Kolkata");
     private static final String BOARDING = "r.departure_time + make_interval(mins => o.offset_minutes)";
     private static final int MAX_REPEAT_WEEKS = 8;
+    // Matches the web card's "x km to pickup" hint: below this, feature 91's plain walk
+    // is not worth a last-mile event of its own.
+    private static final long LAST_MILE_SHOWN_METRES = 1000;
     private static final String PASSENGER_SAYS_WOMAN =
             "EXISTS (SELECT 1 FROM profiles w WHERE w.user_id = :passenger AND w.gender = 'FEMALE')";
     private static final String DRIVER_CONFIRMED =
@@ -311,6 +314,32 @@ public class RideService {
     }
 
     record CandidatesReturned(long passengerId, int count, List<Long> rideIds) implements HasActor {
+        @Override
+        public String actorType() {
+            return "passenger";
+        }
+
+        @Override
+        public Long actorId() {
+            return passengerId;
+        }
+    }
+
+    /** @param mode the access option shown alongside the stop: "walk" or "rickshaw" */
+    record LastMileShown(long passengerId, long rideId, long distanceM, String mode) implements HasActor {
+        @Override
+        public String actorType() {
+            return "passenger";
+        }
+
+        @Override
+        public Long actorId() {
+            return passengerId;
+        }
+    }
+
+    /** A UI-only signal that the passenger tapped an access option; nothing is booked. */
+    record LastMileOptionSelected(long passengerId, long rideId, String mode) implements HasActor {
         @Override
         public String actorType() {
             return "passenger";
@@ -632,6 +661,15 @@ public class RideService {
         return found.get(0);
     }
 
+    /**
+     * A UI-only signal that a passenger tapped a last-mile access option on a search
+     * result (feature 91's walk, or a rickshaw estimate); nothing is booked by it.
+     */
+    public void lastMileOptionSelected(long passengerId, long rideId, String mode) {
+        events.write(EventType.LAST_MILE_OPTION_SELECTED,
+                new LastMileOptionSelected(passengerId, rideId, mode));
+    }
+
     /** A driver's own rides, soonest departure first. */
     public List<Ride> publishedBy(long driverId) {
         return jdbc.queryForList(
@@ -851,6 +889,15 @@ public class RideService {
                 .toList();
         candidates = walked(candidates, origin, destination, stopsAt);
         candidates = rickshawed(candidates, origin, destination, stopsAt);
+        if (logged) {
+            for (Candidate candidate : candidates) {
+                if (candidate.pickupDistanceM() >= LAST_MILE_SHOWN_METRES) {
+                    events.write(EventType.LAST_MILE_SHOWN, new LastMileShown(passengerId,
+                            candidate.rideId(), candidate.pickupDistanceM(),
+                            candidate.pickupRickshaw() != null ? "rickshaw" : "walk"));
+                }
+            }
+        }
         candidates = matched(candidates, preferencesOf(passengerId), driverSays);
         if (sort == Sort.BEST_MATCH) {
             candidates = candidates.stream()

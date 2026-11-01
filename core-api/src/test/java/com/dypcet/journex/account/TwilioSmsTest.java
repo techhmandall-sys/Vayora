@@ -50,10 +50,10 @@ class TwilioSmsTest {
                 .andExpect(header("Authorization", basic))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_FORM_URLENCODED))
                 .andExpect(content().formDataContains(java.util.Map.of(
-                        "To", "+919800000001", "From", FROM, "Body", "Your JOURNEX code is 123456")))
+                        "To", "+919800000001", "From", FROM, "Body", "Your VAYORA code is 123456")))
                 .andRespond(withSuccess("{\"sid\":\"SM1\",\"status\":\"queued\"}", MediaType.APPLICATION_JSON));
 
-        configured().send("+919800000001", "Your JOURNEX code is 123456");
+        configured().send("+919800000001", "Your VAYORA code is 123456");
 
         twilio.verify();
     }

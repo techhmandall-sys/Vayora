@@ -3,4 +3,4 @@
 # is. If B3-KM does as well as B3, the model's features are not what B3's gain comes from.
 name: B3-KM
 ranking: predicted_survival
-hazard_model: h2-km
+hazard_model: h3-km

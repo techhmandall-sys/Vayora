@@ -29,7 +29,7 @@ export function SimulatedPaymentNotice({ forDrivers = false }: { forDrivers?: bo
     provider === 'RAZORPAY_TEST' &&
       t('Payments go through Razorpay in test mode: pay with its test card or UPI details. No real money moves.'),
     forDrivers &&
-      t('Passengers pay through Razorpay, but JOURNEX does not pay drivers through it: what you are owed is recorded here, not sent.'),
+      t('Passengers pay through Razorpay, but VAYORA does not pay drivers through it: what you are owed is recorded here, not sent.'),
   ].filter(Boolean);
   return said.length > 0 ? <Notice tone="info">{said.join(' ')}</Notice> : null;
 }

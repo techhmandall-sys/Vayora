@@ -163,7 +163,7 @@ const booking: Booking = {
 };
 
 describe('access', () => {
-  it('shows a signed-out visitor what JOURNEX is, and takes a driver to sign up as one', async () => {
+  it('shows a signed-out visitor what VAYORA is, and takes a driver to sign up as one', async () => {
     open('/');
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Share the road between Kolhapur and Pune' })).toBeInTheDocument();
@@ -386,7 +386,7 @@ describe('booking durability (administrator)', () => {
     toStop: 'Pune',
     boardingTime: '2026-11-02T01:30:00Z',
     survivalProbability: 0.8107,
-    modelVersion: 'h1-cox',
+    modelVersion: 'h3-cox',
     scoredAt: '2026-10-30T10:00:00Z',
     contributions: { lead_hours: 0.41, seats: 0.02, prior_cancel_share: -0.18, departure_hour: 0 },
   };
@@ -412,7 +412,7 @@ describe('booking durability (administrator)', () => {
 
     const row = (await screen.findByText('Meera Kulkarni')).closest('tr')!;
     expect(within(row).getByText('81%')).toBeInTheDocument();
-    expect(within(row).getByText('h1-cox')).toBeInTheDocument();
+    expect(within(row).getByText('h3-cox')).toBeInTheDocument();
     expect(screen.getByText(/trained on\s+simulated data only/)).toBeInTheDocument();
     expect(screen.getByText(/must\s+not be used to decline, penalise or price anyone/)).toBeInTheDocument();
   });
@@ -892,7 +892,7 @@ describe('ratings', () => {
     const about = within(await screen.findByRole('list', { name: 'About this member' }));
     expect(about.getByText('Declared: Driving licence, not checked')).toBeInTheDocument();
     expect(about.queryByText(/confirmed/)).not.toBeInTheDocument();
-    expect(screen.getByText('JOURNEX has not checked any identity documents.')).toBeInTheDocument();
+    expect(screen.getByText('VAYORA has not checked any identity documents.')).toBeInTheDocument();
   });
 
   it('says so when a member has no ratings instead of showing a score', async () => {
@@ -1280,7 +1280,7 @@ describe('emergencies (administrator)', () => {
         return new Response(null, { status: 204 });
       },
       'GET /admin/mock-outbox': () =>
-        json([{ channel: 'EMAIL', to: 'user@example.test', text: 'Your JOURNEX verification code is 123456.', at: '2026-11-02T06:00:00Z' }]),
+        json([{ channel: 'EMAIL', to: 'user@example.test', text: 'Your VAYORA verification code is 123456.', at: '2026-11-02T06:00:00Z' }]),
     });
     open('/admin/emergencies');
 
@@ -1289,7 +1289,7 @@ describe('emergencies (administrator)', () => {
     expect(screen.getByText('Position given: 16.70500, 74.24330')).toBeInTheDocument();
     expect(screen.getByText('2 emergency contacts on file. They were NOT messaged: the sender is simulated.')).toBeInTheDocument();
     const outbox = within(screen.getByRole('region', { name: 'Simulated outbox' }));
-    expect(await outbox.findByText('Your JOURNEX verification code is 123456.')).toBeInTheDocument();
+    expect(await outbox.findByText('Your VAYORA verification code is 123456.')).toBeInTheDocument();
     expect(outbox.getByText(/None of these was sent to anyone/)).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Acknowledge' }));
@@ -1340,7 +1340,7 @@ describe('what a profile says about a member', () => {
       'Likes to talk',
     ]);
     expect(screen.getByText('Drive to Pune every Friday.')).toBeInTheDocument();
-    expect(screen.getByText('JOURNEX has not checked any identity documents.')).toBeInTheDocument();
+    expect(screen.getByText('VAYORA has not checked any identity documents.')).toBeInTheDocument();
   });
 
   it('treats what the server left out as not said', async () => {
@@ -1351,7 +1351,7 @@ describe('what a profile says about a member', () => {
     });
     open('/users/7');
 
-    await screen.findByText('JOURNEX has not checked any identity documents.');
+    await screen.findByText('VAYORA has not checked any identity documents.');
     expect(within(screen.getByRole('list', { name: 'About this member' })).queryAllByRole('listitem')).toEqual([]);
   });
 });
@@ -2852,7 +2852,7 @@ describe('declared insurance: the driver’s word, never checked', () => {
     });
     open('/vehicles');
 
-    expect(await screen.findByText(/Insurance: New India Assurance, until .*2027\. As you declared it: JOURNEX has not checked it/)).toBeInTheDocument();
+    expect(await screen.findByText(/Insurance: New India Assurance, until .*2027\. As you declared it: VAYORA has not checked it/)).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Remove the insurance' }));
 
     await waitFor(() =>
@@ -2898,7 +2898,7 @@ describe('calling the other side: simulated', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: 'Call the driver' }));
 
-    const said = await screen.findByText(/^Your phone will ring now from JOURNEX's number\./);
+    const said = await screen.findByText(/^Your phone will ring now from VAYORA's number\./);
     expect(said).toHaveTextContent("connected to Ravi Jadhav: neither of you sees the other's number.");
     expect(screen.queryByText(/Calling is simulated/)).not.toBeInTheDocument();
     expect(said).not.toHaveTextContent(/\d{5}/);
@@ -3171,7 +3171,7 @@ describe('paying through Razorpay', () => {
     serve({ 'GET /payment-terms': () => json(razorpayTerms), 'GET /settlements': () => json([]) });
     open('/earnings');
 
-    expect(await screen.findByText(/JOURNEX does not pay drivers through it: what you are owed is recorded here, not sent/))
+    expect(await screen.findByText(/VAYORA does not pay drivers through it: what you are owed is recorded here, not sent/))
       .toBeInTheDocument();
     expect(screen.queryByText(/Payments here are simulated/)).not.toBeInTheDocument();
   });

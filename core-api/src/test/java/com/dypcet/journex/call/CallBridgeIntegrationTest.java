@@ -105,7 +105,7 @@ class CallBridgeIntegrationTest extends PostgresIntegrationTest {
         assertThat(body).doesNotContain(phoneOf(driverId).substring(3)).doesNotContain(phoneOf(passengerId).substring(3));
         assertThat(notifications.forUser(driverId)).filteredOn(n -> n.type() == Type.CALL_REQUESTED)
                 .extracting(Notification::message)
-                .containsExactly("Test PASSENGER is calling you through JOURNEX, from the platform's number. "
+                .containsExactly("Test PASSENGER is calling you through VAYORA, from the platform's number. "
                         + "Neither of you sees the other's number.");
     }
 

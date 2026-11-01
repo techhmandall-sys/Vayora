@@ -138,6 +138,25 @@ def evaluate(name: str, train: pd.DataFrame, valid: pd.DataFrame, config: dict[s
     }
 
 
+def last_mile_ablation(train: pd.DataFrame, valid: pd.DataFrame, penalizer: float) -> dict[str, float]:
+    """Cox concordance on the validation seeds, with the two last-mile features and
+    without them (the model as it stood before this ablation). This, not the single
+    served model's number, is what licenses any claim that pickup accessibility
+    contributed: a model trained without the features is a different fit, not the
+    served one with their coefficients zeroed.
+    """
+    without = tuple(f for f in FEATURES if not f.startswith("last_mile_"))
+    concordance = {}
+    for label, feats in (("with_last_mile", FEATURES), ("without_last_mile", without)):
+        cox = CoxPHFitter(penalizer=penalizer)
+        cox.fit(train[[*feats, "duration_hours", "cancelled"]],
+                duration_col="duration_hours", event_col="cancelled")
+        risk = cox.predict_partial_hazard(valid[list(feats)]).to_numpy()
+        concordance[label] = float(concordance_index_censored(
+            valid["cancelled"].to_numpy(), valid["duration_hours"].to_numpy(), risk)[0])
+    return concordance
+
+
 def _calibration(predicted: np.ndarray, observed: np.ndarray, bins: int) -> list[dict[str, Any]]:
     order = np.argsort(predicted, kind="stable")
     return [
@@ -190,6 +209,7 @@ def main() -> None:
             "proportional_hazards_test_p": {
                 name: float(ph_test.summary.loc[name, "p"]) for name in FEATURES},
         },
+        "last_mile_ablation": last_mile_ablation(train, valid, config["cox"]["penalizer"]),
     }
 
     MODEL_DIR.mkdir(exist_ok=True)
@@ -204,6 +224,9 @@ def main() -> None:
         print(f"{result['model']:>18}  C={result['concordance']:.3f}  "
               f"IBS={result['integrated_brier_score']:.4f}  "
               f"departure Brier={result['departure']['brier_score']:.4f}")
+    ablation = report["last_mile_ablation"]
+    print(f"last-mile ablation (Cox concordance)  with={ablation['with_last_mile']:.3f}  "
+          f"without={ablation['without_last_mile']:.3f}")
 
 
 def _describe(frame: pd.DataFrame) -> dict[str, Any]:

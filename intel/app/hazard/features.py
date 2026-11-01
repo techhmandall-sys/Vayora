@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Mapping
 
-FEATURE_VERSION = "f1"
+FEATURE_VERSION = "f2"
 
 # All known when the booking is requested. Order is the model's column order.
 FEATURES = (
@@ -27,6 +27,10 @@ FEATURES = (
     "prior_completed",       # of those, travelled
     "prior_no_shows",        # of those, never boarded
     "prior_cancel_share",    # prior_cancellations / prior_accepted, 0 with no history
+    "last_mile_distance_m",       # gap from the passenger's start to the boarding stop,
+                                   # as shown with the candidate they booked (feature 91)
+    "last_mile_mode_available",   # whether a non-walk access option (rickshaw or bus)
+                                   # was shown alongside that stop
 )
 
 
@@ -64,8 +68,14 @@ class FeatureTracker:
             history.no_shows += 1
 
     def features(self, *, passenger_id: int, seats: int, now: datetime, departure: datetime,
-                 desired_departure: datetime) -> dict[str, float]:
-        """Features of a booking this passenger would request right now."""
+                 desired_departure: datetime, last_mile_distance_m: float = 0.0,
+                 last_mile_mode_available: bool = False) -> dict[str, float]:
+        """Features of a booking this passenger would request right now.
+
+        ``last_mile_distance_m`` and ``last_mile_mode_available`` describe the gap and
+        access option feature 91 showed for the candidate being booked; they default to
+        "nothing shown", not to history, since they are not a property of the passenger.
+        """
         history = self._history[passenger_id]
         return {
             "lead_hours": (departure - now).total_seconds() / 3600.0,
@@ -78,4 +88,6 @@ class FeatureTracker:
             "prior_no_shows": float(history.no_shows),
             "prior_cancel_share": (
                 history.cancellations / history.accepted if history.accepted else 0.0),
+            "last_mile_distance_m": float(last_mile_distance_m),
+            "last_mile_mode_available": 1.0 if last_mile_mode_available else 0.0,
         }

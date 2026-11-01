@@ -2,7 +2,7 @@
 
     python -m experiments.hotel.load --run-id <uuid>
 
-Not JOURNEX data and not ride-sharing: experiments/configs/hotel.yaml names the source.
+Not VAYORA data and not ride-sharing: experiments/configs/hotel.yaml names the source.
 Only bookings made within the booking horizon are loaded. Each becomes the events a
 booking makes on the platform: requested and accepted on the day it was made, cancelled
 by its guest on the day they cancelled, if they did, and a no-show at arrival if the

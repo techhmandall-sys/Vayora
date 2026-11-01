@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class HazardFeatures {
 
-    public static final String VERSION = "f1";
+    public static final String VERSION = "f2";
 
     private static final ZoneId CORRIDOR_ZONE = ZoneId.of("Asia/Kolkata");
 
@@ -31,8 +31,16 @@ public class HazardFeatures {
     /**
      * Features of a booking this passenger is requesting now. Call before the booking
      * row exists, so that it is not part of its own history.
+     *
+     * @param lastMileDistanceM straight-line metres from the passenger's start to the
+     *                          boarding stop, as shown on the candidate they booked;
+     *                          null when the search did not carry one (an old client)
+     * @param lastMileModeShown the access option feature 91 showed alongside the stop
+     *                          for that candidate: "walk", "rickshaw" or "bus"; null
+     *                          with lastMileDistanceM
      */
-    public Map<String, Double> snapshot(long passengerId, int seats, Instant now, Instant boarding) {
+    public Map<String, Double> snapshot(long passengerId, int seats, Instant now, Instant boarding,
+            Integer lastMileDistanceM, String lastMileModeShown) {
         Map<String, Double> features = new LinkedHashMap<>();
         features.put("lead_hours", Duration.between(now, boarding).toSeconds() / 3600.0);
         features.put("seats", (double) seats);
@@ -40,6 +48,11 @@ public class HazardFeatures {
         // A search here names a day, not a time, so there is no preferred time to be
         // far from. The model was trained with real gaps; see KNOWN_LIMITATIONS.
         features.put("desired_gap_hours", 0.0);
+        // 0 when a client sent none: the same "nothing known" reading an unscored,
+        // never-booked-through-search booking should get, not a missing feature.
+        features.put("last_mile_distance_m", lastMileDistanceM == null ? 0.0 : lastMileDistanceM.doubleValue());
+        features.put("last_mile_mode_available",
+                lastMileModeShown != null && !"walk".equals(lastMileModeShown) ? 1.0 : 0.0);
 
         jdbc.query("""
                 SELECT COUNT(*) FILTER (WHERE accepted_at IS NOT NULL) AS accepted,

@@ -35,7 +35,7 @@ export function InsuranceEditor({ vehicle }: { vehicle: Vehicle }) {
     return (
       <div className="mt-3 space-y-2 text-sm">
         <p className="text-slate-700">
-          {t('Insurance: {insurer}, until {date}. As you declared it: JOURNEX has not checked it with the insurer.', {
+          {t('Insurance: {insurer}, until {date}. As you declared it: VAYORA has not checked it with the insurer.', {
             insurer: vehicle.insurer,
             date: formatDate(vehicle.insuredUntil),
           })}

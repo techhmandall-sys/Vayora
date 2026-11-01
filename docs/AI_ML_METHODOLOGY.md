@@ -37,7 +37,7 @@ that matters for one of the metrics.
 Bookings never accepted (rejected, or unanswered at departure) are not in the data:
 the clock starts at acceptance.
 
-## 3. Features (version `f1`)
+## 3. Features (version `f2`)
 
 All are known when the booking is requested. They are computed in one place,
 `intel/app/hazard/features.py`, by a tracker that only ever sees logged events; the
@@ -56,6 +56,8 @@ be something that was in an event.
 | `prior_completed` | Of those, travelled |
 | `prior_no_shows` | Of those, never boarded |
 | `prior_cancel_share` | `prior_cancellations / prior_accepted`, 0 with no history |
+| `last_mile_distance_m` | Gap from the passenger's start to the boarding stop, as shown with the candidate they booked (feature 91) |
+| `last_mile_mode_available` | Whether a non-walk access option (rickshaw or bus) was shown alongside that stop |
 
 History is read before the current booking is observed, so a booking is never part of
 its own history. A test (`test_history_features_only_ever_look_backwards`) checks it.
@@ -130,7 +132,7 @@ be run against.
 
 ## 6. Serving
 
-`POST /v1/hazard/score` on the intel service takes the nine features, `elapsed_hours`
+`POST /v1/hazard/score` on the intel service takes the eleven features, `elapsed_hours`
 and `horizon_hours`, and returns the conditional survival probability with the model
 version, feature version and `trained_on: synthetic`. The service holds no state: the
 caller supplies the features.

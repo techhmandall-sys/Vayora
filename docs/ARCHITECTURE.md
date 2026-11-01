@@ -1,6 +1,6 @@
 # Architecture
 
-How JOURNEX is put together and why. For what each part can do today, see
+How VAYORA is put together and why. For what each part can do today, see
 FEATURE_MATRIX.md; for what it cannot, KNOWN_LIMITATIONS.md.
 
 ## The parts

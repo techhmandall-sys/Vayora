@@ -29,6 +29,10 @@ class PassengerType:
     weibull_shape: float
     weibull_scale_hours: float
     no_show_probability: float
+    # How much a last-mile gap speeds up this type's cancellation: the Weibull scale is
+    # divided by (1 + last_mile_sensitivity * offset_km), so 0 leaves the type exactly as
+    # before. Never read by anything a feature could see; only the distance is observable.
+    last_mile_sensitivity: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -53,6 +57,22 @@ class Retry:
     probability: float
     delay_mean_hours: float
     max_attempts: int
+
+
+@dataclass(frozen=True)
+class LastMile:
+    """The gap between a passenger's start and the stop they would board at.
+
+    Drawn log-normal in metres, independent of the ride chosen: it is a property of
+    where the passenger is, not of the platform (feature 91 estimates it per candidate;
+    this is the ground truth it would be estimating). A non-walk access option (the
+    simulator's stand-in for feature 91's rickshaw or bus) is offered beyond
+    offer_beyond_metres, mirroring core-api's journex.rickshaw.offer-beyond-metres.
+    """
+
+    offset_metres_mean: float
+    offset_metres_sigma: float
+    offer_beyond_metres: float
 
 
 @dataclass(frozen=True)
@@ -92,6 +112,7 @@ class Demand:
     intervention_response: InterventionResponse
     retry: Retry
     flexible_booking: FlexibleBooking
+    last_mile: LastMile
 
 
 @dataclass(frozen=True)
@@ -161,6 +182,7 @@ def load_world(path: Path) -> World:
     response_raw = demand_raw.pop("intervention_response", None) or {}
     retry_raw = demand_raw.pop("retry", None) or {}
     flexible_raw = demand_raw.pop("flexible_booking", None) or {}
+    last_mile_raw = demand_raw.pop("last_mile", None) or {}
     if set(types_raw) != set(LATENT_TYPES):
         raise ConfigError(f"demand.types must be exactly {sorted(LATENT_TYPES)}")
     types = {
@@ -173,7 +195,8 @@ def load_world(path: Path) -> World:
          "intervention_response": _build(
              InterventionResponse, response_raw, "demand.intervention_response"),
          "retry": _build(Retry, retry_raw, "demand.retry"),
-         "flexible_booking": _build(FlexibleBooking, flexible_raw, "demand.flexible_booking")},
+         "flexible_booking": _build(FlexibleBooking, flexible_raw, "demand.flexible_booking"),
+         "last_mile": _build(LastMile, last_mile_raw, "demand.last_mile")},
         "demand",
     )
     world = World(start=start, supply=_build(Supply, raw["supply"], "supply"), demand=demand)
@@ -239,12 +262,16 @@ def validate(world: World) -> None:
         ("demand.intervention_response.response_delay_mean_hours",
          demand.intervention_response.response_delay_mean_hours),
         ("demand.retry.delay_mean_hours", demand.retry.delay_mean_hours),
+        ("demand.last_mile.offset_metres_mean", demand.last_mile.offset_metres_mean),
+        ("demand.last_mile.offset_metres_sigma", demand.last_mile.offset_metres_sigma),
     ]:
         if value <= 0:
             raise ConfigError(f"{name} must be positive")
     if (demand.departure_tolerance_hours < 0 or demand.shock.rate_per_day < 0
             or demand.flexible_booking.window_hours < 0):
         raise ConfigError("tolerances, windows and rates cannot be negative")
+    if demand.last_mile.offer_beyond_metres < 0:
+        raise ConfigError("demand.last_mile.offer_beyond_metres cannot be negative")
     if demand.retry.max_attempts < 0 or demand.retry.max_attempts != int(demand.retry.max_attempts):
         raise ConfigError("demand.retry.max_attempts must be a whole number, 0 or more")
     if not 0 <= supply.publish_lead_days_min <= supply.publish_lead_days_max:
@@ -268,6 +295,8 @@ def validate(world: World) -> None:
         if min(kind.weibull_shape, kind.weibull_scale_hours, kind.lead_days_mean) <= 0:
             raise ConfigError(
                 f"demand.types.{name}: Weibull shape, scale and lead time must be positive")
+        if kind.last_mile_sensitivity < 0:
+            raise ConfigError(f"demand.types.{name}.last_mile_sensitivity cannot be negative")
     for name, value in probabilities:
         if not 0 <= value <= 1:
             raise ConfigError(f"{name} must be between 0 and 1")

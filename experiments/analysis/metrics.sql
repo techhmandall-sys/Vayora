@@ -1,4 +1,4 @@
--- JOURNEX metric queries. Every number in the report comes from one of these.
+-- VAYORA metric queries. Every number in the report comes from one of these.
 --
 -- Each query starts with a `-- name:` line and binds :run_id and :variant
 -- (see experiments/analysis/queries.py). All queries return one row per seed.

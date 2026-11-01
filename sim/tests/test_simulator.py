@@ -513,7 +513,7 @@ def test_scores_are_probabilities_and_name_the_model_that_made_them(intervened):
         payload = event.payload
         assert 0.0 < payload["survival_probability"] <= 1.0
         assert 0.0 <= payload["elapsed_hours"] < payload["horizon_hours"]
-        assert (payload["model_version"], payload["feature_version"]) == ("h2-cox", "f1")
+        assert (payload["model_version"], payload["feature_version"]) == ("h3-cox", "f2")
 
 
 def test_a_booking_is_asked_at_most_once_only_when_risky_and_never_too_late(intervened):

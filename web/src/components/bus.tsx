@@ -24,7 +24,7 @@ export function BusAlternatives({ from, to }: { from: string; to: string }) {
       <Card>
         <h2 className="font-semibold">{t('Buses instead')}</h2>
         <p className="mt-1 text-sm text-slate-600">
-          {t('Listed by JOURNEX staff, not by the bus operator. Check times and fares with the operator before you travel.')}
+          {t('Listed by VAYORA staff, not by the bus operator. Check times and fares with the operator before you travel.')}
         </p>
         <ul className="mt-3 space-y-1 text-sm">
           {buses.data.map((bus) => (

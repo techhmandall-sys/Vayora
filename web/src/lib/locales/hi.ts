@@ -152,7 +152,7 @@ export const hi: Record<string, string> = {
   'Enter your name': 'अपना नाम दर्ज करें',
   'Use at least 8 characters': 'कम से कम 8 अक्षर रखें',
   'Use at most 72 characters': 'अधिकतम 72 अक्षर रखें',
-  'Choose how you will use JOURNEX': 'चुनें कि आप JOURNEX का उपयोग कैसे करेंगे',
+  'Choose how you will use VAYORA': 'चुनें कि आप VAYORA का उपयोग कैसे करेंगे',
   'Choose where you start': 'चुनें कि आप कहाँ से चलेंगे',
   'Choose where you are going': 'चुनें कि आप कहाँ जा रहे हैं',
   'Choose a date': 'तारीख चुनें',
@@ -484,8 +484,8 @@ export const hi: Record<string, string> = {
     'अगर आप खतरे में हैं, तो अभी 112 पर कॉल करें।',
   'Call 112':
     '112 पर कॉल करें',
-  'You can also alert the JOURNEX administrators. They see it in a queue; they are not an emergency service.':
-    'आप JOURNEX के व्यवस्थापकों को भी सूचित कर सकते हैं। उन्हें यह एक सूची में दिखता है; वे आपातकालीन सेवा नहीं हैं।',
+  'You can also alert the VAYORA administrators. They see it in a queue; they are not an emergency service.':
+    'आप VAYORA के व्यवस्थापकों को भी सूचित कर सकते हैं। उन्हें यह एक सूची में दिखता है; वे आपातकालीन सेवा नहीं हैं।',
   'Send an alert':
     'चेतावनी भेजें',
   'Close':
@@ -522,8 +522,8 @@ export const hi: Record<string, string> = {
     'ईमेल की पुष्टि हुई',
   'Phone confirmed':
     'फ़ोन की पुष्टि हुई',
-  'JOURNEX has not checked any identity documents.':
-    'JOURNEX ने किसी पहचान पत्र की जाँच नहीं की है।',
+  'VAYORA has not checked any identity documents.':
+    'VAYORA ने किसी पहचान पत्र की जाँच नहीं की है।',
   'Enter 10 to 15 digits, with or without a + in front':
     '10 से 15 अंक लिखें, आगे + के साथ या उसके बिना',
   'Not said':
@@ -865,8 +865,8 @@ export const hi: Record<string, string> = {
     'यह कर बीजक (टैक्स इनवॉइस) नहीं है।',
   'Times are India Standard Time.':
     'समय भारतीय मानक समय (IST) में हैं।',
-  'JOURNEX, Kolhapur to Pune':
-    'JOURNEX, कोल्हापुर से पुणे',
+  'VAYORA, Kolhapur to Pune':
+    'VAYORA, कोल्हापुर से पुणे',
   'Print or save as PDF':
     'प्रिंट करें या PDF के रूप में सहेजें',
   'To keep a copy, choose to save as PDF instead of a printer.':
@@ -1031,8 +1031,8 @@ export const hi: Record<string, string> = {
   // Bus services
   'Buses instead':
     'इसके बजाय बसें',
-  'Listed by JOURNEX staff, not by the bus operator. Check times and fares with the operator before you travel.':
-    'JOURNEX कर्मचारियों द्वारा सूचीबद्ध, बस संचालक द्वारा नहीं। यात्रा से पहले समय और किराया संचालक से जाँच लें।',
+  'Listed by VAYORA staff, not by the bus operator. Check times and fares with the operator before you travel.':
+    'VAYORA कर्मचारियों द्वारा सूचीबद्ध, बस संचालक द्वारा नहीं। यात्रा से पहले समय और किराया संचालक से जाँच लें।',
   'about {hours} h':
     'लगभग {hours} घंटे',
   'Bus services':
@@ -1058,8 +1058,8 @@ export const hi: Record<string, string> = {
   'Yes, remove it':
     'हाँ, हटाएँ',
   // Electric range
-  'This route is longer than the {range} km your vehicle covers on a full charge, by your own figures. Plan a charging stop: JOURNEX does not plan one for you.':
-    'यह मार्ग आपके अपने आँकड़ों के अनुसार पूरी चार्ज पर आपके वाहन की {range} किमी की दूरी से लंबा है। चार्जिंग के लिए रुकने की योजना बनाएँ: JOURNEX आपके लिए यह योजना नहीं बनाता।',
+  'This route is longer than the {range} km your vehicle covers on a full charge, by your own figures. Plan a charging stop: VAYORA does not plan one for you.':
+    'यह मार्ग आपके अपने आँकड़ों के अनुसार पूरी चार्ज पर आपके वाहन की {range} किमी की दूरी से लंबा है। चार्जिंग के लिए रुकने की योजना बनाएँ: VAYORA आपके लिए यह योजना नहीं बनाता।',
   // Phone sign-up
   'Enter your email or phone number':
     'अपना ईमेल या फ़ोन नंबर दर्ज करें',
@@ -1147,8 +1147,8 @@ export const hi: Record<string, string> = {
     'मार्ग से {km} किमी दूर',
   'a good place for a break':
     'विश्राम के लिए अच्छी जगह',
-  'Listed by JOURNEX staff. Nothing checks that a stop is open or a charger works.':
-    'JOURNEX कर्मचारियों द्वारा सूचीबद्ध। कोई जाँच नहीं करता कि स्थल खुला है या चार्जर काम करता है।',
+  'Listed by VAYORA staff. Nothing checks that a stop is open or a charger works.':
+    'VAYORA कर्मचारियों द्वारा सूचीबद्ध। कोई जाँच नहीं करता कि स्थल खुला है या चार्जर काम करता है।',
   'Rest stops and chargers':
     'विश्राम स्थल और चार्जर',
   'Drivers see these when they work out a route that passes near them. Nothing here checks that a stop is open or a charger works, and drivers are told so.':
@@ -1196,8 +1196,8 @@ export const hi: Record<string, string> = {
     'चालक ने वह सवारी रद्द कर दी जिसमें आपने {seats} बुक की थीं। आपका पूरा भुगतान लौटा दिया गया है। {more}',
   'No other ride with seats leaves near that time.':
     'उस समय के आसपास सीटों वाली कोई और सवारी नहीं है।',
-  'No other ride with seats leaves near that time. Buses listed by JOURNEX staff (check with the operator before travelling): {buses}.':
-    'उस समय के आसपास सीटों वाली कोई और सवारी नहीं है। JOURNEX कर्मचारियों द्वारा सूचीबद्ध बसें (यात्रा से पहले संचालक से जाँच लें): {buses}।',
+  'No other ride with seats leaves near that time. Buses listed by VAYORA staff (check with the operator before travelling): {buses}.':
+    'उस समय के आसपास सीटों वाली कोई और सवारी नहीं है। VAYORA कर्मचारियों द्वारा सूचीबद्ध बसें (यात्रा से पहले संचालक से जाँच लें): {buses}।',
   'Other rides that could take you: {rides}. Search again to book one.':
     'अन्य सवारियाँ जो आपको ले जा सकती हैं: {rides}। बुक करने के लिए फिर से खोजें।',
   '{time} from {stop} with {driver}':
@@ -1379,10 +1379,10 @@ export const hi: Record<string, string> = {
     'वह कोड अब मान्य नहीं है। नया कोड माँगें।',
   'That code is not right':
     'वह कोड सही नहीं है',
-  'That is not a photo JOURNEX can read: use a JPEG or PNG':
-    'JOURNEX यह फ़ोटो नहीं पढ़ सकता: JPEG या PNG का उपयोग करें',
-  'That is not a push service JOURNEX sends to':
-    'JOURNEX इस पुश सेवा को नहीं भेजता',
+  'That is not a photo VAYORA can read: use a JPEG or PNG':
+    'VAYORA यह फ़ोटो नहीं पढ़ सकता: JPEG या PNG का उपयोग करें',
+  'That is not a push service VAYORA sends to':
+    'VAYORA इस पुश सेवा को नहीं भेजता',
   'That pass is not on sale':
     'वह पास बिक्री के लिए नहीं है',
   'That phone number belongs to another account':
@@ -1445,16 +1445,16 @@ export const hi: Record<string, string> = {
     'कॉल करने से पहले अपने खाते के पेज पर अपना फ़ोन नंबर पक्का करें',
   'They have no confirmed phone number. Use the chat instead.':
     'उनका कोई पक्का फ़ोन नंबर नहीं है। इसके बजाय चैट का उपयोग करें।',
-  "{name} tried to call you through JOURNEX. Calls are simulated, so no call came through. Reply in the ride's chat.":
-    '{name} ने JOURNEX के ज़रिए आपको कॉल करने की कोशिश की। कॉल सिम्युलेटेड हैं, इसलिए कोई कॉल नहीं आई। सवारी की चैट में जवाब दें।',
+  "{name} tried to call you through VAYORA. Calls are simulated, so no call came through. Reply in the ride's chat.":
+    '{name} ने VAYORA के ज़रिए आपको कॉल करने की कोशिश की। कॉल सिम्युलेटेड हैं, इसलिए कोई कॉल नहीं आई। सवारी की चैट में जवाब दें।',
   'Call the driver':
     'चालक को कॉल करें',
   'Call {name}':
     '{name} को कॉल करें',
   "Calling is simulated. With a real phone service you would now be connected to {name} through a masked number, so neither of you sees the other's number. No call was placed, and {name} has been told you tried.":
     'कॉल सिम्युलेटेड है। असली फ़ोन सेवा के साथ अब आप एक छिपे हुए नंबर के ज़रिए {name} से जुड़ जाते, ताकि कोई किसी का नंबर न देखे। कोई कॉल नहीं की गई, और {name} को बता दिया गया है कि आपने कोशिश की।',
-  'Insurance: {insurer}, until {date}. As you declared it: JOURNEX has not checked it with the insurer.':
-    'बीमा: {insurer}, {date} तक। जैसा आपने बताया: JOURNEX ने बीमा कंपनी से इसकी जाँच नहीं की है।',
+  'Insurance: {insurer}, until {date}. As you declared it: VAYORA has not checked it with the insurer.':
+    'बीमा: {insurer}, {date} तक। जैसा आपने बताया: VAYORA ने बीमा कंपनी से इसकी जाँच नहीं की है।',
   'Remove the insurance':
     'बीमा हटाएँ',
   'Insurance':
@@ -1571,8 +1571,8 @@ export const hi: Record<string, string> = {
     'आपने घोषित किया है: {document}।',
   'Declared: {document}, not checked':
     'कहते हैं कि उनके पास {document} है, जाँचा नहीं गया',
-  'You can say which identity document you hold. JOURNEX does not ask for its number or a copy and checks nothing: your profile will say it was declared, not checked.':
-    'आप बता सकते हैं कि आपके पास कौन-सा पहचान पत्र है। JOURNEX उसका नंबर या प्रति नहीं माँगता और कुछ नहीं जाँचता: आपकी प्रोफ़ाइल पर लिखा होगा कि यह घोषित किया गया है, जाँचा नहीं गया।',
+  'You can say which identity document you hold. VAYORA does not ask for its number or a copy and checks nothing: your profile will say it was declared, not checked.':
+    'आप बता सकते हैं कि आपके पास कौन-सा पहचान पत्र है। VAYORA उसका नंबर या प्रति नहीं माँगता और कुछ नहीं जाँचता: आपकी प्रोफ़ाइल पर लिखा होगा कि यह घोषित किया गया है, जाँचा नहीं गया।',
   'Sign in first':
     'पहले साइन इन करें',
   'Your session has ended. Sign in again.':
@@ -1671,8 +1671,8 @@ export const hi: Record<string, string> = {
     'भुगतान पूरा नहीं हुआ। कुछ नहीं खरीदा गया।',
   'Payments go through Razorpay in test mode: pay with its test card or UPI details. No real money moves.':
     'भुगतान Razorpay के टेस्ट मोड से होते हैं: उसके टेस्ट कार्ड या UPI विवरण से भुगतान करें। कोई असली पैसा नहीं जाता।',
-  'Passengers pay through Razorpay, but JOURNEX does not pay drivers through it: what you are owed is recorded here, not sent.':
-    'यात्री Razorpay से भुगतान करते हैं, पर JOURNEX उसके ज़रिए चालकों को भुगतान नहीं करता: आपकी बकाया राशि यहाँ दर्ज होती है, भेजी नहीं जाती।',
+  'Passengers pay through Razorpay, but VAYORA does not pay drivers through it: what you are owed is recorded here, not sent.':
+    'यात्री Razorpay से भुगतान करते हैं, पर VAYORA उसके ज़रिए चालकों को भुगतान नहीं करता: आपकी बकाया राशि यहाँ दर्ज होती है, भेजी नहीं जाती।',
   "{amount} paid in Razorpay's test mode: no real money moved.":
     '{amount} का भुगतान Razorpay के टेस्ट मोड में हुआ: कोई असली पैसा नहीं गया।',
   '{amount} paid through Razorpay.':
@@ -1681,12 +1681,12 @@ export const hi: Record<string, string> = {
     'बुक करते समय आप Razorpay के चेकआउट में कार्ड, UPI या वॉलेट से भुगतान करते हैं। वहाँ भुगतान की गई बुकिंग केवल इसी सवारी के लिए है: अगर चालक सवारी वापस ले, तो पूरी राशि लौटती है और दूसरी सवारियाँ सुझाई जाती हैं।',
   "You pay by card, UPI or a wallet in Razorpay's checkout when you buy.":
     'खरीदते समय आप Razorpay के चेकआउट में कार्ड, UPI या वॉलेट से भुगतान करते हैं।',
-  "{name} is calling you through JOURNEX, from the platform's number. Neither of you sees the other's number.":
-    '{name} JOURNEX के ज़रिए, प्लेटफ़ॉर्म के नंबर से आपको कॉल कर रहे हैं। आप दोनों में से कोई भी दूसरे का नंबर नहीं देखता।',
+  "{name} is calling you through VAYORA, from the platform's number. Neither of you sees the other's number.":
+    '{name} VAYORA के ज़रिए, प्लेटफ़ॉर्म के नंबर से आपको कॉल कर रहे हैं। आप दोनों में से कोई भी दूसरे का नंबर नहीं देखता।',
   "The call could not be placed. Try again, or use the ride's chat.":
     'कॉल नहीं लग सकी। फिर कोशिश करें, या सवारी की चैट का उपयोग करें।',
-  "Your phone will ring now from JOURNEX's number. Answer it to be connected to {name}: neither of you sees the other's number.":
-    'अब आपका फ़ोन JOURNEX के नंबर से बजेगा। {name} से जुड़ने के लिए उठाएँ: आप दोनों में से कोई भी दूसरे का नंबर नहीं देखता।',
+  "Your phone will ring now from VAYORA's number. Answer it to be connected to {name}: neither of you sees the other's number.":
+    'अब आपका फ़ोन VAYORA के नंबर से बजेगा। {name} से जुड़ने के लिए उठाएँ: आप दोनों में से कोई भी दूसरे का नंबर नहीं देखता।',
   'Those stops are not on this ride':
     'ये स्टॉप इस सवारी पर नहीं हैं',
   'Too many wrong attempts. Request a new code.':
@@ -1741,8 +1741,8 @@ export const hi: Record<string, string> = {
     'Google साइन-इन लोड नहीं हो सका। इसके बजाय अपना ईमेल या फ़ोन उपयोग करें।',
   'or':
     'या',
-  'No JOURNEX account uses this Google address yet. How will you use JOURNEX?':
-    'इस Google पते से अभी कोई JOURNEX खाता नहीं है। आप JOURNEX का उपयोग कैसे करेंगे?',
+  'No VAYORA account uses this Google address yet. How will you use VAYORA?':
+    'इस Google पते से अभी कोई VAYORA खाता नहीं है। आप VAYORA का उपयोग कैसे करेंगे?',
   'Google sign-in is not set up on this server':
     'इस सर्वर पर Google साइन-इन सेट नहीं है',
   'That Google sign-in could not be checked':
@@ -1754,8 +1754,8 @@ export const hi: Record<string, string> = {
   // Front page
   'Share the road between Kolhapur and Pune':
     'कोल्हापुर और पुणे के बीच का सफ़र साझा करें',
-  'Book a seat in a car already making the trip, or fill the empty seats in yours. If your plans change, JOURNEX reminds you to give the seat back while someone else can still take it.':
-    'उस कार में सीट बुक करें जो पहले से यह सफ़र कर रही है, या अपनी कार की खाली सीटें भरें। अगर आपकी योजना बदल जाए, तो JOURNEX आपको तब तक सीट लौटाने की याद दिलाता है, जब तक कोई और उसे ले सकता है।',
+  'Book a seat in a car already making the trip, or fill the empty seats in yours. If your plans change, VAYORA reminds you to give the seat back while someone else can still take it.':
+    'उस कार में सीट बुक करें जो पहले से यह सफ़र कर रही है, या अपनी कार की खाली सीटें भरें। अगर आपकी योजना बदल जाए, तो VAYORA आपको तब तक सीट लौटाने की याद दिलाता है, जब तक कोई और उसे ले सकता है।',
   'Offer a ride':
     'सवारी दें',
   'Your seat is held while you pay':
@@ -1772,6 +1772,10 @@ export const hi: Record<string, string> = {
     'दिन पहले तक बुक कर सकते हैं',
   'languages':
     'भाषाएँ',
+  'About {seats} seats published here, typically':
+    'यहाँ सामान्यतः लगभग {seats} सीटें प्रकाशित होती हैं',
+  'Reliability':
+    'स्थिरता',
   'How it works':
     'यह कैसे काम करता है',
   'Search the corridor':
@@ -1788,8 +1792,8 @@ export const hi: Record<string, string> = {
     'अपने चालक से चैट करें और नक्शे पर कार को देखें। आपातकालीन बटन सबसे पहले 112 पर कॉल करने को रखता है।',
   'Why giving a seat back early matters':
     'सीट जल्दी लौटाना क्यों मायने रखता है',
-  'A seat given back three days before departure can still be booked by someone else. Given back two hours before, it usually travels empty. So JOURNEX asks early, gives back more of the fare the earlier you cancel, and never cancels anyone on a guess.':
-    'प्रस्थान से तीन दिन पहले लौटाई गई सीट को कोई और अब भी बुक कर सकता है। दो घंटे पहले लौटाई गई सीट आमतौर पर खाली जाती है। इसलिए JOURNEX जल्दी पूछता है, जितनी जल्दी आप रद्द करें उतना अधिक किराया लौटाता है, और किसी अनुमान के आधार पर कभी किसी की बुकिंग रद्द नहीं करता।',
+  'A seat given back three days before departure can still be booked by someone else. Given back two hours before, it usually travels empty. So VAYORA asks early, gives back more of the fare the earlier you cancel, and never cancels anyone on a guess.':
+    'प्रस्थान से तीन दिन पहले लौटाई गई सीट को कोई और अब भी बुक कर सकता है। दो घंटे पहले लौटाई गई सीट आमतौर पर खाली जाती है। इसलिए VAYORA जल्दी पूछता है, जितनी जल्दी आप रद्द करें उतना अधिक किराया लौटाता है, और किसी अनुमान के आधार पर कभी किसी की बुकिंग रद्द नहीं करता।',
   'The project measures what counts: rides completed for every 100 searches, not bookings made.':
     'परियोजना वही मापती है जो मायने रखता है: हर 100 खोजों पर पूरी हुई सवारियाँ, न कि की गई बुकिंग।',
   'Days before: someone else can book it':
@@ -1808,8 +1812,8 @@ export const hi: Record<string, string> = {
     'चालक कोई सवारी केवल महिलाओं के लिए दे सकता है; उसे केवल महिलाएँ देख और बुक कर सकती हैं।',
   'Flexible bookings':
     'लचीली बुकिंग',
-  'Choose a window of time. If your driver withdraws, JOURNEX looks for another ride in it, at the same price.':
-    'समय की एक अवधि चुनें। अगर आपका चालक सवारी वापस ले ले, तो JOURNEX उसी अवधि में, उसी कीमत पर, दूसरी सवारी खोजता है।',
+  'Choose a window of time. If your driver withdraws, VAYORA looks for another ride in it, at the same price.':
+    'समय की एक अवधि चुनें। अगर आपका चालक सवारी वापस ले ले, तो VAYORA उसी अवधि में, उसी कीमत पर, दूसरी सवारी खोजता है।',
   'Electric cars':
     'इलेक्ट्रिक कारें',
   'A route an electric car cannot cover on one charge is caught before it is published, with chargers along the way.':

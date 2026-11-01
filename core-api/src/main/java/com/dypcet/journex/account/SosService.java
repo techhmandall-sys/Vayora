@@ -105,7 +105,7 @@ public class SosService {
         int told = 0;
         for (EmergencyContact contact : contacts) {
             try {
-                sender.send(Channel.PHONE, contact.phone(), "JOURNEX: " + name
+                sender.send(Channel.PHONE, contact.phone(), "VAYORA: " + name
                         + " pressed the emergency button." + where
                         + " Try to reach them, and call " + EMERGENCY_NUMBER + " if you cannot.");
                 told++;

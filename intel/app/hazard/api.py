@@ -14,7 +14,7 @@ from .model import MODEL_DIR, HazardModel
 
 router = APIRouter(prefix="/v1/hazard", tags=["hazard"])
 
-DEFAULT_MODEL = "h2-cox"
+DEFAULT_MODEL = "h3-cox"
 
 
 @lru_cache

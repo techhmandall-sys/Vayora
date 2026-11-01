@@ -2,7 +2,7 @@
   "name": "journex-gateway",
   "version": "0.1.0",
   "private": true,
-  "description": "JOURNEX gateway: ephemeral streams only",
+  "description": "VAYORA gateway: ephemeral streams only",
   "type": "module",
   "main": "src/index.js",
   "scripts": {

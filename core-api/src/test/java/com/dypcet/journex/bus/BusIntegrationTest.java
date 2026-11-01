@@ -129,7 +129,7 @@ class BusIntegrationTest extends PostgresIntegrationTest {
                 .filter(n -> n.type() == Type.RIDE_CANCELLED).findFirst().orElseThrow().message();
         // 07:00 is more than an hour before boarding at 09:00, so only the 10:00 bus is named.
         assertThat(notice).contains("No other ride with seats leaves near that time.")
-                .endsWith(" Buses listed by JOURNEX staff (check with the operator before travelling): "
+                .endsWith(" Buses listed by VAYORA staff (check with the operator before travelling): "
                         + "10:00 Test Operator, Rs 350.00.");
     }
 

@@ -185,7 +185,7 @@ public class NotificationService {
     private void deliver(List<Copy> copies, String message) {
         for (Copy copy : copies) {
             try {
-                sender.send(copy.channel(), copy.to(), "JOURNEX: " + message);
+                sender.send(copy.channel(), copy.to(), "VAYORA: " + message);
             } catch (RuntimeException e) {
                 log.warn("Notification copy not sent by {}: {}", copy.channel(), e.getMessage());
             }

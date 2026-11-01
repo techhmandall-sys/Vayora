@@ -88,9 +88,9 @@ public class DeliveringMessageSender implements MessageSender {
 
     /** The first sentence, short enough for a subject line. */
     private static String subject(String text) {
-        String body = text.startsWith("JOURNEX: ") ? text.substring("JOURNEX: ".length()) : text;
+        String body = text.startsWith("VAYORA: ") ? text.substring("VAYORA: ".length()) : text;
         int end = body.indexOf(". ");
         String first = end > 0 ? body.substring(0, end + 1) : body;
-        return "JOURNEX: " + (first.length() > 80 ? first.substring(0, 77) + "..." : first);
+        return "VAYORA: " + (first.length() > 80 ? first.substring(0, 77) + "..." : first);
     }
 }

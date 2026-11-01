@@ -99,7 +99,7 @@ const tabLink = ({ isActive }: { isActive: boolean }) =>
   `relative flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-2xl px-1 py-1.5 text-[11px] font-medium ` +
   `focus:outline-none focus-visible:ring-4 focus-visible:ring-teal-600/30 ${isActive ? 'text-teal-700' : 'text-slate-500'}`;
 
-/** The JOURNEX mark: a route between two towns. */
+/** The VAYORA mark: a route between two towns. */
 function Logo() {
   return (
     <svg viewBox="0 0 32 32" aria-hidden="true" className="h-8 w-8 flex-none drop-shadow-sm">
@@ -304,7 +304,7 @@ export function Layout() {
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5 sm:px-6">
           <span className="flex items-center gap-2.5 text-[17px] font-bold tracking-tight text-slate-900" translate="no">
             <Logo />
-            {'JOURNEX'}
+            {'VAYORA'}
           </span>
           <div className="ml-auto flex flex-wrap items-center gap-2 text-sm text-slate-600">
             {user && <MemberPalette role={user.role} emergency={member ? () => setEmergency(true) : undefined} signOut={logout} />}

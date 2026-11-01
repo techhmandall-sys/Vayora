@@ -99,7 +99,7 @@ export function ProfilePage() {
                 </li>
               ))}
             </ul>
-            <p className="mt-3 text-xs text-slate-500">{t('JOURNEX has not checked any identity documents.')}</p>
+            <p className="mt-3 text-xs text-slate-500">{t('VAYORA has not checked any identity documents.')}</p>
           </Card>
           <section aria-label={t('Reviews')} className="space-y-3">
             <h2 className="text-lg font-semibold">{t('Reviews')}</h2>

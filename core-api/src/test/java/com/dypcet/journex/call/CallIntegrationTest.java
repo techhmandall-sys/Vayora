@@ -92,7 +92,7 @@ class CallIntegrationTest extends PostgresIntegrationTest {
         assertThat(toPassenger).isEqualTo(new Relay("mock", "Test PASSENGER"));
         assertThat(notifications.forUser(driverId)).filteredOn(n -> n.type() == Type.CALL_REQUESTED)
                 .extracting(Notification::message)
-                .containsExactly("Test PASSENGER tried to call you through JOURNEX. Calls are simulated, "
+                .containsExactly("Test PASSENGER tried to call you through VAYORA. Calls are simulated, "
                         + "so no call came through. Reply in the ride's chat.");
         assertThat(notifications.forUser(passengerId)).filteredOn(n -> n.type() == Type.CALL_REQUESTED).hasSize(1);
     }

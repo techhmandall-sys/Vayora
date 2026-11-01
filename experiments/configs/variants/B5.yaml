@@ -8,7 +8,7 @@
 # Every number under `budget` is an assumption chosen by the authors, not an estimate.
 name: B5
 ranking: predicted_survival
-hazard_model: h2-cox
+hazard_model: h3-cox
 intervention:
   survival_threshold: 0.8
   min_hours_before_departure: 24

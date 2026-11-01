@@ -3,7 +3,7 @@
 # on timing alone.
 name: B4-KM
 ranking: predicted_survival
-hazard_model: h2-km
+hazard_model: h3-km
 intervention:
   survival_threshold: 0.8
   min_hours_before_departure: 24

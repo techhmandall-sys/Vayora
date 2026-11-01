@@ -44,14 +44,14 @@ class IntelHazardScorerTest {
                         {"features": {"lead_hours": 48.0}, "elapsed_hours": 6.0, "horizon_hours": 54.0}
                         """))
                 .andRespond(withSuccess("""
-                        {"survival_probability": 0.87, "model_version": "h1-cox", "contributions": {"lead_hours": 0.25},
-                         "feature_version": "f1", "model_kind": "cox_ph", "trained_on": "synthetic",
+                        {"survival_probability": 0.87, "model_version": "h3-cox", "contributions": {"lead_hours": 0.25},
+                         "feature_version": "f2", "model_kind": "cox_ph", "trained_on": "synthetic",
                          "elapsed_hours": 6.0, "horizon_hours": 54.0,
                          "scored_at": "2026-10-10T06:00:00Z"}""", MediaType.APPLICATION_JSON));
 
         Optional<Score> score = scorer.score(FEATURES, 6.0, 54.0);
 
-        assertThat(score).contains(new Score(0.87, "h1-cox", "f1", java.util.Map.of("lead_hours", 0.25)));
+        assertThat(score).contains(new Score(0.87, "h3-cox", "f2", java.util.Map.of("lead_hours", 0.25)));
         intel.verify();
     }
 
@@ -65,7 +65,7 @@ class IntelHazardScorerTest {
     @Test
     void aScoreForOtherFeaturesIsRefused() {
         intelAnswers("""
-                {"survival_probability": 0.87, "model_version": "h2", "feature_version": "f2"}""");
+                {"survival_probability": 0.87, "model_version": "h2", "feature_version": "f3"}""");
 
         assertThat(scorer.score(FEATURES, 0, 10)).isEmpty();
     }
@@ -73,12 +73,12 @@ class IntelHazardScorerTest {
     @Test
     void aProbabilityOutsideZeroToOneOrMissingIsRefused() {
         intelAnswers("""
-                {"survival_probability": 1.4, "model_version": "h1-cox", "feature_version": "f1"}""");
+                {"survival_probability": 1.4, "model_version": "h3-cox", "feature_version": "f2"}""");
         assertThat(scorer.score(FEATURES, 0, 10)).isEmpty();
 
         intel.reset();
         intelAnswers("""
-                {"model_version": "h1-cox", "feature_version": "f1"}""");
+                {"model_version": "h3-cox", "feature_version": "f2"}""");
         assertThat(scorer.score(FEATURES, 0, 10)).isEmpty();
     }
 }

@@ -29,7 +29,9 @@ public enum EventType {
     NUDGE_CONVERTED,
     TRIP_STARTED,
     TRIP_COMPLETED,
-    TRIP_FAILED;
+    TRIP_FAILED,
+    LAST_MILE_SHOWN,
+    LAST_MILE_OPTION_SELECTED;
 
     /** The value stored in {@code events.event_type}. */
     public String wireName() {
