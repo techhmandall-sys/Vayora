@@ -1,0 +1,177 @@
+{
+  "version": "h3",
+  "world": "world.yaml",
+  "variant": "variants/B0.yaml",
+  "validation_seeds": [
+    2001,
+    2002,
+    2003,
+    2004,
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010
+  ],
+  "bookings": 13576,
+  "known_outcome": 13327,
+  "observed_survival_to_departure": 0.8250919186613641,
+  "models": {
+    "true": {
+      "mean_survival": 0.8263850363570944,
+      "brier": 0.08647776803739982,
+      "auc_lasting": 0.89795130837328
+    },
+    "cox": {
+      "mean_survival": 0.8286578388261487,
+      "brier": 0.11689915546238568,
+      "auc_lasting": 0.8077456191315776,
+      "mean_abs_error_vs_truth": 0.12216715187200748,
+      "spearman_vs_truth": 0.7655112530874044,
+      "share_of_achievable_auc": 0.7733248079760324,
+      "calibration_vs_truth": [
+        {
+          "bookings": 1333,
+          "mean_predicted": 0.48303124349402043,
+          "mean_true": 0.47974403844306734,
+          "observed": 0.46211552888222057
+        },
+        {
+          "bookings": 1333,
+          "mean_predicted": 0.6613718948036535,
+          "mean_true": 0.6377181816301497,
+          "observed": 0.641410352588147
+        },
+        {
+          "bookings": 1333,
+          "mean_predicted": 0.7454143082228676,
+          "mean_true": 0.735860134499127,
+          "observed": 0.7261815453863466
+        },
+        {
+          "bookings": 1333,
+          "mean_predicted": 0.8092794801747767,
+          "mean_true": 0.8049080870397766,
+          "observed": 0.8012003000750187
+        },
+        {
+          "bookings": 1333,
+          "mean_predicted": 0.8584661862026446,
+          "mean_true": 0.8613705059445789,
+          "observed": 0.8514628657164292
+        },
+        {
+          "bookings": 1333,
+          "mean_predicted": 0.8957377035384619,
+          "mean_true": 0.8946413182127598,
+          "observed": 0.9009752438109527
+        },
+        {
+          "bookings": 1333,
+          "mean_predicted": 0.9259319065761359,
+          "mean_true": 0.9295273189186135,
+          "observed": 0.9332333083270817
+        },
+        {
+          "bookings": 1332,
+          "mean_predicted": 0.9496780009051943,
+          "mean_true": 0.9562408002302228,
+          "observed": 0.9662162162162162
+        },
+        {
+          "bookings": 1332,
+          "mean_predicted": 0.9697776600697842,
+          "mean_true": 0.9739782656153793,
+          "observed": 0.978978978978979
+        },
+        {
+          "bookings": 1332,
+          "mean_predicted": 0.9882063497309839,
+          "mean_true": 0.9901927383149057,
+          "observed": 0.9894894894894894
+        }
+      ]
+    },
+    "km": {
+      "mean_survival": 0.8259647697498004,
+      "brier": 0.12275299821705433,
+      "auc_lasting": 0.7845333055864158,
+      "mean_abs_error_vs_truth": 0.13528525061437877,
+      "spearman_vs_truth": 0.7217877816808252,
+      "share_of_achievable_auc": 0.7149952760540301,
+      "calibration_vs_truth": [
+        {
+          "bookings": 1333,
+          "mean_predicted": 0.5800874207600226,
+          "mean_true": 0.5429850130588965,
+          "observed": 0.5356339084771192
+        },
+        {
+          "bookings": 1333,
+          "mean_predicted": 0.6669289828686354,
+          "mean_true": 0.6313317985076891,
+          "observed": 0.6249062265566392
+        },
+        {
+          "bookings": 1333,
+          "mean_predicted": 0.7297647458142925,
+          "mean_true": 0.7408861524902867,
+          "observed": 0.7119279819954989
+        },
+        {
+          "bookings": 1333,
+          "mean_predicted": 0.7875702017483582,
+          "mean_true": 0.7917048272923669,
+          "observed": 0.805701425356339
+        },
+        {
+          "bookings": 1333,
+          "mean_predicted": 0.8345105237330891,
+          "mean_true": 0.8437709464967471,
+          "observed": 0.8477119279819955
+        },
+        {
+          "bookings": 1333,
+          "mean_predicted": 0.8747146171818329,
+          "mean_true": 0.889922725406378,
+          "observed": 0.894973743435859
+        },
+        {
+          "bookings": 1333,
+          "mean_predicted": 0.9074603988859132,
+          "mean_true": 0.9149294625089874,
+          "observed": 0.9129782445611403
+        },
+        {
+          "bookings": 1332,
+          "mean_predicted": 0.9356777792330617,
+          "mean_true": 0.9505891963828783,
+          "observed": 0.9534534534534534
+        },
+        {
+          "bookings": 1332,
+          "mean_predicted": 0.9595229342749059,
+          "mean_true": 0.9693690961677136,
+          "observed": 0.972972972972973
+        },
+        {
+          "bookings": 1332,
+          "mean_predicted": 0.9837109312090454,
+          "mean_true": 0.9886833407009972,
+          "observed": 0.990990990990991
+        }
+      ]
+    }
+  },
+  "at_risk_from": {
+    "48": 4805,
+    "96": 1153,
+    "120": 495,
+    "144": 171,
+    "150": 118,
+    "156": 53,
+    "160": 24,
+    "163": 8
+  }
+}

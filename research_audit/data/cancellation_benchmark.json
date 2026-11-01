@@ -1,0 +1,72 @@
+[
+  {
+    "set": "hotel: city",
+    "run_id": "407e1000-0000-4000-8000-000000000001",
+    "variant": "HOTEL-CITY",
+    "accepted": 10808,
+    "survival_from_day_6": 0.7996104619193127,
+    "daily_rate_min": 0.015532544378698224,
+    "daily_rate_max": 0.0425531914893617,
+    "no_show_share": 0.02266839378238342
+  },
+  {
+    "set": "hotel: resort",
+    "run_id": "407e1000-0000-4000-8000-000000000001",
+    "variant": "HOTEL-RESORT",
+    "accepted": 8938,
+    "survival_from_day_6": 0.8974092919882647,
+    "daily_rate_min": 0.011206896551724138,
+    "daily_rate_max": 0.024904877205119337,
+    "no_show_share": 0.01141194898187514
+  },
+  {
+    "set": "simulated B0, last-mile off (= world h2)",
+    "run_id": "7a1c0de0-0000-4000-8000-000000000009",
+    "variant": "B0",
+    "accepted": 40512,
+    "survival_from_day_6": 0.6691806638777791,
+    "daily_rate_min": 0.044233807266982623,
+    "daily_rate_max": 0.06315433975008443,
+    "no_show_share": 0.01950039494470774
+  },
+  {
+    "set": "simulated B0, world h3 (scale x1)",
+    "run_id": "7a1c0de0-0000-4000-8000-000000000003",
+    "variant": "B0",
+    "accepted": 41391,
+    "survival_from_day_6": 0.5898860059172325,
+    "daily_rate_min": 0.05134281200631911,
+    "daily_rate_max": 0.08716216216216216,
+    "no_show_share": 0.017370926046725133
+  },
+  {
+    "set": "simulated B0, scale x1.5",
+    "run_id": "7a1c0de0-0000-4000-8000-000000000006",
+    "variant": "B0",
+    "accepted": 40295,
+    "survival_from_day_6": 0.6920294139591453,
+    "daily_rate_min": 0.04189723320158103,
+    "daily_rate_max": 0.0560242996962538,
+    "no_show_share": 0.019803945898994913
+  },
+  {
+    "set": "simulated B0, scale x2",
+    "run_id": "7a1c0de0-0000-4000-8000-000000000007",
+    "variant": "B0",
+    "accepted": 39608,
+    "survival_from_day_6": 0.7533128503966727,
+    "daily_rate_min": 0.03322784810126582,
+    "daily_rate_max": 0.0430976430976431,
+    "no_show_share": 0.020955362553019594
+  },
+  {
+    "set": "simulated B0, scale x3",
+    "run_id": "7a1c0de0-0000-4000-8000-000000000008",
+    "variant": "B0",
+    "accepted": 38803,
+    "survival_from_day_6": 0.820891612723025,
+    "daily_rate_min": 0.025356576862123614,
+    "daily_rate_max": 0.03258313738663084,
+    "no_show_share": 0.021982836378630518
+  }
+]
