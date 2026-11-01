@@ -244,5 +244,8 @@ services:
 volumes:
   m2cache:
   pgdata:
+    # A database made before the project was called VAYORA lives in journex_pgdata: set
+    # PG_VOLUME=journex_pgdata in .env to keep using it rather than start empty.
+    name: ${PG_VOLUME:-vayora_pgdata}
   mongodata:
   osrmdata:

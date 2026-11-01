@@ -46,6 +46,7 @@ Every setting has a working default in `docker-compose.yml`. To change one, copy
 | `JWT_SECRET` | a public development value | At least 32 bytes. core-api signs with it; the gateway, and intel for live what-if runs, verify with it, so all three must have the same one. **Change it** |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | empty | Set both to have an administrator created when core-api starts. The password needs 12 characters or more. There is no other way to make one |
 | `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | `vayora` | |
+| `PG_VOLUME` | `vayora_pgdata` | The Docker volume holding the database. A database made before the project was renamed from JOURNEX is in `journex_pgdata`; set this to keep using it |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Where the browser app is served from, for core-api, the gateway and intel. Change it together with `WEB_PORT` |
 | `*_PORT` | see the table above | Change one if the port is taken |
 | `OSRM_PBF_URL`, `OSRM_BBOX` | western India, clipped to the corridor | |
@@ -75,8 +76,9 @@ Flyway applies the migrations in `core-api/src/main/resources/db/migration/` whe
 core-api starts. There is nothing to run by hand. A migration that has been applied is
 never edited; a change is a new numbered file.
 
-Data lives in Docker volumes (`pgdata`, `mongodata`, `osrmdata`) and survives
-`docker compose down`. To start from nothing:
+Data lives in Docker volumes (`vayora_pgdata`, or whatever `PG_VOLUME` names;
+`vayora_mongodata`; `vayora_osrmdata`) and survives `docker compose down`. To start from
+nothing:
 
 ```sh
 docker compose down -v
