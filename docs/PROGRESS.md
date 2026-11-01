@@ -1,5 +1,28 @@
 # Progress
 
+## 2026-11-01 (later) — CI's one failure found, warnings cleared, caches removed
+
+- **CI had never passed.** The web tests could not start on GitHub's Node 20: jsdom's undici
+  calls a compression function that version lacks, while the same tests pass on a developer's
+  Node 24. Reproduced in a clean Linux copy and fixed by moving CI to Node 24 and the actions
+  to v5. Proved in that same copy (246 web, 28 gateway), not yet on GitHub: it needs a push.
+- **An empty reply from Razorpay** crashed into a bare 500; it now counts as no answer, with
+  the message that says so, and books nothing. A new test covers it.
+- **The Problems panel: no errors, 273 warnings, now 5.** About 262 were the Java extension's
+  null analysis, which meets Spring's non-null annotations with none of the project's own.
+  It is off in `.vscode/settings.json` (local, and `automatic` brings it back). The riskiest
+  "may be null" sites were read first; the Razorpay one was the only real fault. The other
+  warnings were an unused import and field, a deprecated call, a shadowed name and the test
+  containers' leak warning, by design. The 5 left say that methods the framework calls are
+  "never used".
+- **Removed:** `.pytest_cache`, `.ruff_cache`, `core-api/target`, `web/dist`, the TypeScript
+  build cache, `.github/modernize` (a Copilot extension's leftovers), and the six superseded
+  `journex-*` Docker images, about 1.9 GB.
+- **Kept on purpose:** `.env`, `experiments/data` (the hotel dataset the research needs),
+  `node_modules`, Docker's build cache, and the `journex_*` volumes, including the 20.69 GB
+  `journex_pgdata` kept when the database moved.
+- Tests: 325 Java, 246 web, 28 gateway, all passing. Python not rerun: nothing in it changed.
+
 ## 2026-11-01 — one codebase in JOURNEX too, and the last old name gone from Docker
 
 - **The code is copied into the `JOURNEX` repository**, as the team asked, with the rename:

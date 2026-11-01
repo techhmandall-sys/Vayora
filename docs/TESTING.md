@@ -9,7 +9,7 @@ with the lint checks below: `npm run lint` in `web/` and `gateway/` (ESLint), an
 
 | Suite | Command, from the repository root | Tests |
 |---|---|---|
-| core-api | `docker compose --profile test run --rm core-api-tests` | 324 |
+| core-api | `docker compose --profile test run --rm core-api-tests` | 325 |
 | Python (events, simulator, model, scheduler, experiments, intel API) | `docker compose --profile research run --rm research` | 210 |
 | web | `cd web && npm ci && npm test` | 246 |
 | gateway | `cd gateway && npm ci && npm test` | 28 |
@@ -41,7 +41,7 @@ fail with `NoClassDefFoundError`. Let the editor finish, then run the suite agai
 | `MatchScoreTest` | 6 | **Agreeing on everything near and at the best price is 100**, each disagreement costs its whole weight and is named, what either left unsaid counts half, conversation one step apart, distance, price and record each scale their own part, **weights that do not add up to 100 are refused** |
 | `MatchScoringIntegrationTest` | 3 | **Best match puts the driver the passenger agrees with first, and says why**, every other order untouched but scored, a passenger who said nothing matched on distance, price and record alone |
 | `MidRouteIntegrationTest` | 6 | **A ride under way sold from a stop it is not yet near and from no other**, **a ride started early judged from its start**, only if it confirms instantly, **a no-show's seat sold again from a later stop**, the late booking's trip counted from start to finish, holds by the same rule |
-| `RazorpayIntegrationTest` | 6 | Against a stand-in for Razorpay: **a checkout opened for what the server says is due**, the terms say so; a paid booking recorded with the method Razorpay reports, captured, and **refunded through Razorpay on cancelling**; **a forged signature books nothing and asks Razorpay nothing**; **one payment pays for one booking only**; **an underpayment refunded in full after the booking rolls back**; a flexible booking refused |
+| `RazorpayIntegrationTest` | 7 | Against a stand-in for Razorpay: **an empty reply treated as no answer, booking nothing**; **a checkout opened for what the server says is due**, the terms say so; a paid booking recorded with the method Razorpay reports, captured, and **refunded through Razorpay on cancelling**; **a forged signature books nothing and asks Razorpay nothing**; **one payment pays for one booking only**; **an underpayment refunded in full after the booking rolls back**; a flexible booking refused |
 | `PaymentFlowIntegrationTest` | 16 | Hold on request, **a declined payment leaves no booking and no seat taken**, every refund tier, driver cancellation, payouts, **the ledger balances and cannot be rewritten**, idempotency key, the published terms |
 | `CallIntegrationTest` | 5 | Either side may call the other and the other is told, **the answer over HTTP carries no phone number**, nobody else may call, only while confirmed and shortly before the trip, only between confirmed numbers |
 | `CallBridgeIntegrationTest` | 2 | With a Twilio account, Twilio replaced: **a call bridged between the two confirmed numbers, which go to Twilio and appear in no answer**, the other side told who is calling; a call Twilio refuses is a 503 that says so, and nobody is told |
