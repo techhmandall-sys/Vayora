@@ -66,6 +66,15 @@ vayora:
       key-secret: ${RAZORPAY_KEY_SECRET:}
       base-url: https://api.razorpay.com
       timeout: PT10S
+  invoice:
+    # A tax invoice for what VAYORA itself charges, on real payments only: off until all three
+    # are set. The rate and the SAC code are the authors' reading, for a tax adviser to confirm
+    # before real use. GST is taken out of the amount charged, so no price changes.
+    gstin: ${VAYORA_GSTIN:}
+    legal-name: ${VAYORA_LEGAL_NAME:}
+    address: ${VAYORA_LEGAL_ADDRESS:}
+    gst-rate: 0.18
+    sac-code: "9985"
   pass:
     # On sale to passengers. A pass waives the service fee on bookings requested while it
     # runs. Prices are the authors' assumptions, not market research.

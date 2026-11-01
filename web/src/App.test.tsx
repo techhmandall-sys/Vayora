@@ -2874,6 +2874,42 @@ describe('declared insurance: the driver’s word, never checked', () => {
   });
 });
 
+describe('tax invoices', () => {
+  const invoice = { number: 'VAY/2026-27/000012', issuedAt: '2026-11-01T04:00:00Z', gstin: '27AAAAA0000A1Z5', legalName: 'Vayora Mobility LLP', address: 'Kolhapur 416006',
+    sacCode: '9985', ratePercent: 18, taxableValue: 76.27, cgst: 6.87, sgst: 6.86, igst: 0 };
+  const receipt = { bookingId: 90, passenger: 'Asha Patil', driver: 'Ravi Jadhav', fromStop: 'Kolhapur', toStop: 'Pune', seats: 2, boarding: '2026-11-05T01:30:00Z', status: 'CONFIRMED',
+    paidAt: '2026-11-01T04:00:00Z', method: 'CARD', fare: 900, serviceFee: 90, total: 990, refunded: 0, refundReason: null, provider: 'RAZORPAY' };
+
+  it('shows one for the service fee only, instead of saying there is none', async () => {
+    signIn('PASSENGER');
+    serve({ 'GET /bookings/90/receipt-data': () => json({ ...receipt, taxInvoice: invoice }) });
+    open('/receipts/booking/90');
+
+    expect(await screen.findByText('Tax invoice VAY/2026-27/000012')).toBeInTheDocument();
+    expect(screen.getByText('GSTIN: 27AAAAA0000A1Z5')).toBeInTheDocument();
+    expect(screen.getByText('For: VAYORA service fee (SAC 9985)')).toBeInTheDocument();
+    expect(screen.getByText('CGST at 9%')).toBeInTheDocument();
+    expect(screen.getByText('SGST at 9%')).toBeInTheDocument();
+    expect(screen.getByText('The fare is collected for the driver and is not part of this tax invoice.')).toBeInTheDocument();
+    expect(screen.queryByText('This is not a tax invoice.')).not.toBeInTheDocument();
+  });
+
+  it('charges IGST alone from another state, and says there is none when there is none', async () => {
+    signIn('PASSENGER');
+    serve({ 'GET /bookings/90/receipt-data': () => json({ ...receipt, taxInvoice: { ...invoice, cgst: 0, sgst: 0, igst: 13.73 } }) });
+    open('/receipts/booking/90');
+
+    expect(await screen.findByText('IGST at 18%')).toBeInTheDocument();
+    expect(screen.queryByText(/CGST/)).not.toBeInTheDocument();
+    cleanup();
+
+    serve({ 'GET /bookings/90/receipt-data': () => json({ ...receipt, taxInvoice: null }) });
+    open('/receipts/booking/90');
+    expect(await screen.findByText('This is not a tax invoice.')).toBeInTheDocument();
+    expect(screen.queryByText(/Tax invoice VAY/)).not.toBeInTheDocument();
+  });
+});
+
 describe('staff checks of what a driver declared', () => {
   const declared = { email: 'ravi@example.test', emailVerified: false, phone: null, phoneVerified: false, bio: null, birthYear: null, gender: null, smoking: null, pets: null, music: null, chattiness: null, declaredId: 'PASSPORT' };
   const check = { id: 5, kind: 'IDENTITY', vehicleId: null, status: 'WAITING', requestedAt: '2026-11-01T04:00:00Z', decidedAt: null, note: null };

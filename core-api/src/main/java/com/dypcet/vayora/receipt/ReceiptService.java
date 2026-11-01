@@ -1,6 +1,7 @@
 package com.dypcet.vayora.receipt;
 
 import com.dypcet.vayora.payment.MockPaymentProvider;
+import com.dypcet.vayora.receipt.TaxInvoices.TaxInvoice;
 import com.dypcet.vayora.payment.PaymentService;
 import com.dypcet.vayora.payment.RazorpayPaymentProvider;
 import java.io.ByteArrayOutputStream;
@@ -30,8 +31,8 @@ import org.springframework.web.server.ResponseStatusException;
  * show in the member's own language (feature 50).
  *
  * <p>A receipt states what the records say, and nothing else. While the provider is the
- * mock, every receipt says plainly that no money moved. None is a tax invoice: the
- * platform does not handle GST.
+ * mock, every receipt says plainly that no money moved. None is a tax invoice unless a GST
+ * registration is configured and the money was real (TaxInvoices).
  *
  * <p>The built-in PDF fonts cover Latin script only, so the PDF is in English and any
  * other character in a name or stop is shown as "?". The app's receipt has no such limit.
@@ -49,10 +50,12 @@ public class ReceiptService {
      * @param refunded     0 when nothing came back
      * @param refundReason null when nothing came back
      * @param provider     MOCK means no money moved
+     * @param taxInvoice   for the service fee; null when none is due
      */
     public record BookingReceipt(long bookingId, String passenger, String driver, String fromStop, String toStop,
             int seats, Instant boarding, String status, Instant paidAt, String method, BigDecimal fare,
-            BigDecimal serviceFee, BigDecimal total, BigDecimal refunded, String refundReason, String provider) {
+            BigDecimal serviceFee, BigDecimal total, BigDecimal refunded, String refundReason, String provider,
+            TaxInvoice taxInvoice) {
     }
 
     /**
@@ -61,15 +64,18 @@ public class ReceiptService {
      * @param paidAt when it was bought, or given if a reward
      * @param method null for a reward: nothing was paid
      * @param reward given free for an invitation
+     * @param taxInvoice for the price; null when none is due
      */
     public record PassReceipt(long passId, String passenger, String kind, BigDecimal price, Instant startsAt,
-            Instant endsAt, Instant paidAt, String method, String provider, boolean reward) {
+            Instant endsAt, Instant paidAt, String method, String provider, boolean reward, TaxInvoice taxInvoice) {
     }
 
     private final JdbcTemplate jdbc;
+    private final TaxInvoices invoices;
 
-    public ReceiptService(JdbcTemplate jdbc) {
+    public ReceiptService(JdbcTemplate jdbc, TaxInvoices invoices) {
         this.jdbc = jdbc;
+        this.invoices = invoices;
     }
 
     /** The receipt for the payment on one of the passenger's bookings, as PDF. */
@@ -110,11 +116,16 @@ public class ReceiptService {
                         rs.getObject("boarding", OffsetDateTime.class).toInstant(), rs.getString("status"),
                         rs.getObject("created_at", OffsetDateTime.class).toInstant(), rs.getString("method"),
                         rs.getBigDecimal("fare"), rs.getBigDecimal("service_fee"), rs.getBigDecimal("amount"),
-                        rs.getBigDecimal("refunded"), rs.getString("refund_reason"), rs.getString("provider")),
+                        rs.getBigDecimal("refunded"), rs.getString("refund_reason"), rs.getString("provider"), null),
                 bookingId, passengerId);
         // A booking with no payment, or someone else's, looks the same as none at all.
-        return found.stream().findFirst().orElseThrow(() -> new ResponseStatusException(
+        BookingReceipt r = found.stream().findFirst().orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "No receipt for that booking"));
+        // Refunded before anyone asked: that would need a credit note, which is not issued.
+        boolean due = RazorpayPaymentProvider.NAME.equals(r.provider()) && r.refunded().signum() == 0;
+        return new BookingReceipt(r.bookingId(), r.passenger(), r.driver(), r.fromStop(), r.toStop(), r.seats(),
+                r.boarding(), r.status(), r.paidAt(), r.method(), r.fare(), r.serviceFee(), r.total(), r.refunded(),
+                r.refundReason(), r.provider(), invoices.forBooking(bookingId, r.serviceFee(), due).orElse(null));
     }
 
     /** What the receipt for one of the passenger's passes says. */
@@ -128,10 +139,13 @@ public class ReceiptService {
                         rs.getBigDecimal("price"), rs.getObject("starts_at", OffsetDateTime.class).toInstant(),
                         rs.getObject("ends_at", OffsetDateTime.class).toInstant(),
                         rs.getObject("created_at", OffsetDateTime.class).toInstant(), rs.getString("method"),
-                        rs.getString("provider"), rs.getBoolean("reward")),
+                        rs.getString("provider"), rs.getBoolean("reward"), null),
                 passId, passengerId);
-        return found.stream().findFirst().orElseThrow(() -> new ResponseStatusException(
+        PassReceipt r = found.stream().findFirst().orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "No receipt for that pass"));
+        boolean due = !r.reward() && RazorpayPaymentProvider.NAME.equals(r.provider());
+        return new PassReceipt(r.passId(), r.passenger(), r.kind(), r.price(), r.startsAt(), r.endsAt(), r.paidAt(),
+                r.method(), r.provider(), r.reward(), invoices.forPass(passId, r.price(), due).orElse(null));
     }
 
     private static List<String> lines(BookingReceipt receipt) {
@@ -153,7 +167,11 @@ public class ReceiptService {
             lines.add("Refunded: " + rupees(receipt.refunded())
                     + " (" + receipt.refundReason().toLowerCase(Locale.ROOT).replace('_', ' ') + ")");
         }
-        lines.addAll(footer(receipt.provider()));
+        if (receipt.taxInvoice() != null) {
+            lines.addAll(invoiceLines(receipt.taxInvoice(), "VAYORA service fee"));
+            lines.add("The fare is collected for the driver and is not part of this tax invoice.");
+        }
+        lines.addAll(footer(receipt.provider(), receipt.taxInvoice() != null));
         return lines;
     }
 
@@ -179,11 +197,32 @@ public class ReceiptService {
         lines.addAll(List.of(
                 "Paid: " + when(receipt.paidAt()) + " by " + receipt.method(),
                 "Total: " + rupees(receipt.price())));
-        lines.addAll(footer(receipt.provider()));
+        if (receipt.taxInvoice() != null) {
+            lines.addAll(invoiceLines(receipt.taxInvoice(), "VAYORA travel pass"));
+        }
+        lines.addAll(footer(receipt.provider(), receipt.taxInvoice() != null));
         return lines;
     }
 
-    private static List<String> footer(String provider) {
+    private static List<String> invoiceLines(TaxInvoice invoice, String service) {
+        List<String> lines = new ArrayList<>(List.of(
+                "",
+                "Tax invoice " + invoice.number(),
+                "Issued " + when(invoice.issuedAt()) + " by " + invoice.legalName() + ", " + invoice.address(),
+                "GSTIN: " + invoice.gstin(),
+                "For: " + service + " (SAC " + invoice.sacCode() + ")",
+                "Value before tax: " + rupees(invoice.taxableValue())));
+        if (invoice.igst().signum() > 0) {
+            lines.add("IGST at " + invoice.ratePercent().toPlainString() + "%: " + rupees(invoice.igst()));
+        } else {
+            String half = invoice.ratePercent().divide(BigDecimal.TWO).stripTrailingZeros().toPlainString();
+            lines.add("CGST at " + half + "%: " + rupees(invoice.cgst()));
+            lines.add("SGST at " + half + "%: " + rupees(invoice.sgst()));
+        }
+        return lines;
+    }
+
+    private static List<String> footer(String provider, boolean invoiced) {
         List<String> lines = new ArrayList<>(List.of("", "Payment provider: " + provider));
         if (MockPaymentProvider.NAME.equals(provider)) {
             lines.add("SIMULATED PAYMENT: no money was taken or paid. This is a student project.");
@@ -192,7 +231,9 @@ public class ReceiptService {
         } else if (PaymentService.CASH.equals(provider)) {
             lines.add("PAID IN CASH to the driver after the ride, as the driver recorded it.");
         }
-        lines.add("This is not a tax invoice.");
+        if (!invoiced) {
+            lines.add("This is not a tax invoice.");
+        }
         lines.add("VAYORA, Kolhapur to Pune");
         return lines;
     }

@@ -8,7 +8,7 @@ import { formatExactRupees, formatFullDateTime } from '../lib/format';
 import { useT, type Translate } from '../lib/i18n';
 import { passKindLabels } from '../lib/passes';
 import { methodLabels, refundReasons } from '../lib/payments';
-import type { BookingReceipt, PassReceipt } from '../lib/types';
+import type { BookingReceipt, PassReceipt, TaxInvoice } from '../lib/types';
 
 /**
  * Receipts in the reader's language (feature 50): the same facts as the PDF, with names and
@@ -24,7 +24,7 @@ export function BookingReceiptPage() {
     <Page title={t('Receipt for booking {id}', { id })}>
       <QueryState isPending={receipt.isPending} error={receipt.error} isEmpty={false} empty="" onRetry={() => void receipt.refetch()} />
       {r && (
-        <Receipt provider={r.provider}>
+        <Receipt provider={r.provider} invoice={r.taxInvoice} invoiceFor={r.taxInvoice && t('For: VAYORA service fee (SAC {code})', { code: r.taxInvoice.sacCode })} farePaid>
           <Line label={t('Passenger')} value={r.passenger} />
           <Line label={t('Driver')} value={r.driver} />
           <Line
@@ -62,6 +62,8 @@ export function PassReceiptPage() {
         // A reward was paid through nothing, so there is no provider to name.
         <Receipt
           provider={r.reward ? null : r.provider}
+          invoice={r.taxInvoice}
+          invoiceFor={r.taxInvoice && t('For: VAYORA travel pass (SAC {code})', { code: r.taxInvoice.sacCode })}
           notes={[
             ...(r.reward ? [t('Given free on {date} as a reward for an invitation. Nothing was paid.', { date: formatFullDateTime(r.paidAt) })] : []),
             t('No service fee is charged on bookings requested while it runs.'),
@@ -80,7 +82,40 @@ export function PassReceiptPage() {
   );
 }
 
-function Receipt({ provider, notes = [], children }: { provider: string | null; notes?: string[]; children: ReactNode }) {
+/** What VAYORA itself charged, as the tax invoice says it. */
+function InvoiceLines({ invoice, invoiceFor, farePaid }: { invoice: TaxInvoice; invoiceFor: string | null | undefined; farePaid: boolean }) {
+  const t = useT();
+  const half = String(invoice.ratePercent / 2);
+  return (
+    <div className="mt-4 border-t border-slate-200 pt-3 text-sm">
+      <p className="font-semibold text-slate-900">{t('Tax invoice {number}', { number: invoice.number })}</p>
+      <p className="mt-1 text-slate-600">{t('Issued on {date} by {name}, {address}', { date: formatFullDateTime(invoice.issuedAt), name: invoice.legalName, address: invoice.address })}</p>
+      <p className="text-slate-600">{t('GSTIN: {gstin}', { gstin: invoice.gstin })}</p>
+      {invoiceFor && <p className="text-slate-600">{invoiceFor}</p>}
+      <dl className="mt-2">
+        <Line label={t('Value before tax')} value={formatExactRupees(invoice.taxableValue)} />
+        {invoice.igst > 0 ? (
+          <Line label={t('IGST at {rate}%', { rate: invoice.ratePercent })} value={formatExactRupees(invoice.igst)} />
+        ) : (
+          <>
+            <Line label={t('CGST at {rate}%', { rate: half })} value={formatExactRupees(invoice.cgst)} />
+            <Line label={t('SGST at {rate}%', { rate: half })} value={formatExactRupees(invoice.sgst)} />
+          </>
+        )}
+      </dl>
+      {farePaid && <p className="mt-2 text-slate-600">{t('The fare is collected for the driver and is not part of this tax invoice.')}</p>}
+    </div>
+  );
+}
+
+function Receipt({ provider, notes = [], invoice, invoiceFor, farePaid = false, children }: {
+  provider: string | null;
+  notes?: string[];
+  invoice?: TaxInvoice | null;
+  invoiceFor?: string | null;
+  farePaid?: boolean;
+  children: ReactNode;
+}) {
   const t = useT();
   return (
     <>
@@ -91,9 +126,10 @@ function Receipt({ provider, notes = [], children }: { provider: string | null; 
             {note}
           </p>
         ))}
+        {invoice && <InvoiceLines invoice={invoice} invoiceFor={invoiceFor} farePaid={farePaid} />}
         <div className="mt-4 space-y-1 border-t border-slate-200 pt-3 text-sm text-slate-600">
           {provider && <p className="font-medium text-slate-900">{providerStatement(provider, t)}</p>}
-          <p>{t('This is not a tax invoice.')}</p>
+          {!invoice && <p>{t('This is not a tax invoice.')}</p>}
           <p>{t('Times are India Standard Time.')}</p>
           <p>{t('VAYORA, Kolhapur to Pune')}</p>
         </div>

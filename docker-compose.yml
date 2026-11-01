@@ -150,6 +150,10 @@ services:
       # Payments through Razorpay: both or neither. Neither: the simulated provider.
       RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
       RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
+      # Tax invoices: all three or none (see DEPLOYMENT.md). None: receipts say they are not one.
+      VAYORA_GSTIN: ${VAYORA_GSTIN:-}
+      VAYORA_LEGAL_NAME: ${VAYORA_LEGAL_NAME:-}
+      VAYORA_LEGAL_ADDRESS: ${VAYORA_LEGAL_ADDRESS:-}
     ports:
       - "${CORE_API_PORT:-8080}:8080"
     healthcheck:

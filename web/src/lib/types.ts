@@ -567,7 +567,23 @@ export interface PassengerPayment {
 export type RefundReason = 'NOT_ACCEPTED' | 'DRIVER_CANCELLED' | 'PASSENGER_CANCELLED';
 
 /** What a booking's receipt says: the same facts as its PDF, names as written. */
+/** For what VAYORA itself charges, on real money only, once a GST registration is configured. */
+export interface TaxInvoice {
+  number: string;
+  issuedAt: string;
+  gstin: string;
+  legalName: string;
+  address: string;
+  sacCode: string;
+  ratePercent: number;
+  taxableValue: number;
+  cgst: number;
+  sgst: number;
+  igst: number;
+}
+
 export interface BookingReceipt {
+  taxInvoice?: TaxInvoice | null;
   bookingId: number;
   passenger: string;
   driver: string;
@@ -590,6 +606,7 @@ export interface BookingReceipt {
 
 /** What a pass's receipt says. */
 export interface PassReceipt {
+  taxInvoice?: TaxInvoice | null;
   passId: number;
   passenger: string;
   kind: PassKind;

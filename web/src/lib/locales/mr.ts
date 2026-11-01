@@ -45,6 +45,27 @@ export const mr: Record<string, string> = {
     'डिव्हाइसप्रमाणे',
   'Theme: {name}':
     'थीम: {name}',
+  // Tax invoices
+  'Tax invoice {number}':
+    'कर बीजक {number}',
+  'Issued on {date} by {name}, {address}':
+    '{date} रोजी {name}, {address} यांनी जारी केले',
+  'GSTIN: {gstin}':
+    'जीएसटीआयएन: {gstin}',
+  'For: VAYORA service fee (SAC {code})':
+    'यासाठी: VAYORA सेवा शुल्क (SAC {code})',
+  'For: VAYORA travel pass (SAC {code})':
+    'यासाठी: VAYORA प्रवास पास (SAC {code})',
+  'Value before tax':
+    'करापूर्वीचे मूल्य',
+  'CGST at {rate}%':
+    'CGST {rate}% दराने',
+  'SGST at {rate}%':
+    'SGST {rate}% दराने',
+  'IGST at {rate}%':
+    'IGST {rate}% दराने',
+  'The fare is collected for the driver and is not part of this tax invoice.':
+    'भाडे चालकासाठी घेतले जाते आणि ते या कर बीजकात समाविष्ट नाही.',
   // Staff checks of identity documents and insurance
   'Declare an identity document first':
     'आधी ओळखपत्र जाहीर करा',
