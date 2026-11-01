@@ -88,6 +88,8 @@ export interface Ride {
   womenOnly: boolean;
   /** Minutes in all the driver will go out of their way for pickups; 0 for none. */
   maxDetourMinutes?: number;
+  /** Passengers may pay once their booking ends, in the app or in cash to the driver. */
+  payAfterRide?: boolean;
 }
 
 export type RouteSource = 'OSRM' | 'STRAIGHT_LINE';
@@ -208,6 +210,8 @@ export interface Candidate {
   /** An auto-rickshaw where the walk is long; null where none is offered (feature 91). */
   pickupRickshaw?: RickshawEstimate | null;
   dropoffRickshaw?: RickshawEstimate | null;
+  /** The driver lets passengers book now and pay once the booking ends. */
+  payAfterRide?: boolean;
 }
 
 /** An auto-rickshaw to or from a stop: an estimate, never a quote. */
@@ -459,6 +463,16 @@ export interface SeatHold {
 
 export type PaymentMethod = 'CARD' | 'UPI' | 'WALLET';
 
+/** How something was paid: as when booking, or in cash to the driver after the ride. */
+export type PaidMethod = PaymentMethod | 'CASH';
+
+/**
+ * Where a booking's money stands. Paid when booking: held, then settled. Paid after the
+ * ride: deferred while the booking is live, then due, or void if it owed nothing, then
+ * settled once paid.
+ */
+export type PaymentStatus = 'HELD' | 'SETTLED' | 'DEFERRED' | 'DUE' | 'VOID';
+
 export interface PaymentTerms {
   /** `MOCK` means payments are simulated and no money moves. */
   provider: string;
@@ -500,16 +514,21 @@ export interface PassengerPayment {
   toStop: string;
   fare: number;
   serviceFee: number;
-  /** Fare plus fee: what was held. */
+  /** Fare plus fee: what was held, or what a booking paid after the ride costs in full. */
   amount: number;
-  method: PaymentMethod;
-  /** `MOCK` means no money moved. */
-  provider: string;
-  status: 'HELD' | 'SETTLED';
+  /** Null while a booking paid after the ride has not been paid. */
+  method: PaidMethod | null;
+  /** `MOCK` means no money moved; `CASH`, paid to the driver by hand; null as for the method. */
+  provider: string | null;
+  status: PaymentStatus;
   /** 0 when nothing came back. */
   refunded: number;
   refundReason: RefundReason | null;
   createdAt: string;
+  /** Nothing was taken at booking: paid once the booking ended. */
+  payAfterRide?: boolean;
+  /** What a booking paid after the ride owed when it ended; null until then. */
+  amountDue?: number | null;
 }
 
 export type RefundReason = 'NOT_ACCEPTED' | 'DRIVER_CANCELLED' | 'PASSENGER_CANCELLED';
@@ -525,7 +544,7 @@ export interface BookingReceipt {
   boarding: string;
   status: BookingStatus;
   paidAt: string;
-  method: PaymentMethod;
+  method: PaidMethod;
   fare: number;
   serviceFee: number;
   total: number;
@@ -600,6 +619,12 @@ export interface Booking {
   pickupLon?: number | null;
   /** What the pickup costs the driver, in minutes. */
   detourMinutes?: number | null;
+  /** Nothing was taken at booking: the passenger pays once it ends. */
+  payAfterRide?: boolean;
+  /** Null on a booking nothing was charged for. */
+  paymentStatus?: PaymentStatus | null;
+  /** What a booking paid after the ride owed when it ended; null until then. */
+  amountDue?: number | null;
 }
 
 /** A completed trip its passenger says did not happen. */

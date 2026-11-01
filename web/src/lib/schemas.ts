@@ -112,6 +112,7 @@ export const rideSchema = z
     departure: z.string().min(1, msg('Choose when you leave')),
     seatsOffered: z.coerce.number<number>().int().min(1, msg('Offer at least 1 seat')).max(8, msg('At most 8 seats')),
     instantBooking: z.boolean(),
+    payAfterRide: z.boolean(),
     maxTwoInBack: z.boolean(),
     womenOnly: z.boolean(),
     notes: z.string().max(500, msg('At most 500 characters')),
@@ -191,6 +192,7 @@ export function toPublishRequest(form: RideForm) {
     departureTime: new Date(form.departure).toISOString(),
     seatsOffered: form.seatsOffered,
     instantBooking: form.instantBooking,
+    payAfterRide: form.payAfterRide,
     stops: included.map((stop) => ({
       name: stop.place.name,
       lat: stop.lat,

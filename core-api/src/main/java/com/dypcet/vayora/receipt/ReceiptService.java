@@ -1,6 +1,7 @@
 package com.dypcet.vayora.receipt;
 
 import com.dypcet.vayora.payment.MockPaymentProvider;
+import com.dypcet.vayora.payment.PaymentService;
 import com.dypcet.vayora.payment.RazorpayPaymentProvider;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -88,10 +89,15 @@ public class ReceiptService {
                        s.name AS from_stop, t.name AS to_stop, b.seats, b.status,
                        r.departure_time + make_interval(mins => s.offset_minutes
                                                          + COALESCE(b.pickup_offset_minutes, 0)) AS boarding,
-                       p.fare, p.service_fee, p.amount, p.method, p.provider, p.created_at,
+                       p.service_fee, p.method, p.provider,
+                       -- Paid after the ride: what was owed, when it was paid.
+                       CASE WHEN p.deferred THEN p.amount_due - p.service_fee ELSE p.fare END AS fare,
+                       CASE WHEN p.deferred THEN p.amount_due ELSE p.amount END AS amount,
+                       CASE WHEN p.deferred THEN p.settled_at ELSE p.created_at END AS created_at,
                        COALESCE(f.amount, 0) AS refunded, f.reason AS refund_reason
                 FROM bookings b
-                JOIN payment_intents p ON p.booking_id = b.id
+                -- A pay-after-ride booking has a receipt once it is paid, and not before.
+                JOIN payment_intents p ON p.booking_id = b.id AND (NOT p.deferred OR p.status = 'SETTLED')
                 JOIN users u ON u.id = b.passenger_id
                 JOIN rides r ON r.id = b.ride_id
                 JOIN users d ON d.id = r.driver_id
@@ -183,6 +189,8 @@ public class ReceiptService {
             lines.add("SIMULATED PAYMENT: no money was taken or paid. This is a student project.");
         } else if (RazorpayPaymentProvider.TEST_NAME.equals(provider)) {
             lines.add("TEST MODE: paid in Razorpay's test mode, where no real money moves. This is a student project.");
+        } else if (PaymentService.CASH.equals(provider)) {
+            lines.add("PAID IN CASH to the driver after the ride, as the driver recorded it.");
         }
         lines.add("This is not a tax invoice.");
         lines.add("VAYORA, Kolhapur to Pune");

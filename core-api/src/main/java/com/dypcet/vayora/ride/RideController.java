@@ -66,7 +66,9 @@ public class RideController {
             @Min(0) @Max(8) int repeatWeeks,
             boolean womenOnly,
             // Minutes in all the driver will go out of their way for pickups; null is none.
-            Integer maxDetourMinutes) {
+            Integer maxDetourMinutes,
+            // Passengers may pay once their booking ends, in the app or in cash to the driver.
+            boolean payAfterRide) {
     }
 
     public record PointRequest(
@@ -99,7 +101,7 @@ public class RideController {
                 request.departureTime(), request.seatsOffered(), request.instantBooking(),
                 stops, request.segmentPrices(), request.notes(), request.maxTwoInBack(),
                 request.returnDepartureTime(), request.repeatWeeks(), request.womenOnly(),
-                request.maxDetourMinutes() == null ? 0 : request.maxDetourMinutes()));
+                request.maxDetourMinutes() == null ? 0 : request.maxDetourMinutes(), request.payAfterRide()));
     }
 
     /** The road route through some stops and a suggested price per leg, before publishing. */

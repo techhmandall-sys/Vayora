@@ -55,7 +55,8 @@ public class NotificationService {
         SUPPLY_NUDGE,
         CALL_REQUESTED,
         REFERRAL_REWARD,
-        RELEASE_REMINDER
+        RELEASE_REMINDER,
+        PAYMENT_RECEIVED
     }
 
     /**

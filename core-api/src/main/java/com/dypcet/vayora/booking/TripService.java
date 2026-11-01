@@ -159,9 +159,12 @@ public class TripService {
         Booking booking = bookings.lockBooking(bookingId);
         bookings.move(booking, BookingStatus.NO_SHOW);
         payments.captureInFull(bookingId, driverId, SettlementReason.PASSENGER_NO_SHOW);
-        notifications.send(booking.passengerId(), Type.MARKED_NO_SHOW,
-                Text.of("The driver reported that you did not board for {seats}. Nothing is refunded for a missed ride.",
-                        "seats", BookingService.seatsText(booking)), bookingId);
+        notifications.send(booking.passengerId(), Type.MARKED_NO_SHOW, payments.due(bookingId)
+                .map(due -> Text.of("The driver reported that you did not board for {seats}. As for a seat paid when"
+                        + " booking, the full Rs {amount} is due: pay it in My bookings.",
+                        "seats", BookingService.seatsText(booking), "amount", due.toPlainString()))
+                .orElseGet(() -> Text.of("The driver reported that you did not board for {seats}. Nothing is refunded"
+                        + " for a missed ride.", "seats", BookingService.seatsText(booking))), bookingId);
         events.write(EventType.TRIP_FAILED, new TripFailed(bookingId, rideId,
                 booking.passengerId(), driverId, "passenger_no_show"));
         return bookings.load(bookingId);
@@ -179,9 +182,12 @@ public class TripService {
         for (Booking booking : bookings.lockAll(rideId, BookingStatus.CONFIRMED)) {
             bookings.move(booking, BookingStatus.COMPLETED);
             payments.captureInFull(booking.id(), driverId, SettlementReason.TRIP_COMPLETED);
-            notifications.send(booking.passengerId(), Type.TRIP_COMPLETED,
-                    Text.of("Your trip from {from} to {to} is complete. You can rate your driver in My bookings.",
-                            "from", booking.fromStop(), "to", booking.toStop()), booking.id());
+            notifications.send(booking.passengerId(), Type.TRIP_COMPLETED, payments.due(booking.id())
+                    .map(due -> Text.of("Your trip from {from} to {to} is complete. Rs {amount} is due: pay it in"
+                            + " My bookings, or in cash to your driver.",
+                            "from", booking.fromStop(), "to", booking.toStop(), "amount", due.toPlainString()))
+                    .orElseGet(() -> Text.of("Your trip from {from} to {to} is complete. You can rate your driver in"
+                            + " My bookings.", "from", booking.fromStop(), "to", booking.toStop())), booking.id());
             events.write(EventType.TRIP_COMPLETED,
                     new Trip(booking.id(), rideId, booking.passengerId(), driverId));
             travelled.add(booking.passengerId());

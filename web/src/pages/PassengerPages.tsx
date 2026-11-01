@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { Armchair, Award, BadgeCheck, Car, CarTaxiFront, Clock, Footprints, Hourglass, Map as MapIcon, Route as RouteIcon, ShieldCheck, Shuffle, Sparkles, Ticket, TriangleAlert, UserRound, Users, Wallet, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import { paidLine, RefundTerms, SimulatedPaymentNotice, usePaymentTerms } from '../components/payment';
+import { laterLine, paidLine, PayDue, RefundTerms, SimulatedPaymentNotice, usePaymentTerms } from '../components/payment';
 import { RateForm, RatingSummary } from '../components/rating';
 import { RideChat } from '../components/RideChat';
 import { BoardingPassView } from '../components/boarding';
@@ -260,12 +260,13 @@ export function SearchPage() {
   const stale = sorting || results.isPlaceholderData;
 
   const book = useMutation({
-    mutationFn: async (candidate: Candidate) => {
+    // `later`: book now and pay once the booking ends, on a ride whose driver accepts that.
+    mutationFn: async ({ candidate, later }: { candidate: Candidate; later: boolean }) => {
       const key = candidateKey(candidate, criteria!.form.seats);
       if (!idempotencyKeys.current.has(key)) idempotencyKeys.current.set(key, crypto.randomUUID());
       const stretch = { rideId: candidate.rideId, fromSeq: candidate.fromSeq, toSeq: candidate.toSeq, seats: criteria!.form.seats };
       // Paid first, at the checkout, for what core-api says is due; then booked with the proof.
-      const razorpay = checkout
+      const razorpay = checkout && !later
         ? await payAtCheckout('/bookings/checkout', stretch, `${t(candidate.fromStop)} – ${t(candidate.toStop)}`)
         : undefined;
       return api<Booking>('/bookings', {
@@ -273,7 +274,7 @@ export function SearchPage() {
         headers: { 'Idempotency-Key': idempotencyKeys.current.get(key)! },
         body: {
           ...stretch,
-          ...(razorpay ? { razorpay } : { paymentMethod: method }),
+          ...(later ? { payAfterRide: true } : razorpay ? { razorpay } : { paymentMethod: method }),
           tier: checkout ? 'EXACT' : tier,
           // Picked up where the search started, if that is what the result offered.
           ...(candidate.detourMinutes != null ? { pickupLat: criteria!.origin.lat, pickupLon: criteria!.origin.lon } : {}),
@@ -284,7 +285,7 @@ export function SearchPage() {
         },
       });
     },
-    onSuccess: (booking, candidate) => {
+    onSuccess: (booking, { candidate }) => {
       idempotencyKeys.current.delete(candidateKey(candidate, criteria!.form.seats));
       setBooked(booking);
       setHeld(null);
@@ -513,7 +514,8 @@ export function SearchPage() {
                 time: formatDateTime(booked.boardingTime),
               })
             : t('Request sent. Your seats are held while the driver decides; see My bookings.')}
-          {booked.total !== null && ` ${paidLine(terms.data?.provider, formatRupees(booked.total), t)}`}
+          {booked.total !== null &&
+            ` ${booked.payAfterRide ? laterLine(formatRupees(booked.total), t) : paidLine(terms.data?.provider, formatRupees(booked.total), t)}`}
         </SuccessCard>
       )}
       {book.error && <Notice tone="error">{book.error.message}</Notice>}
@@ -630,9 +632,14 @@ export function SearchPage() {
                         <span className="block text-xs font-medium text-emerald-800">{t('A lower fee: this driver keeps their rides')}</span>
                       )}
                     </p>
-                    <Button className="mt-1 px-6" disabled={book.isPending} onClick={() => book.mutate(candidate)}>
+                    <Button className="mt-1 px-6" disabled={book.isPending} onClick={() => book.mutate({ candidate, later: false })}>
                       {candidate.instantBooking ? t('Book') : t('Request')}
                     </Button>
+                    {candidate.payAfterRide && (
+                      <Button tone="secondary" disabled={book.isPending} onClick={() => book.mutate({ candidate, later: true })}>
+                        {candidate.instantBooking ? t('Book, pay after the ride') : t('Request, pay after the ride')}
+                      </Button>
+                    )}
                   </div>
                 </div>
 
@@ -664,6 +671,7 @@ export function SearchPage() {
                   ) : (
                     <Chip icon={Clock} tone="amber">{t('Driver approves each request')}</Chip>
                   )}
+                  {candidate.payAfterRide && <Chip icon={Wallet} tone="teal">{t('Pay after the ride')}</Chip>}
                   {candidate.driverConfirmed && <Chip icon={BadgeCheck} tone="teal">{t('Contact confirmed')}</Chip>}
                   {candidate.maxTwoInBack && <Chip icon={Armchair}>{t('At most two in the back')}</Chip>}
                   {candidate.womenOnly && <Chip icon={UserRound} tone="red">{t('Women only')}</Chip>}
@@ -864,6 +872,16 @@ export function BookingsPage() {
                       fee: formatRupees(booking.serviceFee ?? 0),
                     })}
                 {booking.refunded !== null && ` · ${t('{amount} returned', { amount: formatRupees(booking.refunded) })}`}
+                {booking.payAfterRide &&
+                  ` · ${
+                    booking.paymentStatus === 'DUE' && booking.amountDue != null
+                      ? t('{amount} due', { amount: formatRupees(booking.amountDue) })
+                      : booking.paymentStatus === 'SETTLED'
+                        ? t('paid after the ride')
+                        : booking.paymentStatus === 'VOID'
+                          ? t('nothing owed')
+                          : t('pay after the ride')
+                  }`}
               </p>
               <p className="mt-2">
                 <StatusBadge status={booking.status} />
@@ -915,6 +933,9 @@ export function BookingsPage() {
             <div className="mt-3">
               <CallButton bookingId={booking.id} label={t('Call the driver')} />
             </div>
+          )}
+          {booking.paymentStatus === 'DUE' && booking.amountDue != null && (
+            <PayDue bookingId={booking.id} amount={booking.amountDue} description={`${t(booking.fromStop)} – ${t(booking.toStop)}`} />
           )}
           <Collapse open={meetingShown === booking.id}>
             <RideRoute

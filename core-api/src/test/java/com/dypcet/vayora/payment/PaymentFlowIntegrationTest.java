@@ -231,7 +231,8 @@ class PaymentFlowIntegrationTest extends PostgresIntegrationTest {
         assertThat(ledger(booking)).hasSize(4);
 
         // Across every payment any test has settled: hold = capture + release, and the
-        // driver is never paid more than was captured.
+        // driver is never paid more than was captured. A payment made after the ride held
+        // what was owed then, which a late cancellation makes less than the whole amount.
         assertThat(jdbc.queryForObject("""
                 SELECT COUNT(*) FROM payment_intents p
                 JOIN (SELECT intent_id,
@@ -241,7 +242,8 @@ class PaymentFlowIntegrationTest extends PostgresIntegrationTest {
                              COALESCE(SUM(amount) FILTER (WHERE kind = 'PAYOUT'), 0) AS paid_out
                       FROM ledger_entries GROUP BY intent_id) l ON l.intent_id = p.id
                 WHERE p.status = 'SETTLED'
-                  AND (l.held <> p.amount OR l.held <> l.captured + l.released
+                  AND (l.held <> CASE WHEN p.deferred THEN p.amount_due ELSE p.amount END
+                       OR l.held <> l.captured + l.released
                        OR l.paid_out > l.captured)""", Integer.class)).isZero();
     }
 

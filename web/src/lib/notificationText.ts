@@ -41,6 +41,10 @@ const TEMPLATES = new Set([
   msg('As you chose a flexible booking, you are booked on the {time} ride with {driver}, who will pick you up at your own point.'),
   msg('As you chose a flexible booking, you have asked for a seat on the {time} ride with {driver}, who would pick you up at your own point. The driver will answer.'),
   msg('{time} with {driver}, picking you up at your own point'),
+  msg('Your trip from {from} to {to} is complete. Rs {amount} is due: pay it in My bookings, or in cash to your driver.'),
+  msg('The driver reported that you did not board for {seats}. As for a seat paid when booking, the full Rs {amount} is due: pay it in My bookings.'),
+  msg('{passenger} paid Rs {amount} in the app for {seats}.'),
+  msg('Your driver recorded Rs {amount} paid in cash for {seats}.'),
 ]);
 
 const known = (text: NotificationText): boolean =>

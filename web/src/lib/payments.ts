@@ -1,11 +1,12 @@
 import { msg } from './i18n';
-import type { PaymentMethod, RefundReason } from './types';
+import type { PaidMethod, RefundReason } from './types';
 
 /** How a payment was made, wherever it is named. */
-export const methodLabels: Record<PaymentMethod, string> = {
+export const methodLabels: Record<PaidMethod, string> = {
   CARD: msg('Card'),
   UPI: msg('UPI'),
   WALLET: msg('Wallet'),
+  CASH: msg('Cash to the driver'),
 };
 
 /** Why money came back, told to the passenger it came back to. */

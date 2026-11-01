@@ -67,7 +67,7 @@ territory.
 | `PUT /api/v1/vehicles/{id}/insurance` | D | Declare the insurer and `insuredUntil` (not checked, no policy number) |
 | `DELETE /api/v1/vehicles/{id}/insurance` | D | Remove the declaration |
 | `POST /api/v1/rides/route-preview` | D | Road route through some stops, with a suggested price per leg |
-| `POST /api/v1/rides` | D | Publish a ride; optionally its return and up to 8 weekly repeats, all or nothing. An electric car is refused (400) if a stretch between two stops is longer than its stated range |
+| `POST /api/v1/rides` | D | Publish a ride; optionally its return and up to 8 weekly repeats, all or nothing. An electric car is refused (400) if a stretch between two stops is longer than its stated range. `payAfterRide: true` lets passengers pay once their booking ends |
 | `GET /api/v1/rides/mine` | D | Own rides |
 | `GET /api/v1/rides/{id}` | any | A ride with its stops, legs, route and notes |
 | `GET /api/v1/rides/{id}/membership` | any | Whether the caller is on the ride. Used by the gateway |
@@ -90,7 +90,9 @@ woman, filter or no filter.
 | `POST /api/v1/holds` | P | Hold seats for 5 minutes. Not a booking |
 | `GET /api/v1/holds/mine` | P | Own hold, or 204 |
 | `DELETE /api/v1/holds/mine` | P | Give the hold up |
-| `POST /api/v1/bookings` | P | Request seats on a stretch of a ride; the payment hold is placed in the same step. With Razorpay, `razorpay: {orderId, paymentId, signature}` from its checkout in place of `paymentMethod`: checked, and refunded in full if the booking fails. Optional `tier`: `EXACT` (default), `FLEXIBLE` or `ANY_TIME`, what happens if the driver withdraws. Optional `pickupLat` and `pickupLon`: be picked up there, on the leg after `fromSeq`, if the ride offers detours; its cost is worked out again here |
+| `POST /api/v1/bookings` | P | Request seats on a stretch of a ride; the payment hold is placed in the same step. With Razorpay, `razorpay: {orderId, paymentId, signature}` from its checkout in place of `paymentMethod`: checked, and refunded in full if the booking fails. Optional `tier`: `EXACT` (default), `FLEXIBLE` or `ANY_TIME`, what happens if the driver withdraws. Optional `pickupLat` and `pickupLon`: be picked up there, on the leg after `fromSeq`, if the ride offers detours; its cost is worked out again here. `payAfterRide: true` takes nothing now, on a ride whose driver allows it (409 otherwise), and needs no payment fields. 409 while the passenger owes anything on an earlier booking |
+| `POST /api/v1/bookings/{id}/pay` | P | Pay what own pay-after-ride booking owes now it has ended: `paymentMethod`, or `razorpay` from a checkout. 409 if nothing is due, 402 if declined |
+| `POST /api/v1/bookings/{id}/cash-received` | D | Record that the passenger paid what is due in cash; nothing is paid out |
 | `GET /api/v1/bookings` | P | Own bookings |
 | `POST /api/v1/bookings/{id}/cancel` | P | Cancel; the refund follows the published tiers |
 | `GET /api/v1/rides/{rideId}/bookings` | D | Bookings on own ride |
@@ -120,8 +122,10 @@ returns the booking the first request made instead of making another.
 | `GET /api/v1/payment-terms` | any | The provider (`MOCK`, `RAZORPAY_TEST` or `RAZORPAY`), the service fee rate, the refund tiers, `checkout` (the passenger pays in Razorpay's checkout first) and `flexibleTiers` (false with Razorpay) |
 | `POST /api/v1/bookings/checkout` | P | `{rideId, fromSeq, toSeq, seats}`: opens a Razorpay order for what booking them would take now, worked out by the server. Answers `{orderId, keyId, amount (paise), currency, testMode}`; 409 when payments are simulated |
 | `POST /api/v1/passes/checkout` | P | `{kind}`: the same for a pass |
-| `GET /api/v1/payments` | P | Own payments |
-| `GET /api/v1/settlements` | D | Own payouts |
+| `POST /api/v1/bookings/{id}/checkout` | P | The same for what own pay-after-ride booking owes now it has ended; 409 if nothing is due |
+| `GET /api/v1/payments` | P | Own payments; `payAfterRide` and `amountDue` on those paid after the ride |
+| `GET /api/v1/settlements` | D | Own payouts; `provider: "CASH"` for what a passenger paid in cash |
+| `GET /api/v1/settlements/cash-fees` | D | `{held}`: the platform's fees inside cash the driver took |
 | `GET /api/v1/passes/offers` | any | Passes on sale |
 | `GET /api/v1/passes` | P | Own passes; `reward` marks one given free for an invitation |
 | `POST /api/v1/passes` | P | Buy a pass; one bought while another runs starts when it ends. With Razorpay, `razorpay: {orderId, paymentId, signature}` from its checkout in place of `paymentMethod` |

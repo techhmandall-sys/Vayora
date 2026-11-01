@@ -1,10 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import { api } from '../lib/api';
-import { formatPercent } from '../lib/format';
+import { formatPercent, formatRupees } from '../lib/format';
 import { useT } from '../lib/i18n';
-import type { PaymentTerms } from '../lib/types';
-import { Notice } from './ui';
+import { payAtCheckout } from '../lib/razorpay';
+import type { Booking, PaymentMethod, PaymentTerms } from '../lib/types';
+import { Button, Notice, SelectField } from './ui';
 
 // The terms change only with a redeploy; one fetch per visit is enough.
 export const usePaymentTerms = () =>
@@ -39,6 +41,51 @@ export function paidLine(provider: string | undefined, amount: string, t: Return
   if (provider === 'RAZORPAY_TEST') return t("{amount} paid in Razorpay's test mode: no real money moved.", { amount });
   if (provider === 'RAZORPAY') return t('{amount} paid through Razorpay.', { amount });
   return t('{amount} is held (simulated payment).', { amount });
+}
+
+/** What a passenger booking to pay after the ride is told: nothing was taken. */
+export function laterLine(amount: string, t: ReturnType<typeof useT>): string {
+  return t('Nothing is taken now: pay {amount} after the ride, in the app or in cash to the driver.', { amount });
+}
+
+/**
+ * What a booking paid after the ride owes, and the way to pay it: in Razorpay's checkout
+ * while payments go through it, otherwise by the method chosen here, as when booking.
+ */
+export function PayDue({ bookingId, amount, description }: { bookingId: number; amount: number; description: string }) {
+  const t = useT();
+  const queryClient = useQueryClient();
+  const terms = usePaymentTerms();
+  const checkout = terms.data?.checkout === true;
+  const [method, setMethod] = useState<PaymentMethod>('UPI');
+  const pay = useMutation({
+    mutationFn: async () => {
+      const razorpay = checkout ? await payAtCheckout(`/bookings/${bookingId}/checkout`, undefined, description) : undefined;
+      return api<Booking>(`/bookings/${bookingId}/pay`, { method: 'POST', body: razorpay ? { razorpay } : { paymentMethod: method } });
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ['bookings'] });
+      void queryClient.invalidateQueries({ queryKey: ['payments'] });
+    },
+  });
+  return (
+    <div className="mt-3 space-y-2">
+      <Notice tone="info">{t('{amount} is due. Pay it here, or in cash to your driver.', { amount: formatRupees(amount) })}</Notice>
+      {pay.error && <Notice tone="error">{pay.error.message}</Notice>}
+      <div className="flex flex-wrap items-end gap-2">
+        {!checkout && (
+          <SelectField label={t('Pay with')} value={method} onChange={(event) => setMethod(event.target.value as PaymentMethod)}>
+            <option value="UPI">{t('UPI')}</option>
+            <option value="CARD">{t('Card')}</option>
+            <option value="WALLET">{t('Wallet')}</option>
+          </SelectField>
+        )}
+        <Button disabled={pay.isPending} onClick={() => pay.mutate()}>
+          {t('Pay {amount}', { amount: formatRupees(amount) })}
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 /** The refund policy in words, built from what the server will actually apply. */

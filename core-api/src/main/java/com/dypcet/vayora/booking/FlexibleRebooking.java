@@ -43,6 +43,7 @@ public class FlexibleRebooking {
     private static final int TRIED = 5;
 
     /** What is needed after the commit, read while the booking was still locked. */
+    /** @param paymentMethod null for a booking paid after the ride, which is rebooked the same way */
     record Withdrawn(long rideId, Booking booking, FlexTier tier, Point from, Point to, String paymentMethod) {
     }
 
@@ -86,7 +87,7 @@ public class FlexibleRebooking {
         Point from = booking.pickupLat() != null && booking.pickupLon() != null
                 ? new Point(booking.pickupLat(), booking.pickupLon()) : ends.get(0);
         Withdrawn withdrawn = new Withdrawn(rideId, booking, tier, from, ends.get(1),
-                method.isEmpty() ? PaymentChoice.Method.CARD.name() : method.get(0));
+                booking.payAfterRide() ? null : method.isEmpty() ? PaymentChoice.Method.CARD.name() : method.get(0));
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
@@ -112,11 +113,12 @@ public class FlexibleRebooking {
         for (Candidate ride : fits) {
             // A ride that picks the passenger up at their own point is booked with that point.
             Point pickup = ride.detourMinutes() != null ? withdrawn.from() : null;
+            boolean payAfterRide = withdrawn.paymentMethod() == null;
             try {
                 Booking booked = ownTransaction.execute(status -> bookings.request(was.passengerId(), ride.rideId(),
-                        ride.fromSeq(), ride.toSeq(), was.seats(),
-                        new PaymentChoice(PaymentChoice.Method.valueOf(withdrawn.paymentMethod()), null), null,
-                        withdrawn.tier(), pickup));
+                        ride.fromSeq(), ride.toSeq(), was.seats(), payAfterRide ? null
+                                : new PaymentChoice(PaymentChoice.Method.valueOf(withdrawn.paymentMethod()), null), null,
+                        withdrawn.tier(), pickup, null, null, payAfterRide));
                 boolean confirmed = booked.status() == BookingStatus.CONFIRMED;
                 tell(was, pickup != null
                         ? Text.of(confirmed

@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,10 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Holds a passenger's money when a booking is requested and settles it, exactly once,
  * when the booking ends.
+ *
+ * <p>A pay-after-ride booking holds nothing. It owes, when it ends, exactly what a booking
+ * paid up front would have kept, and is settled when the passenger pays that in the app or
+ * the driver says it was paid in cash.
  *
  * <p>Every method here is called from inside the booking's own transaction, so money and
  * booking state commit or roll back together. None opens a transaction of its own.
@@ -38,10 +43,33 @@ public class PaymentService {
         LATE_CANCELLATION
     }
 
-    /** One of a passenger's payments, with what came back. */
+    /** Why a pay-after-ride booking owes something, and what the driver's share is paid as. */
+    enum DueReason {
+        TRIP_COMPLETED(SettlementReason.TRIP_COMPLETED),
+        PASSENGER_NO_SHOW(SettlementReason.PASSENGER_NO_SHOW),
+        PASSENGER_CANCELLED(SettlementReason.LATE_CANCELLATION);
+
+        private final SettlementReason settlement;
+
+        DueReason(SettlementReason settlement) {
+            this.settlement = settlement;
+        }
+    }
+
+    /** Takes the money for a pay-after-ride booking hand to hand; nothing is paid out. */
+    public static final String CASH = "CASH";
+
+    /**
+     * One of a passenger's payments, with what came back.
+     *
+     * @param payAfterRide whether nothing was taken at booking
+     * @param amountDue    what a pay-after-ride booking owed when it ended, paid or not;
+     *                     null until then, and for one that owed nothing
+     */
     public record Payment(long bookingId, String fromStop, String toStop, BigDecimal fare,
             BigDecimal serviceFee, BigDecimal amount, String method, String provider,
-            String status, BigDecimal refunded, String refundReason, Instant createdAt) {
+            String status, BigDecimal refunded, String refundReason, Instant createdAt,
+            boolean payAfterRide, BigDecimal amountDue) {
     }
 
     /** One payout to a driver. */
@@ -50,7 +78,7 @@ public class PaymentService {
     }
 
     private record Intent(long id, BigDecimal fare, BigDecimal serviceFee, BigDecimal amount,
-            String providerRef, String status) {
+            String providerRef, String status, boolean deferred, BigDecimal amountDue, String dueReason) {
     }
 
     private final JdbcTemplate jdbc;
@@ -98,6 +126,96 @@ public class PaymentService {
     }
 
     /**
+     * Records what a pay-after-ride booking costs, at the fee {@link #hold} would charge
+     * now, and takes nothing. What it owes is worked out when it ends.
+     */
+    public void defer(long bookingId, long passengerId, long driverId, BigDecimal fare) {
+        BigDecimal fee = feeFor(passengerId, driverId, fare);
+        BigDecimal amount = fare.add(fee);
+        if (amount.signum() == 0) {
+            return; // a free ride: there will be nothing to pay
+        }
+        jdbc.update("""
+                INSERT INTO payment_intents (booking_id, passenger_id, fare, service_fee, amount,
+                                             status, deferred)
+                VALUES (?, ?, ?, ?, ?, 'DEFERRED', true)""",
+                bookingId, passengerId, fare, fee, amount);
+    }
+
+    /** Whether the passenger owes anything on a pay-after-ride booking that has ended. */
+    public boolean owes(long passengerId) {
+        return Boolean.TRUE.equals(jdbc.queryForObject(
+                "SELECT EXISTS (SELECT 1 FROM payment_intents WHERE passenger_id = ? AND status = 'DUE')",
+                Boolean.class, passengerId));
+    }
+
+    /** What a pay-after-ride booking owes now; empty if nothing, or if it was paid. */
+    public Optional<BigDecimal> due(long bookingId) {
+        return jdbc.queryForList(
+                "SELECT amount_due FROM payment_intents WHERE booking_id = ? AND status = 'DUE'",
+                BigDecimal.class, bookingId).stream().findFirst();
+    }
+
+    /** What one of this passenger's bookings owes now, for a checkout; someone else's is not found. */
+    public BigDecimal dueFrom(long passengerId, long bookingId) {
+        List<String> status = jdbc.queryForList(
+                "SELECT status FROM payment_intents WHERE booking_id = ? AND passenger_id = ?",
+                String.class, bookingId, passengerId);
+        if (status.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found");
+        }
+        return due(bookingId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.CONFLICT, "Nothing is due on this booking"));
+    }
+
+    /**
+     * Pays what a pay-after-ride booking owes, in the app: the provider takes it at once,
+     * and the driver is paid their part as for a booking paid up front. If the provider
+     * declines, throws 402 and nothing changes.
+     */
+    public void payDue(long bookingId, long driverId, PaymentChoice choice) {
+        Intent intent = lockDue(bookingId);
+        PaymentProvider.Hold hold = provider.hold(intent.amountDue(), choice).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED,
+                        "The payment was declined. Nothing was paid."));
+        paid(intent, hold.method().name(), provider.name(), hold.reference());
+        provider.capture(hold.reference(), intent.amountDue());
+        entry(intent.id(), "CAPTURE", intent.amountDue());
+        BigDecimal toDriver = intent.amountDue().subtract(intent.serviceFee());
+        if (toDriver.signum() > 0) {
+            String payoutReference = provider.payout(driverId, toDriver);
+            entry(intent.id(), "PAYOUT", toDriver);
+            settlement(bookingId, driverId, toDriver, intent, provider.name(), payoutReference);
+        }
+    }
+
+    /**
+     * Records that the driver was paid what is due in cash. The money went hand to hand, so
+     * nothing is paid out: the driver already holds their part, and the platform's fee with it.
+     */
+    public void paidInCash(long bookingId, long driverId) {
+        Intent intent = lockDue(bookingId);
+        String reference = "cash_" + UUID.randomUUID();
+        paid(intent, CASH, CASH, reference);
+        entry(intent.id(), "CAPTURE", intent.amountDue());
+        BigDecimal toDriver = intent.amountDue().subtract(intent.serviceFee());
+        if (toDriver.signum() > 0) {
+            settlement(bookingId, driverId, toDriver, intent, CASH, reference);
+        }
+    }
+
+    /** The platform's fees inside what the driver has taken in cash, which the driver holds for it. */
+    public BigDecimal cashFeesHeld(long driverId) {
+        return jdbc.queryForObject("""
+                SELECT COALESCE(SUM(p.service_fee), 0)
+                FROM payment_intents p
+                JOIN bookings b ON b.id = p.booking_id
+                JOIN rides r ON r.id = b.ride_id
+                WHERE r.driver_id = ? AND p.method = 'CASH'""",
+                BigDecimal.class, driverId);
+    }
+
+    /**
      * What booking these seats would take now: the fare for the stretch and this passenger's
      * fee, as {@link #hold} works it out. What a checkout is opened for.
      */
@@ -130,38 +248,60 @@ public class PaymentService {
                 : serviceFee.on(fare, keptRides.by(driverId));
     }
 
-    /** Returns everything, fee included: the driver declined, never answered, or withdrew. */
+    /**
+     * Returns everything, fee included: the driver declined, never answered, or withdrew.
+     * A pay-after-ride booking then owes nothing.
+     */
     public void releaseInFull(long bookingId, RefundReason reason) {
-        lockHeld(bookingId).ifPresent(intent ->
-                settle(bookingId, intent, intent.amount(), reason, null, null));
+        lockOpen(bookingId).ifPresent(intent -> {
+            if (intent.deferred()) {
+                owe(intent, BigDecimal.ZERO, null);
+            } else {
+                settle(bookingId, intent, intent.amount(), reason, null, null);
+            }
+        });
     }
 
     /**
      * Settles a passenger's own cancellation. Before the driver accepted, everything comes
      * back. After, the fare comes back by the timing tiers, the service fee is kept, and
-     * the part of the fare not refunded goes to the driver.
+     * the part of the fare not refunded goes to the driver. A pay-after-ride booking owes
+     * what would have been kept.
      */
     public void settlePassengerCancellation(long bookingId, long driverId, boolean accepted,
             Instant boarding, Instant now) {
-        lockHeld(bookingId).ifPresent(intent -> {
+        lockOpen(bookingId).ifPresent(intent -> {
             BigDecimal refund = accepted
                     ? refundPolicy.fareRefund(intent.fare(), Duration.between(now, boarding))
                     : intent.amount();
+            if (intent.deferred()) {
+                owe(intent, intent.amount().subtract(refund), DueReason.PASSENGER_CANCELLED);
+                return;
+            }
             RefundReason reason = accepted ? RefundReason.PASSENGER_CANCELLED : RefundReason.NOT_ACCEPTED;
             settle(bookingId, intent, refund, reason, driverId, SettlementReason.LATE_CANCELLATION);
         });
     }
 
-    /** Keeps everything and pays the fare to the driver: the trip ran, or the passenger did not show. */
+    /**
+     * Keeps everything and pays the fare to the driver: the trip ran, or the passenger did not
+     * show. A pay-after-ride booking owes all of it.
+     */
     public void captureInFull(long bookingId, long driverId, SettlementReason reason) {
-        lockHeld(bookingId).ifPresent(intent ->
-                settle(bookingId, intent, BigDecimal.ZERO, null, driverId, reason));
+        lockOpen(bookingId).ifPresent(intent -> {
+            if (intent.deferred()) {
+                owe(intent, intent.amount(), reason == SettlementReason.PASSENGER_NO_SHOW
+                        ? DueReason.PASSENGER_NO_SHOW : DueReason.TRIP_COMPLETED);
+            } else {
+                settle(bookingId, intent, BigDecimal.ZERO, null, driverId, reason);
+            }
+        });
     }
 
     public List<Payment> forPassenger(long passengerId) {
         return jdbc.query("""
                 SELECT p.booking_id, s.name AS from_stop, t.name AS to_stop, p.fare, p.service_fee,
-                       p.amount, p.method, p.provider, p.status, p.created_at,
+                       p.amount, p.method, p.provider, p.status, p.created_at, p.deferred, p.amount_due,
                        COALESCE(f.amount, 0) AS refunded, f.reason AS refund_reason
                 FROM payment_intents p
                 JOIN bookings b ON b.id = p.booking_id
@@ -174,7 +314,8 @@ public class PaymentService {
                         rs.getBigDecimal("service_fee"), rs.getBigDecimal("amount"),
                         rs.getString("method"), rs.getString("provider"), rs.getString("status"),
                         rs.getBigDecimal("refunded"), rs.getString("refund_reason"),
-                        rs.getObject("created_at", OffsetDateTime.class).toInstant()),
+                        rs.getObject("created_at", OffsetDateTime.class).toInstant(),
+                        rs.getBoolean("deferred"), rs.getBigDecimal("amount_due")),
                 passengerId);
     }
 
@@ -231,25 +372,63 @@ public class PaymentService {
                 intent.id());
     }
 
+    /** Ends a pay-after-ride booking: due with what it owes and why, or void if nothing. */
+    private void owe(Intent intent, BigDecimal owed, DueReason reason) {
+        if (owed.signum() > 0) {
+            jdbc.update("UPDATE payment_intents SET status = 'DUE', amount_due = ?, due_reason = ? WHERE id = ?",
+                    owed, reason.name(), intent.id());
+        } else {
+            jdbc.update("UPDATE payment_intents SET status = 'VOID', settled_at = now() WHERE id = ?", intent.id());
+        }
+    }
+
+    /** Settles a due intent as paid, by whom and how; the money is held, the caller keeps it. */
+    private void paid(Intent intent, String method, String providerName, String reference) {
+        jdbc.update("""
+                UPDATE payment_intents SET status = 'SETTLED', settled_at = now(),
+                                           method = ?, provider = ?, provider_ref = ?
+                WHERE id = ?""",
+                method, providerName, reference, intent.id());
+        entry(intent.id(), "HOLD", intent.amountDue());
+    }
+
+    private void settlement(long bookingId, long driverId, BigDecimal amount, Intent intent,
+            String providerName, String reference) {
+        jdbc.update("""
+                INSERT INTO settlements (booking_id, driver_id, amount, reason, provider, provider_ref)
+                VALUES (?, ?, ?, ?, ?, ?)""",
+                bookingId, driverId, amount, DueReason.valueOf(intent.dueReason()).settlement.name(),
+                providerName, reference);
+    }
+
     /**
-     * Locks the booking's intent. Empty if the booking has none. An intent already
-     * settled is a bug in the caller: a booking ends once.
+     * Locks the booking's intent while the booking is live: held, or a pay-after-ride one
+     * still waiting. Empty if the booking has none. One already ended is a bug in the
+     * caller: a booking ends once.
      */
-    private Optional<Intent> lockHeld(long bookingId) {
-        List<Intent> found = jdbc.query("""
-                SELECT id, fare, service_fee, amount, provider_ref, status
+    private Optional<Intent> lockOpen(long bookingId) {
+        Optional<Intent> found = lock(bookingId);
+        if (found.isPresent() && !List.of("HELD", "DEFERRED").contains(found.get().status())) {
+            throw new IllegalStateException("Payment for booking " + bookingId + " is already settled");
+        }
+        return found;
+    }
+
+    /** Locks the intent of a pay-after-ride booking that owes something and is not yet paid. */
+    private Intent lockDue(long bookingId) {
+        return lock(bookingId).filter(intent -> "DUE".equals(intent.status()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Nothing is due on this booking"));
+    }
+
+    private Optional<Intent> lock(long bookingId) {
+        return jdbc.query("""
+                SELECT id, fare, service_fee, amount, provider_ref, status, deferred, amount_due, due_reason
                 FROM payment_intents WHERE booking_id = ? FOR UPDATE""",
                 (rs, n) -> new Intent(rs.getLong("id"), rs.getBigDecimal("fare"),
                         rs.getBigDecimal("service_fee"), rs.getBigDecimal("amount"),
-                        rs.getString("provider_ref"), rs.getString("status")),
-                bookingId);
-        if (found.isEmpty()) {
-            return Optional.empty();
-        }
-        if (!"HELD".equals(found.get(0).status())) {
-            throw new IllegalStateException("Payment for booking " + bookingId + " is already settled");
-        }
-        return found.stream().findFirst();
+                        rs.getString("provider_ref"), rs.getString("status"), rs.getBoolean("deferred"),
+                        rs.getBigDecimal("amount_due"), rs.getString("due_reason")),
+                bookingId).stream().findFirst();
     }
 
     private void entry(long intentId, String kind, BigDecimal amount) {

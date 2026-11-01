@@ -24,7 +24,8 @@ class TransactionBoundaryTest {
 
     @Test
     void everyPublicActionOnBookingsIsTransactional() {
-        assertTransactional(BookingService.class, Set.of("request", "accept", "reject", "cancel", "expire"));
+        assertTransactional(BookingService.class,
+                Set.of("request", "accept", "reject", "cancel", "expire", "payDue", "paidInCash"));
     }
 
     private static void assertTransactional(Class<?> type, Set<String> actions) {

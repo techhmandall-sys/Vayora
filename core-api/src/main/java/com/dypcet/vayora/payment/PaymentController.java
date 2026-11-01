@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** A person's own money history. All of it was handled by the mock provider. */
+/** A person's own money history, and what a driver holds from rides paid in cash. */
 @RestController
 @RequestMapping("/api/v1")
 public class PaymentController {
@@ -32,6 +32,10 @@ public class PaymentController {
      */
     public record Terms(String provider, BigDecimal serviceFeeRate, List<RefundTier> refundTiers,
             boolean checkout, boolean flexibleTiers) {
+    }
+
+    /** @param held the platform's fees inside what a driver took in cash, which they hold for it */
+    public record CashFees(BigDecimal held) {
     }
 
     private final PaymentService payments;
@@ -60,5 +64,11 @@ public class PaymentController {
     @PreAuthorize("hasRole('DRIVER')")
     public List<Settlement> settlements(@AuthenticationPrincipal Jwt jwt) {
         return payments.forDriver(CurrentUser.id(jwt));
+    }
+
+    @GetMapping("/settlements/cash-fees")
+    @PreAuthorize("hasRole('DRIVER')")
+    public CashFees cashFees(@AuthenticationPrincipal Jwt jwt) {
+        return new CashFees(payments.cashFeesHeld(CurrentUser.id(jwt)));
     }
 }

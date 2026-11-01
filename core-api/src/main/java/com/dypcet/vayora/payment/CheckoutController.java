@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,6 +68,14 @@ public class CheckoutController {
         long passengerId = CurrentUser.id(jwt);
         return order(payments.amountDue(passengerId, request.rideId(), request.fromSeq(), request.toSeq(),
                 request.seats()), "booking", passengerId);
+    }
+
+    /** A checkout for what one of the passenger's pay-after-ride bookings owes now it has ended. */
+    @PostMapping("/bookings/{id}/checkout")
+    @PreAuthorize("hasRole('PASSENGER')")
+    public Order due(@AuthenticationPrincipal Jwt jwt, @PathVariable long id) {
+        long passengerId = CurrentUser.id(jwt);
+        return order(payments.dueFrom(passengerId, id), "due", passengerId);
     }
 
     @PostMapping("/passes/checkout")

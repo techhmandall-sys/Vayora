@@ -46,6 +46,8 @@ Access is through `JdbcTemplate` with hand-written SQL. There is no ORM.
 | V32 | On users: `id_document`, the kind of identity document a driver says they hold (one of five). Never a number or a copy, and never checked |
 | V33 | On sos_alerts: `contacts_missed`, the emergency texts a real provider could not send (0 with the simulated sender) |
 | V34 | Unique indexes on payment_intents and passes by (provider, provider_ref): one real payment pays for one booking or one pass |
+| V35 | On bookings: `last_mile_distance_m` and `last_mile_mode_shown`, the gap to the boarding stop and the access option shown, recorded once at request time for the durability model |
+| V36 | Paying after the ride: `rides.pay_after_ride`; on payment_intents `deferred`, `amount_due` and `due_reason`, the statuses `DEFERRED`, `DUE` and `VOID`, the method `CASH`, and checks that only a deferred intent waits, owes or is paid in cash |
 
 ### Tables
 
@@ -73,7 +75,7 @@ Access is through `JdbcTemplate` with hand-written SQL. There is no ORM.
 
 | Table | One row is | Notes |
 |---|---|---|
-| `payment_intents` | The amount held for one booking | One per booking. `HELD`, then `SETTLED` once |
+| `payment_intents` | The amount held for one booking | One per booking. `HELD`, then `SETTLED` once. Paid after the ride: `DEFERRED` with nothing moved, then `DUE` with what is owed or `VOID`, then `SETTLED` once paid, by the provider or `CASH` |
 | `ledger_entries` | One movement of money | Append-only: a trigger refuses `UPDATE` and `DELETE` |
 | `refunds` | What went back to a passenger | At most one per booking |
 | `settlements` | What was paid to a driver | At most one per booking, with the reason |
@@ -99,6 +101,7 @@ Access is through `JdbcTemplate` with hand-written SQL. There is no ORM.
 |---|---|
 | `rides.status` | `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED` |
 | `bookings.status` | `PENDING`, `CONFIRMED`, `REJECTED`, `CANCELLED`, `COMPLETED`, `NO_SHOW` |
+| `payment_intents.status` | `HELD`, `SETTLED`; paid after the ride `DEFERRED`, `DUE`, `VOID`, `SETTLED` |
 | `users.status` | `ACTIVE`, `SUSPENDED` |
 | `reports.status` | `OPEN`, `RESOLVED`, `DISMISSED` |
 | `sos_alerts.status` | `OPEN`, `ACKNOWLEDGED` |

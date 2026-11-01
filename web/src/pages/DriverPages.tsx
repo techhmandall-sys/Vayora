@@ -317,6 +317,7 @@ export function PublishRidePage() {
       departure: '',
       seatsOffered: 3,
       instantBooking: true,
+      payAfterRide: false,
       maxTwoInBack: false,
       womenOnly: false,
       notes: '',
@@ -403,6 +404,15 @@ export function PublishRidePage() {
               <label className="flex items-center gap-2 self-end pb-2 text-sm text-slate-700">
                 <input type="checkbox" className="h-4 w-4 rounded border-slate-300" {...register('instantBooking')} />
                 {t('Confirm bookings instantly, without asking me')}
+              </label>
+              <label className="flex items-start gap-2 text-sm text-slate-700 sm:col-span-2">
+                <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-slate-300" {...register('payAfterRide')} />
+                <span>
+                  {t('Let passengers pay after the ride, in the app or in cash to me')}
+                  <span className="block text-slate-500">
+                    {t('Nothing is taken when they book. A late cancellation or a no-show owes what it would have cost paid up front, and they cannot book again until it is paid.')}
+                  </span>
+                </span>
               </label>
             </div>
             </FormStep>
@@ -637,6 +647,7 @@ export function RidesPage() {
               <p className="mt-1 text-sm text-slate-600">
                 {t('Leaves {time}', { time: formatDateTime(ride.departureTime) })} ·{' '}
                 {ride.instantBooking ? t('Instant booking') : t('You approve requests')}
+                {ride.payAfterRide && ` · ${t('Passengers may pay after the ride')}`}
               </p>
               {ride.distanceKm !== null && ride.durationMinutes !== null && (
                 <p className="mt-1 text-sm text-slate-600">
@@ -723,10 +734,13 @@ function RideBookings({ ride }: { ride: Ride }) {
     enabled: open,
   });
   const decide = useMutation({
-    mutationFn: ({ booking, action }: { booking: number; action: 'accept' | 'reject' | 'no-show' }) =>
+    mutationFn: ({ booking, action }: { booking: number; action: 'accept' | 'reject' | 'no-show' | 'cash-received' }) =>
       api<Booking>(`/bookings/${booking}/${action}`, { method: 'POST' }),
-    // Covers this ride's bookings and the seat counts on the ride itself.
-    onSettled: () => void queryClient.invalidateQueries({ queryKey: ['rides'] }),
+    // Covers this ride's bookings and the seat counts on the ride itself; cash changes earnings.
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ['rides'] });
+      void queryClient.invalidateQueries({ queryKey: ['settlements'] });
+    },
   });
 
   return (
@@ -791,11 +805,31 @@ function RideBookings({ ride }: { ride: Ride }) {
                         </a>
                       </p>
                     )}
+                    {booking.payAfterRide && (
+                      <p className={booking.paymentStatus === 'DUE' ? 'font-medium text-amber-800' : 'text-slate-600'}>
+                        {booking.paymentStatus === 'DUE' && booking.amountDue != null
+                          ? t('{amount} due, in the app or in cash to you', { amount: formatRupees(booking.amountDue) })
+                          : booking.paymentStatus === 'SETTLED'
+                            ? t('Paid after the ride')
+                            : booking.paymentStatus === 'VOID'
+                              ? t('Owes nothing')
+                              : t('Pays after the ride')}
+                      </p>
+                    )}
                     <p className="mt-1">
                       <StatusBadge status={booking.status} />
                     </p>
                   </div>
                   <div className="flex gap-2">
+                    {booking.paymentStatus === 'DUE' && booking.amountDue != null && (
+                      <ConfirmButton
+                        label={t('Cash received')}
+                        confirmLabel={t('Yes, I was paid {amount} in cash', { amount: formatRupees(booking.amountDue) })}
+                        tone="primary"
+                        disabled={decide.isPending}
+                        onConfirm={() => decide.mutate({ booking: booking.id, action: 'cash-received' })}
+                      />
+                    )}
                     {booking.status === 'PENDING' && ride.status === 'SCHEDULED' && (
                       <>
                         <Button disabled={decide.isPending} onClick={() => decide.mutate({ booking: booking.id, action: 'accept' })}>
@@ -849,11 +883,19 @@ const settlementReason: Record<Settlement['reason'], string> = {
 export function EarningsPage() {
   const t = useT();
   const settlements = useQuery({ queryKey: ['settlements'], queryFn: () => api<Settlement[]>('/settlements') });
+  const cashFees = useQuery({ queryKey: ['settlements', 'cash-fees'], queryFn: () => api<{ held: number }>('/settlements/cash-fees') });
   const total = settlements.data?.reduce((sum, settlement) => sum + settlement.amount, 0) ?? 0;
 
   return (
     <Page title={t('Earnings')}>
       <SimulatedPaymentNotice forDrivers />
+      {cashFees.data && cashFees.data.held > 0 && (
+        <Notice tone="info">
+          {t("{amount} of the cash passengers paid you after their rides is VAYORA's service fee, which you hold for the platform.", {
+            amount: formatRupees(cashFees.data.held),
+          })}
+        </Notice>
+      )}
       <QueryState
         isPending={settlements.isPending}
         error={settlements.error}
@@ -891,7 +933,10 @@ export function EarningsPage() {
                     <td className="py-2 pr-4">
                       {t(settlement.fromStop)} → {t(settlement.toStop)}
                     </td>
-                    <td className="py-2 pr-4">{t(settlementReason[settlement.reason])}</td>
+                    <td className="py-2 pr-4">
+                      {t(settlementReason[settlement.reason])}
+                      {settlement.provider === 'CASH' && ` · ${t('taken in cash')}`}
+                    </td>
                     <td className="py-2 text-right font-medium">{formatRupees(settlement.amount)}</td>
                   </tr>
                 ))}

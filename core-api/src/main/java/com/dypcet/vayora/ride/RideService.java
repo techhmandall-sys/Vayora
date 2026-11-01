@@ -76,11 +76,22 @@ public class RideService {
      *                            prices and intervals; null for no return ride
      * @param repeatWeeks         how many further weeks the ride, and its return, are
      *                            published for at the same time of day
+     * @param payAfterRide        passengers may book without paying and pay once the
+     *                            booking ends, in the app or in cash to the driver
      */
     public record PublishRide(long vehicleId, Instant departureTime, int seatsOffered,
             boolean instantBooking, List<StopInput> stops, List<BigDecimal> segmentPrices,
             String notes, boolean maxTwoInBack, Instant returnDepartureTime, int repeatWeeks,
-            boolean womenOnly, int maxDetourMinutes) {
+            boolean womenOnly, int maxDetourMinutes, boolean payAfterRide) {
+
+        /** Paid when booking. */
+        public PublishRide(long vehicleId, Instant departureTime, int seatsOffered,
+                boolean instantBooking, List<StopInput> stops, List<BigDecimal> segmentPrices,
+                String notes, boolean maxTwoInBack, Instant returnDepartureTime, int repeatWeeks,
+                boolean womenOnly, int maxDetourMinutes) {
+            this(vehicleId, departureTime, seatsOffered, instantBooking, stops, segmentPrices,
+                    notes, maxTwoInBack, returnDepartureTime, repeatWeeks, womenOnly, maxDetourMinutes, false);
+        }
 
         /** No detours: passengers board only at the stops. */
         public PublishRide(long vehicleId, Instant departureTime, int seatsOffered,
@@ -122,12 +133,13 @@ public class RideService {
      * @param path            the route to draw, as [lat, lon] pairs; empty as above
      * @param seriesSize      how many rides were published together with this one,
      *                        itself included; 1 for a ride published alone
+     * @param payAfterRide    passengers may pay once their booking ends instead of when booking
      */
     public record Ride(long id, long driverId, String driverName, long vehicleId,
             Instant departureTime, int seatsOffered, boolean instantBooking, String status,
             List<Stop> stops, List<Segment> segments, Double distanceKm, Integer durationMinutes,
             String routeSource, List<double[]> path, String notes, boolean maxTwoInBack,
-            int seriesSize, boolean womenOnly, int maxDetourMinutes) {
+            int seriesSize, boolean womenOnly, int maxDetourMinutes, boolean payAfterRide) {
     }
 
     /**
@@ -147,6 +159,7 @@ public class RideService {
      * @param vehicle           make and model, as the driver entered them
      * @param comfort           the driver's own description of the car; null, like luggage,
      *                          if not said
+     * @param payAfterRide      the driver lets passengers pay once the booking ends
      */
     public record Candidate(long rideId, String driverName, boolean instantBooking,
             int fromSeq, int toSeq, String fromStop, String toStop, Instant boardingTime,
@@ -158,7 +171,8 @@ public class RideService {
             int driverRidesWithdrawn, int pickupWalkMinutes, int dropoffWalkMinutes, boolean suggestFlexible,
             boolean underWay, boolean keptRides, String insurer, LocalDate insuredUntil,
             int matchScore, List<MatchScore.Reason> matchReasons, Integer detourMinutes,
-            boolean walkOnFootpaths, Rickshaws.Estimate pickupRickshaw, Rickshaws.Estimate dropoffRickshaw) {
+            boolean walkOnFootpaths, Rickshaws.Estimate pickupRickshaw, Rickshaws.Estimate dropoffRickshaw,
+            boolean payAfterRide) {
 
         Candidate withSeatsAvailable(int seats) {
             return new Candidate(rideId, driverName, instantBooking, fromSeq, toSeq, fromStop, toStop,
@@ -167,7 +181,7 @@ public class RideService {
                     driverConfirmed, maxTwoInBack, vehicle, comfort, luggage, electric, womenOnly,
                     driverRidesCompleted, driverRidesWithdrawn, pickupWalkMinutes, dropoffWalkMinutes, suggestFlexible,
                     underWay, keptRides, insurer, insuredUntil, matchScore, matchReasons, detourMinutes,
-                    walkOnFootpaths, pickupRickshaw, dropoffRickshaw);
+                    walkOnFootpaths, pickupRickshaw, dropoffRickshaw, payAfterRide);
         }
 
         Candidate withMatch(MatchScore.Match match) {
@@ -177,7 +191,7 @@ public class RideService {
                     driverConfirmed, maxTwoInBack, vehicle, comfort, luggage, electric, womenOnly,
                     driverRidesCompleted, driverRidesWithdrawn, pickupWalkMinutes, dropoffWalkMinutes, suggestFlexible,
                     underWay, keptRides, insurer, insuredUntil, match.score(), match.reasons(), detourMinutes,
-                    walkOnFootpaths, pickupRickshaw, dropoffRickshaw);
+                    walkOnFootpaths, pickupRickshaw, dropoffRickshaw, payAfterRide);
         }
 
         /** Picked up at the passenger's own point: no walk, later than the stop, and a detour for the driver. */
@@ -188,7 +202,7 @@ public class RideService {
                     dropoffDistanceM, driverConfirmed, maxTwoInBack, vehicle, comfort, luggage, electric, womenOnly,
                     driverRidesCompleted, driverRidesWithdrawn, 0, dropoffWalkMinutes, suggestFlexible,
                     underWay, keptRides, insurer, insuredUntil, matchScore, matchReasons, pickup.detourMinutes(),
-                    walkOnFootpaths, null, dropoffRickshaw);
+                    walkOnFootpaths, null, dropoffRickshaw, payAfterRide);
         }
 
         /** Walking times worked out on footpaths, in place of the straight-line estimates. */
@@ -199,7 +213,7 @@ public class RideService {
                     driverConfirmed, maxTwoInBack, vehicle, comfort, luggage, electric, womenOnly,
                     driverRidesCompleted, driverRidesWithdrawn, pickupMinutes, dropoffMinutes, suggestFlexible,
                     underWay, keptRides, insurer, insuredUntil, matchScore, matchReasons, detourMinutes, true,
-                    pickupRickshaw, dropoffRickshaw);
+                    pickupRickshaw, dropoffRickshaw, payAfterRide);
         }
 
         /** An auto-rickshaw estimate for either end where the walk is long; null where not offered. */
@@ -210,7 +224,7 @@ public class RideService {
                     driverConfirmed, maxTwoInBack, vehicle, comfort, luggage, electric, womenOnly,
                     driverRidesCompleted, driverRidesWithdrawn, pickupWalkMinutes, dropoffWalkMinutes, suggestFlexible,
                     underWay, keptRides, insurer, insuredUntil, matchScore, matchReasons, detourMinutes,
-                    walkOnFootpaths, pickup, dropoff);
+                    walkOnFootpaths, pickup, dropoff, payAfterRide);
         }
     }
 
@@ -456,13 +470,13 @@ public class RideService {
                 INSERT INTO rides (driver_id, vehicle_id, departure_time, seats_offered,
                                    instant_booking, status, route, distance_m, duration_s,
                                    route_source, notes, max_two_in_back, series_id, women_only,
-                                   max_detour_minutes)
-                VALUES (?, ?, ?, ?, ?, 'SCHEDULED', ST_GeogFromText(?), ?, ?, ?, ?, ?, ?, ?, ?)
+                                   max_detour_minutes, pay_after_ride)
+                VALUES (?, ?, ?, ?, ?, 'SCHEDULED', ST_GeogFromText(?), ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 RETURNING id""",
                 Long.class, driverId, ride.vehicleId(), utc(departure),
                 ride.seatsOffered(), ride.instantBooking(), lineString(route.path()),
                 route.distanceMetres(), route.durationSeconds(), route.source(), notes,
-                ride.maxTwoInBack(), seriesId, ride.womenOnly(), ride.maxDetourMinutes());
+                ride.maxTwoInBack(), seriesId, ride.womenOnly(), ride.maxDetourMinutes(), ride.payAfterRide());
 
         for (int seq = 0; seq < stops.size(); seq++) {
             StopInput stop = stops.get(seq);
@@ -613,7 +627,7 @@ public class RideService {
                 SELECT r.id, r.driver_id, r.vehicle_id, r.departure_time, r.seats_offered,
                        r.instant_booking, r.status, r.distance_m, r.duration_s, r.route_source,
                        ST_AsGeoJSON(r.route::geometry) AS route_json, u.full_name,
-                       r.notes, r.max_two_in_back, r.women_only, r.max_detour_minutes,
+                       r.notes, r.max_two_in_back, r.women_only, r.max_detour_minutes, r.pay_after_ride,
                        CASE WHEN r.series_id IS NULL THEN 1
                             ELSE (SELECT COUNT(*) FROM rides s WHERE s.series_id = r.series_id)
                        END AS series_size
@@ -629,7 +643,7 @@ public class RideService {
                         rs.getString("route_source"), path(rs.getString("route_json")),
                         rs.getString("notes"), rs.getBoolean("max_two_in_back"),
                         rs.getInt("series_size"), rs.getBoolean("women_only"),
-                        rs.getInt("max_detour_minutes")),
+                        rs.getInt("max_detour_minutes"), rs.getBoolean("pay_after_ride")),
                 rideId);
         if (found.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found");
@@ -780,7 +794,7 @@ public class RideService {
                 )
                 SELECT * FROM (
                     SELECT DISTINCT ON (r.id)
-                           r.id, u.full_name, r.instant_booking, r.driver_id, r.max_two_in_back,
+                           r.id, u.full_name, r.instant_booking, r.driver_id, r.max_two_in_back, r.pay_after_ride,
                            r.women_only, r.status = 'IN_PROGRESS' AS under_way,
                            v.make || ' ' || v.model AS vehicle, v.comfort, v.luggage, v.electric,
                            -- Declared insurance, only while it covers the day the trip ends.
@@ -874,7 +888,8 @@ public class RideService {
                             walkMinutes(rs.getDouble("dropoff_m")),
                             weakRecord(rs.getInt("driver_completed"), rs.getInt("driver_withdrawn")),
                             rs.getBoolean("under_way"), kept, rs.getString("insurer"),
-                            rs.getObject("insured_until", LocalDate.class), 0, List.of(), null, false, null, null);
+                            rs.getObject("insured_until", LocalDate.class), 0, List.of(), null, false, null, null,
+                            rs.getBoolean("pay_after_ride"));
                 });
 
         List<Candidate> candidates = boardingAt.apply("ST_DWithin(o.location, want.origin, :radius)");

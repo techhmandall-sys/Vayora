@@ -10,11 +10,17 @@ import { useT } from '../lib/i18n';
 import { methodLabels, refundReasons } from '../lib/payments';
 import type { PassengerPayment } from '../lib/types';
 
+/** What was actually taken: for a booking paid after the ride, what it owed, once paid. */
+function taken(payment: PassengerPayment): number {
+  if (!payment.payAfterRide) return payment.amount - payment.refunded;
+  return payment.status === 'SETTLED' ? (payment.amountDue ?? 0) : 0;
+}
+
 /** What a passenger has paid, and what came back, newest first. */
 export function PaymentsPage() {
   const t = useT();
   const payments = useQuery({ queryKey: ['payments'], queryFn: () => api<PassengerPayment[]>('/payments') });
-  const paid = payments.data?.reduce((sum, payment) => sum + payment.amount - payment.refunded, 0) ?? 0;
+  const paid = payments.data?.reduce((sum, payment) => sum + taken(payment), 0) ?? 0;
 
   return (
     <Page title={t('Payments')}>
@@ -53,7 +59,9 @@ export function PaymentsPage() {
                     <td className="py-2 pr-4">
                       {t(payment.fromStop)} → {t(payment.toStop)}
                     </td>
-                    <td className="py-2 pr-4">{t(methodLabels[payment.method])}</td>
+                    <td className="py-2 pr-4">
+                      {payment.method ? t(methodLabels[payment.method]) : payment.status === 'VOID' ? '—' : t('Not paid yet')}
+                    </td>
                     <td className="py-2 pr-4 text-right">
                       <span className="font-medium">{formatRupees(payment.amount)}</span>
                       <span className="block text-xs text-slate-500">
@@ -61,14 +69,23 @@ export function PaymentsPage() {
                       </span>
                     </td>
                     <td className="py-2 pr-4">
-                      {payment.refunded > 0 && payment.refundReason
-                        ? `${formatRupees(payment.refunded)}: ${t(refundReasons[payment.refundReason])}`
-                        : payment.status === 'HELD'
-                          ? t('Held until the trip ends')
-                          : t('Nothing')}
+                      {payment.payAfterRide
+                        ? payment.status === 'DUE' && payment.amountDue != null
+                          ? t('{amount} due: pay it in My bookings', { amount: formatRupees(payment.amountDue) })
+                          : payment.status === 'SETTLED' && payment.amountDue != null
+                            ? t('{amount} paid after the ride', { amount: formatRupees(payment.amountDue) })
+                            : payment.status === 'VOID'
+                              ? t('Nothing owed')
+                              : t('Pay after the ride')
+                        : payment.refunded > 0 && payment.refundReason
+                          ? `${formatRupees(payment.refunded)}: ${t(refundReasons[payment.refundReason])}`
+                          : payment.status === 'HELD'
+                            ? t('Held until the trip ends')
+                            : t('Nothing')}
                     </td>
                     <td className="py-2">
-                      <ReceiptLinks of="booking" id={payment.bookingId} />
+                      {/* Paid after the ride, there is a receipt once it is paid and not before. */}
+                      {(!payment.payAfterRide || payment.status === 'SETTLED') && <ReceiptLinks of="booking" id={payment.bookingId} />}
                     </td>
                   </tr>
                 ))}

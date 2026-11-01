@@ -120,5 +120,6 @@ function providerStatement(provider: string, t: Translate): string {
   if (provider === 'MOCK') return t('Simulated payment: no money was taken or paid. This is a student project.');
   if (provider === 'RAZORPAY_TEST') return t("Paid in Razorpay's test mode, where no real money moves. This is a student project.");
   if (provider === 'RAZORPAY') return t('Paid through Razorpay.');
+  if (provider === 'CASH') return t('Paid in cash to the driver after the ride, as the driver recorded it.');
   return t('Payment provider: {provider}', { provider });
 }

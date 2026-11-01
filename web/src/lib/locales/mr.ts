@@ -1849,3 +1849,74 @@ export const mr: Record<string, string> = {
   'A final-year project at DYPCET, Kolhapur. Payments, text messages and calls are simulated unless real services are connected.':
     'DYPCET, कोल्हापूर येथील अंतिम वर्षाचा प्रकल्प. खऱ्या सेवा जोडल्या जाईपर्यंत पेमेंट, मजकूर संदेश आणि कॉल नमुना (सिम्युलेशन) आहेत.',
 };
+  // Paying after the ride
+  'Cash to the driver':
+    'चालकाला रोख',
+  'Nothing is taken now: pay {amount} after the ride, in the app or in cash to the driver.':
+    'आत्ता काहीही घेतले नाही: प्रवासानंतर {amount} भरा, ॲपमध्ये किंवा चालकाला रोख.',
+  '{amount} is due. Pay it here, or in cash to your driver.':
+    '{amount} देय आहे. ते इथे भरा, किंवा तुमच्या चालकाला रोख द्या.',
+  'Pay {amount}':
+    '{amount} भरा',
+  'Book, pay after the ride':
+    'बुक करा, प्रवासानंतर पैसे द्या',
+  'Request, pay after the ride':
+    'विनंती करा, प्रवासानंतर पैसे द्या',
+  'Pay after the ride':
+    'प्रवासानंतर पेमेंट',
+  '{amount} due':
+    '{amount} देय',
+  'paid after the ride':
+    'प्रवासानंतर पेमेंट झाले',
+  'nothing owed':
+    'काहीही देय नाही',
+  'pay after the ride':
+    'प्रवासानंतर पेमेंट',
+  'Let passengers pay after the ride, in the app or in cash to me':
+    'प्रवाशांना प्रवासानंतर पैसे देऊ द्या, ॲपमध्ये किंवा मला रोख',
+  'Nothing is taken when they book. A late cancellation or a no-show owes what it would have cost paid up front, and they cannot book again until it is paid.':
+    'बुक करताना काहीही घेतले जात नाही. उशिरा रद्द केल्यास किंवा न आल्यास, आधी पैसे भरले असते तितकेच देय होते, आणि ते भरेपर्यंत त्यांना पुन्हा बुक करता येत नाही.',
+  'Passengers may pay after the ride':
+    'प्रवासी प्रवासानंतर पैसे देऊ शकतात',
+  '{amount} due, in the app or in cash to you':
+    '{amount} देय, ॲपमध्ये किंवा तुम्हाला रोख',
+  'Paid after the ride':
+    'प्रवासानंतर पेमेंट झाले',
+  'Owes nothing':
+    'काहीही देय नाही',
+  'Pays after the ride':
+    'प्रवासानंतर पैसे देतील',
+  'Cash received':
+    'रोख मिळाले',
+  'Yes, I was paid {amount} in cash':
+    'हो, मला {amount} रोख मिळाले',
+  '{amount} of the cash passengers paid you after their rides is VAYORA\'s service fee, which you hold for the platform.':
+    'प्रवासानंतर प्रवाशांनी तुम्हाला दिलेल्या रोख रकमेपैकी {amount} हे VAYORA चे सेवा शुल्क आहे, जे तुम्ही प्लॅटफॉर्मसाठी ठेवले आहे.',
+  'taken in cash':
+    'रोख घेतले',
+  'Not paid yet':
+    'अजून पेमेंट झाले नाही',
+  '{amount} due: pay it in My bookings':
+    '{amount} देय: माझी बुकिंग मध्ये भरा',
+  '{amount} paid after the ride':
+    'प्रवासानंतर {amount} भरले',
+  'Nothing owed':
+    'काहीही देय नाही',
+  'Paid in cash to the driver after the ride, as the driver recorded it.':
+    'प्रवासानंतर चालकाला रोख दिले, चालकाने नोंदवल्याप्रमाणे.',
+  'You have a payment due from an earlier booking. Pay it in My bookings before booking again.':
+    'मागील बुकिंगचे पेमेंट देय आहे. पुन्हा बुक करण्यापूर्वी ते माझी बुकिंग मध्ये भरा.',
+  'This driver takes payment when you book, not after the ride':
+    'या राइडसाठी पेमेंट बुक करतानाच होते, प्रवासानंतर नाही',
+  'Nothing is due on this booking':
+    'या बुकिंगवर काहीही देय नाही',
+  'The payment was declined. Nothing was paid.':
+    'पेमेंट नाकारले गेले. काहीही भरले गेले नाही.',
+  '{passenger} paid Rs {amount} in the app for {seats}.':
+    '{passenger} यांनी {seats} साठी ॲपमध्ये Rs {amount} भरले.',
+  'Your driver recorded Rs {amount} paid in cash for {seats}.':
+    'तुमच्या चालकाने {seats} साठी Rs {amount} रोख मिळाल्याची नोंद केली.',
+  'The driver reported that you did not board for {seats}. As for a seat paid when booking, the full Rs {amount} is due: pay it in My bookings.':
+    'चालकाने कळवले की तुम्ही {seats} साठी बसला नाहीत. बुक करताना भरलेल्या सीटप्रमाणे, पूर्ण Rs {amount} देय आहेत: ते माझी बुकिंग मध्ये भरा.',
+  'Your trip from {from} to {to} is complete. Rs {amount} is due: pay it in My bookings, or in cash to your driver.':
+    '{from} ते {to} हा तुमचा प्रवास पूर्ण झाला. Rs {amount} देय आहेत: माझी बुकिंग मध्ये भरा, किंवा तुमच्या चालकाला रोख द्या.',

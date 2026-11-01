@@ -3180,3 +3180,88 @@ describe('paying through Razorpay', () => {
     expect(screen.queryByText(/Payments here are simulated/)).not.toBeInTheDocument();
   });
 });
+
+describe('paying after the ride', () => {
+  const bodyOf = (fetchMock: ReturnType<typeof serve>, path: string) => {
+    const call = fetchMock.mock.calls.find(([url, init]) => init?.method === 'POST' && new URL(String(url)).pathname.endsWith(path));
+    return call ? JSON.parse(String(call[1]?.body ?? 'null')) : undefined;
+  };
+
+  it('books without paying on a ride whose driver accepts it, and says nothing was taken', async () => {
+    signIn('PASSENGER');
+    const fetchMock = serve({
+      'GET /rides/search': () => json([{ ...candidate, instantBooking: true, payAfterRide: true }]),
+      'POST /bookings': () => json({ ...booking, status: 'CONFIRMED', payAfterRide: true, paymentStatus: 'DEFERRED' }, 201),
+    });
+    open('/search');
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Search' }));
+    const results = await screen.findByRole('region', { name: 'Search results' });
+    expect(within(results).getByText('Pay after the ride')).toBeInTheDocument();
+    await userEvent.click(within(results).getByRole('button', { name: 'Book, pay after the ride' }));
+
+    expect(await screen.findByText(/Nothing is taken now: pay ₹572 after the ride/)).toBeInTheDocument();
+    const body = bodyOf(fetchMock, '/bookings');
+    expect(body).toMatchObject({ rideId: 12, payAfterRide: true });
+    expect(body).not.toHaveProperty('paymentMethod');
+  });
+
+  it('offers no way to pay later where the driver takes payment when booking', async () => {
+    signIn('PASSENGER');
+    serve({ 'GET /rides/search': () => json([candidate]) });
+    open('/search');
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Search' }));
+    const results = await screen.findByRole('region', { name: 'Search results' });
+    expect(await within(results).findByRole('button', { name: 'Request' })).toBeInTheDocument();
+    expect(within(results).queryByRole('button', { name: /pay after the ride/ })).not.toBeInTheDocument();
+    expect(within(results).queryByText('Pay after the ride')).not.toBeInTheDocument();
+  });
+
+  it('shows what is due on a booking and pays it by the method chosen', async () => {
+    signIn('PASSENGER');
+    let mine = [{ ...booking, status: 'COMPLETED' as Booking['status'], passengerRated: true, passengerConfirmed: true,
+      payAfterRide: true, paymentStatus: 'DUE' as Booking['paymentStatus'], amountDue: 572 }];
+    const fetchMock = serve({
+      'GET /bookings': () => json(mine),
+      'POST /bookings/90/pay': () => {
+        mine = [{ ...mine[0], paymentStatus: 'SETTLED' }];
+        return json(mine[0]);
+      },
+    });
+    open('/bookings');
+
+    expect(await screen.findByText('₹572 is due. Pay it here, or in cash to your driver.')).toBeInTheDocument();
+    await userEvent.selectOptions(screen.getByLabelText('Pay with'), 'Card');
+    await userEvent.click(screen.getByRole('button', { name: 'Pay ₹572' }));
+
+    expect(await screen.findByText(/paid after the ride/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Pay ₹572' })).not.toBeInTheDocument();
+    expect(bodyOf(fetchMock, '/bookings/90/pay')).toEqual({ paymentMethod: 'CARD' });
+  });
+
+  it('lets the driver record cash, but only after confirming', async () => {
+    signIn('DRIVER');
+    let aboard = [{ ...booking, status: 'COMPLETED' as Booking['status'], driverRated: true,
+      payAfterRide: true, paymentStatus: 'DUE' as Booking['paymentStatus'], amountDue: 572 }];
+    const fetchMock = serve({
+      'GET /rides/mine': () => json([{ ...rideWithRoute, status: 'COMPLETED', notes: null, maxTwoInBack: false, seriesSize: 1, payAfterRide: true }]),
+      'GET /rides/12/bookings': () => json(aboard),
+      'POST /bookings/90/cash-received': () => {
+        aboard = [{ ...aboard[0], paymentStatus: 'SETTLED' }];
+        return json(aboard[0]);
+      },
+    });
+    open('/rides');
+
+    expect(await screen.findByText(/Passengers may pay after the ride/)).toBeInTheDocument();
+    await userEvent.click(await screen.findByRole('button', { name: 'Show passengers' }));
+    expect(await screen.findByText('₹572 due, in the app or in cash to you')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Cash received' }));
+    expect(bodyOf(fetchMock, '/cash-received')).toBeUndefined(); // asks first
+    await userEvent.click(screen.getByRole('button', { name: 'Yes, I was paid ₹572 in cash' }));
+
+    expect(await screen.findByText('Paid after the ride')).toBeInTheDocument();
+    expect(fetchMock.mock.calls.some(([url, init]) => init?.method === 'POST' && String(url).endsWith('/bookings/90/cash-received'))).toBe(true);
+  });
+});

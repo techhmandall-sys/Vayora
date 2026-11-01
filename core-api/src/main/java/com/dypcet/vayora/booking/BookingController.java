@@ -53,7 +53,17 @@ public class BookingController {
             // The last-mile gap and access option shown on the candidate booked (feature 91);
             // null when the client sent none. Both or neither.
             @Min(0) Integer lastMileDistanceM,
-            @Pattern(regexp = "walk|rickshaw|bus") String lastMileModeShown) {
+            @Pattern(regexp = "walk|rickshaw|bus") String lastMileModeShown,
+            // Pay once the booking ends, on a ride whose driver accepts that; then nothing above
+            // about paying is needed.
+            boolean payAfterRide) {
+    }
+
+    /** How a passenger pays what a pay-after-ride booking owes: as when booking, or a checkout. */
+    public record PayDueRequest(
+            PaymentChoice.Method paymentMethod,
+            @Size(max = 20) String mockOutcome,
+            @Valid PaymentChoice.Checkout razorpay) {
     }
 
     private static final int MAX_IDEMPOTENCY_KEY_LENGTH = 100;
@@ -99,12 +109,29 @@ public class BookingController {
                     "Idempotency-Key must be 1 to " + MAX_IDEMPOTENCY_KEY_LENGTH + " characters");
         }
         return bookings.request(CurrentUser.id(jwt), request.rideId(), request.fromSeq(),
-                request.toSeq(), request.seats(),
-                PaymentChoice.of(request.paymentMethod(), request.mockOutcome(), request.razorpay()), idempotencyKey,
+                request.toSeq(), request.seats(), request.payAfterRide() ? null
+                        : PaymentChoice.of(request.paymentMethod(), request.mockOutcome(), request.razorpay()),
+                idempotencyKey,
                 request.tier() == null ? FlexTier.EXACT : request.tier(),
                 request.pickupLat() == null || request.pickupLon() == null ? null
                         : new Point(request.pickupLat(), request.pickupLon()),
-                request.lastMileDistanceM(), request.lastMileModeShown());
+                request.lastMileDistanceM(), request.lastMileModeShown(), request.payAfterRide());
+    }
+
+    /** The passenger pays, in the app, what their pay-after-ride booking owes. */
+    @PostMapping("/bookings/{id}/pay")
+    @PreAuthorize("hasRole('PASSENGER')")
+    public Booking pay(@AuthenticationPrincipal Jwt jwt, @PathVariable long id,
+            @Valid @RequestBody PayDueRequest request) {
+        return bookings.payDue(CurrentUser.id(jwt), id,
+                PaymentChoice.of(request.paymentMethod(), request.mockOutcome(), request.razorpay()));
+    }
+
+    /** The driver says the passenger paid what their pay-after-ride booking owes, in cash. */
+    @PostMapping("/bookings/{id}/cash-received")
+    @PreAuthorize("hasRole('DRIVER')")
+    public Booking cashReceived(@AuthenticationPrincipal Jwt jwt, @PathVariable long id) {
+        return bookings.paidInCash(CurrentUser.id(jwt), id);
     }
 
     /** How long a driver has to answer a request. The same for everyone, so open to all. */
