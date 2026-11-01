@@ -26,6 +26,9 @@ export const mr: Record<string, string> = {
   'Keep it': 'राहू द्या',
   'Loading…': 'लोड होत आहे…',
   'Try again': 'पुन्हा प्रयत्न करा',
+  Reload: 'पुन्हा लोड करा',
+  'This screen could not be loaded. VAYORA may have been updated: reload to get the new version.':
+    'ही स्क्रीन लोड होऊ शकली नाही. VAYORA कदाचित अपडेट झाले आहे: नवीन आवृत्ती मिळवण्यासाठी पुन्हा लोड करा.',
   'Paid out each week (₹)':
     'दर आठवड्याला दिलेली रक्कम (₹)',
   'Week of {date}':
@@ -1848,7 +1851,6 @@ export const mr: Record<string, string> = {
     'चालक खाते तयार करा',
   'A final-year project at DYPCET, Kolhapur. Payments, text messages and calls are simulated unless real services are connected.':
     'DYPCET, कोल्हापूर येथील अंतिम वर्षाचा प्रकल्प. खऱ्या सेवा जोडल्या जाईपर्यंत पेमेंट, मजकूर संदेश आणि कॉल नमुना (सिम्युलेशन) आहेत.',
-};
   // Paying after the ride
   'Cash to the driver':
     'चालकाला रोख',
@@ -1920,3 +1922,4 @@ export const mr: Record<string, string> = {
     'चालकाने कळवले की तुम्ही {seats} साठी बसला नाहीत. बुक करताना भरलेल्या सीटप्रमाणे, पूर्ण Rs {amount} देय आहेत: ते माझी बुकिंग मध्ये भरा.',
   'Your trip from {from} to {to} is complete. Rs {amount} is due: pay it in My bookings, or in cash to your driver.':
     '{from} ते {to} हा तुमचा प्रवास पूर्ण झाला. Rs {amount} देय आहेत: माझी बुकिंग मध्ये भरा, किंवा तुमच्या चालकाला रोख द्या.',
+};
