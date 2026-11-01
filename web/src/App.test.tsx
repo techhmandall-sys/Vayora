@@ -2441,10 +2441,10 @@ describe('what if', () => {
     await userEvent.selectOptions(screen.getByLabelText('Hours either side of the chosen time'), '8');
 
     const row = screen.getByRole('row', { name: /Completed rides per 100 searches/ });
-    // The committed sweep: B4 against B3 at 8 hours.
-    expect(row).toHaveTextContent('33.06');
-    expect(row).toHaveTextContent('33.11');
-    expect(row).toHaveTextContent('−0.05 (−0.10 to −0.01)');
+    // The committed sweep (world h3, web/src/data/whatif.json): B4 against B3 at 8 hours.
+    expect(row).toHaveTextContent('32.51');
+    expect(row).toHaveTextContent('32.58');
+    expect(row).toHaveTextContent('−0.06 (−0.12 to −0.01)');
     expect(within(row).queryByText('no clear difference')).not.toBeInTheDocument();
     expect(screen.getByText('B4 compared with B3, 30 seeds each, paired by seed.', { exact: false })).toBeInTheDocument();
   });

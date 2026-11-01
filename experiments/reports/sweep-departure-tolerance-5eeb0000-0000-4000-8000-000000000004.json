@@ -21,27 +21,27 @@
       },
       "measures": {
         "per_100": {
-          "mean": 29.07096040818369,
-          "baseline_mean": 29.066308840234218,
+          "mean": 28.571844151655473,
+          "baseline_mean": 28.534436496180263,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": 0.004651567949473071,
-            "ci_low": -0.03542210854425503,
-            "ci_high": 0.044725244443201174,
+            "mean_difference": 0.037407655475211146,
+            "ci_low": -0.006746347418588455,
+            "ci_high": 0.08156165836901075,
             "confidence": 0.95,
-            "wilcoxon_p": 0.6766366192024715,
-            "seeds_improved": 12,
-            "seeds_worsened": 13
+            "wilcoxon_p": 0.09809198334063142,
+            "seeds_improved": 19,
+            "seeds_worsened": 10
           }
         },
         "late_share": {
-          "mean": 0.3381439716391508,
-          "baseline_mean": 0.39000429731918895,
+          "mean": 0.31207955774657775,
+          "baseline_mean": 0.37883186781762723,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": -0.05186032568003817,
-            "ci_low": -0.057868980682447536,
-            "ci_high": -0.045851670677628804,
+            "mean_difference": -0.06675231007104947,
+            "ci_low": -0.07279275110141961,
+            "ci_high": -0.06071186904067933,
             "confidence": 0.95,
             "wilcoxon_p": 1.862645149230957e-09,
             "seeds_improved": 0,
@@ -49,13 +49,13 @@
           }
         },
         "contact_rate": {
-          "mean": 0.19274628633259755,
+          "mean": 0.2622121421408977,
           "baseline_mean": 0.0,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": 0.19274628633259755,
-            "ci_low": 0.1888783001536392,
-            "ci_high": 0.1966142725115559,
+            "mean_difference": 0.2622121421408977,
+            "ci_low": 0.25751213060082606,
+            "ci_high": 0.2669121536809694,
             "confidence": 0.95,
             "wilcoxon_p": 1.862645149230957e-09,
             "seeds_improved": 30,
@@ -63,45 +63,45 @@
           }
         },
         "refilled": {
-          "mean": 166.6,
-          "baseline_mean": 155.4,
+          "mean": 215.9,
+          "baseline_mean": 199.53333333333333,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": 11.2,
-            "ci_low": 9.247620347251598,
-            "ci_high": 13.152379652748401,
+            "mean_difference": 16.366666666666667,
+            "ci_low": 13.997957844032907,
+            "ci_high": 18.735375489300427,
             "confidence": 0.95,
-            "wilcoxon_p": 1.7008425382861862e-06,
+            "wilcoxon_p": 1.7180929312456739e-06,
             "seeds_improved": 30,
             "seeds_worsened": 0
           }
         },
         "refills_only_option": {
-          "mean": 73.5,
-          "baseline_mean": 71.53333333333333,
+          "mean": 90.63333333333334,
+          "baseline_mean": 87.56666666666666,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": 1.9666666666666666,
-            "ci_low": -0.21612343289661085,
-            "ci_high": 4.149456766229944,
+            "mean_difference": 3.066666666666667,
+            "ci_low": 0.8828855825860265,
+            "ci_high": 5.250447750747307,
             "confidence": 0.95,
-            "wilcoxon_p": 0.03942252497056081,
-            "seeds_improved": 21,
+            "wilcoxon_p": 0.012584730477430804,
+            "seeds_improved": 22,
             "seeds_worsened": 8
           }
         },
         "empty_share": {
-          "mean": 0.5824659109877133,
-          "baseline_mean": 0.5850611596102041,
+          "mean": 0.569727128809801,
+          "baseline_mean": 0.5735744572800615,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": -0.0025952486224907977,
-            "ci_low": -0.003433596419837278,
-            "ci_high": -0.0017569008251443175,
+            "mean_difference": -0.0038473284702603768,
+            "ci_low": -0.004733708209421171,
+            "ci_high": -0.0029609487310995825,
             "confidence": 0.95,
-            "wilcoxon_p": 6.910413503646851e-07,
-            "seeds_improved": 4,
-            "seeds_worsened": 26
+            "wilcoxon_p": 1.862645149230957e-09,
+            "seeds_improved": 0,
+            "seeds_worsened": 30
           }
         }
       }
@@ -113,27 +113,27 @@
       },
       "measures": {
         "per_100": {
-          "mean": 31.101924416886785,
-          "baseline_mean": 31.109453724497357,
+          "mean": 30.56405765784822,
+          "baseline_mean": 30.53740464732954,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": -0.007529307610568499,
-            "ci_low": -0.04463203596486211,
-            "ci_high": 0.029573420743725112,
+            "mean_difference": 0.026653010518679566,
+            "ci_low": -0.018398037212344922,
+            "ci_high": 0.07170405824970405,
             "confidence": 0.95,
-            "wilcoxon_p": 0.6384532010547104,
-            "seeds_improved": 12,
-            "seeds_worsened": 14
+            "wilcoxon_p": 0.29046597119691886,
+            "seeds_improved": 17,
+            "seeds_worsened": 10
           }
         },
         "late_share": {
-          "mean": 0.32060033400423743,
-          "baseline_mean": 0.37632867214122734,
+          "mean": 0.3007919185852273,
+          "baseline_mean": 0.36752663661518653,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": -0.05572833813698993,
-            "ci_low": -0.060487334848094335,
-            "ci_high": -0.05096934142588552,
+            "mean_difference": -0.06673471802995926,
+            "ci_low": -0.07398650810332985,
+            "ci_high": -0.05948292795658866,
             "confidence": 0.95,
             "wilcoxon_p": 1.862645149230957e-09,
             "seeds_improved": 0,
@@ -141,13 +141,13 @@
           }
         },
         "contact_rate": {
-          "mean": 0.20702611566584353,
+          "mean": 0.2734835448604874,
           "baseline_mean": 0.0,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": 0.20702611566584353,
-            "ci_low": 0.202731288199198,
-            "ci_high": 0.21132094313248906,
+            "mean_difference": 0.2734835448604874,
+            "ci_low": 0.2683612339346524,
+            "ci_high": 0.27860585578632246,
             "confidence": 0.95,
             "wilcoxon_p": 1.862645149230957e-09,
             "seeds_improved": 30,
@@ -155,45 +155,45 @@
           }
         },
         "refilled": {
-          "mean": 197.43333333333334,
-          "baseline_mean": 186.23333333333332,
+          "mean": 252.56666666666666,
+          "baseline_mean": 236.23333333333332,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": 11.2,
-            "ci_low": 9.055169210175753,
-            "ci_high": 13.344830789824245,
+            "mean_difference": 16.333333333333332,
+            "ci_low": 13.58353532502353,
+            "ci_high": 19.083131341643135,
             "confidence": 0.95,
-            "wilcoxon_p": 2.5219363938825784e-06,
-            "seeds_improved": 29,
+            "wilcoxon_p": 1.7159286750586906e-06,
+            "seeds_improved": 30,
             "seeds_worsened": 0
           }
         },
         "refills_only_option": {
-          "mean": 76.43333333333334,
-          "baseline_mean": 76.36666666666666,
+          "mean": 90.46666666666667,
+          "baseline_mean": 89.46666666666667,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": 0.06666666666666667,
-            "ci_low": -2.251675077848661,
-            "ci_high": 2.3850084111819947,
+            "mean_difference": 1.0,
+            "ci_low": -1.6908837627269881,
+            "ci_high": 3.690883762726988,
             "confidence": 0.95,
-            "wilcoxon_p": 0.9272432140985162,
-            "seeds_improved": 17,
+            "wilcoxon_p": 0.46073172199977397,
+            "seeds_improved": 15,
             "seeds_worsened": 11
           }
         },
         "empty_share": {
-          "mean": 0.5422808736347898,
-          "baseline_mean": 0.5448457545201771,
+          "mean": 0.5274644510605988,
+          "baseline_mean": 0.5318777913500646,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": -0.0025648808853873327,
-            "ci_low": -0.0037405504333641046,
-            "ci_high": -0.0013892113374105609,
+            "mean_difference": -0.004413340289465841,
+            "ci_low": -0.005633876321654919,
+            "ci_high": -0.003192804257276763,
             "confidence": 0.95,
-            "wilcoxon_p": 3.453157842159271e-05,
-            "seeds_improved": 4,
-            "seeds_worsened": 26
+            "wilcoxon_p": 4.6566128730773926e-08,
+            "seeds_improved": 3,
+            "seeds_worsened": 27
           }
         }
       }
@@ -205,27 +205,27 @@
       },
       "measures": {
         "per_100": {
-          "mean": 31.870339196000707,
-          "baseline_mean": 31.873144782553716,
+          "mean": 31.334287142252812,
+          "baseline_mean": 31.331904147409684,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": -0.00280558655301076,
-            "ci_low": -0.041976970371070975,
-            "ci_high": 0.03636579726504945,
+            "mean_difference": 0.0023829948431251563,
+            "ci_low": -0.04983100641557255,
+            "ci_high": 0.05459699610182287,
             "confidence": 0.95,
             "wilcoxon_p": 1.0,
-            "seeds_improved": 13,
-            "seeds_worsened": 14
+            "seeds_improved": 15,
+            "seeds_worsened": 12
           }
         },
         "late_share": {
-          "mean": 0.31679474516429607,
-          "baseline_mean": 0.37310110444534617,
+          "mean": 0.2950301269616362,
+          "baseline_mean": 0.3598106255540808,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": -0.05630635928105019,
-            "ci_low": -0.061641342709228636,
-            "ci_high": -0.050971375852871745,
+            "mean_difference": -0.06478049859244456,
+            "ci_low": -0.07175143498136788,
+            "ci_high": -0.057809562203521236,
             "confidence": 0.95,
             "wilcoxon_p": 1.862645149230957e-09,
             "seeds_improved": 0,
@@ -233,13 +233,13 @@
           }
         },
         "contact_rate": {
-          "mean": 0.21414694073426033,
+          "mean": 0.2793903100820935,
           "baseline_mean": 0.0,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": 0.21414694073426033,
-            "ci_low": 0.2101157534863635,
-            "ci_high": 0.21817812798215716,
+            "mean_difference": 0.2793903100820935,
+            "ci_low": 0.2746708047770854,
+            "ci_high": 0.28410981538710156,
             "confidence": 0.95,
             "wilcoxon_p": 1.862645149230957e-09,
             "seeds_improved": 30,
@@ -247,45 +247,45 @@
           }
         },
         "refilled": {
-          "mean": 210.9,
-          "baseline_mean": 199.86666666666667,
+          "mean": 269.3,
+          "baseline_mean": 254.4,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": 11.033333333333333,
-            "ci_low": 9.189668716694753,
-            "ci_high": 12.876997949971914,
+            "mean_difference": 14.9,
+            "ci_low": 13.035933165662687,
+            "ci_high": 16.764066834337314,
             "confidence": 0.95,
-            "wilcoxon_p": 1.8722982951146767e-06,
-            "seeds_improved": 29,
-            "seeds_worsened": 1
+            "wilcoxon_p": 1.705141514598868e-06,
+            "seeds_improved": 30,
+            "seeds_worsened": 0
           }
         },
         "refills_only_option": {
-          "mean": 74.73333333333333,
-          "baseline_mean": 75.9,
+          "mean": 87.06666666666666,
+          "baseline_mean": 87.7,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": -1.1666666666666667,
-            "ci_low": -3.288244840713075,
-            "ci_high": 0.9549115073797412,
+            "mean_difference": -0.6333333333333333,
+            "ci_low": -3.0818883931225103,
+            "ci_high": 1.8152217264558437,
             "confidence": 0.95,
-            "wilcoxon_p": 0.32901444687048553,
-            "seeds_improved": 11,
-            "seeds_worsened": 18
+            "wilcoxon_p": 0.6804028025838755,
+            "seeds_improved": 14,
+            "seeds_worsened": 15
           }
         },
         "empty_share": {
-          "mean": 0.5316176924097971,
-          "baseline_mean": 0.5341146881800581,
+          "mean": 0.5158450278230178,
+          "baseline_mean": 0.5197741019370988,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": -0.0024969957702611883,
-            "ci_low": -0.0035647000078321764,
-            "ci_high": -0.0014292915326902002,
+            "mean_difference": -0.0039290741140809845,
+            "ci_low": -0.005285866538275235,
+            "ci_high": -0.0025722816898867337,
             "confidence": 0.95,
-            "wilcoxon_p": 2.6885420083999634e-05,
-            "seeds_improved": 3,
-            "seeds_worsened": 27
+            "wilcoxon_p": 3.7904828786849976e-06,
+            "seeds_improved": 4,
+            "seeds_worsened": 26
           }
         }
       }
@@ -297,27 +297,27 @@
       },
       "measures": {
         "per_100": {
-          "mean": 33.0600539116776,
-          "baseline_mean": 33.11356446628228,
+          "mean": 32.51370944142218,
+          "baseline_mean": 32.57768702797512,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": -0.05351055460467459,
-            "ci_low": -0.1000407371845248,
-            "ci_high": -0.006980372024824377,
+            "mean_difference": -0.06397758655293587,
+            "ci_low": -0.11619633408486588,
+            "ci_high": -0.01175883902100585,
             "confidence": 0.95,
-            "wilcoxon_p": 0.025461702630548314,
-            "seeds_improved": 7,
+            "wilcoxon_p": 0.017897082542391966,
+            "seeds_improved": 9,
             "seeds_worsened": 20
           }
         },
         "late_share": {
-          "mean": 0.3134352069628093,
-          "baseline_mean": 0.3713113927100732,
+          "mean": 0.29633131348382497,
+          "baseline_mean": 0.3591166024078378,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": -0.057876185747263956,
-            "ci_low": -0.06420399573385399,
-            "ci_high": -0.05154837576067393,
+            "mean_difference": -0.06278528892401287,
+            "ci_low": -0.06902928299782954,
+            "ci_high": -0.056541294850196204,
             "confidence": 0.95,
             "wilcoxon_p": 1.862645149230957e-09,
             "seeds_improved": 0,
@@ -325,59 +325,59 @@
           }
         },
         "contact_rate": {
-          "mean": 0.22153245829778623,
+          "mean": 0.27939669224845187,
           "baseline_mean": 0.0,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": 0.22153245829778623,
-            "ci_low": 0.21701662190677035,
-            "ci_high": 0.2260482946888021,
+            "mean_difference": 0.27939669224845187,
+            "ci_low": 0.2739197452005437,
+            "ci_high": 0.28487363929636006,
             "confidence": 0.95,
-            "wilcoxon_p": 1.7333066441991056e-06,
+            "wilcoxon_p": 1.862645149230957e-09,
             "seeds_improved": 30,
             "seeds_worsened": 0
           }
         },
         "refilled": {
-          "mean": 230.43333333333334,
-          "baseline_mean": 219.5,
+          "mean": 292.46666666666664,
+          "baseline_mean": 277.56666666666666,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": 10.933333333333334,
-            "ci_low": 8.753960074006558,
-            "ci_high": 13.112706592660109,
+            "mean_difference": 14.9,
+            "ci_low": 12.985041681896337,
+            "ci_high": 16.814958318103663,
             "confidence": 0.95,
-            "wilcoxon_p": 2.422874943419762e-06,
-            "seeds_improved": 28,
-            "seeds_worsened": 2
+            "wilcoxon_p": 1.6986964471794946e-06,
+            "seeds_improved": 30,
+            "seeds_worsened": 0
           }
         },
         "refills_only_option": {
-          "mean": 78.43333333333334,
-          "baseline_mean": 81.3,
+          "mean": 90.9,
+          "baseline_mean": 95.1,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": -2.8666666666666667,
-            "ci_low": -4.9276645047979,
-            "ci_high": -0.805668828535433,
+            "mean_difference": -4.2,
+            "ci_low": -6.364911824005134,
+            "ci_high": -2.0350881759948662,
             "confidence": 0.95,
-            "wilcoxon_p": 0.008667768658430774,
-            "seeds_improved": 9,
-            "seeds_worsened": 18
+            "wilcoxon_p": 0.0007967327558467686,
+            "seeds_improved": 8,
+            "seeds_worsened": 20
           }
         },
         "empty_share": {
-          "mean": 0.5173762088838546,
-          "baseline_mean": 0.5192567884843297,
+          "mean": 0.5011423107375284,
+          "baseline_mean": 0.5035120973922348,
           "vs_baseline": {
             "seeds": 30,
-            "mean_difference": -0.0018805796004751295,
-            "ci_low": -0.0031664271872871726,
-            "ci_high": -0.0005947320136630864,
+            "mean_difference": -0.0023697866547064666,
+            "ci_low": -0.003704322383731644,
+            "ci_high": -0.0010352509256812891,
             "confidence": 0.95,
-            "wilcoxon_p": 0.0032229889184236526,
-            "seeds_improved": 8,
-            "seeds_worsened": 22
+            "wilcoxon_p": 0.001718590036034584,
+            "seeds_improved": 7,
+            "seeds_worsened": 23
           }
         }
       }

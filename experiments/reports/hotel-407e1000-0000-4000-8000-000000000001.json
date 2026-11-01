@@ -160,10 +160,10 @@
       ]
     },
     "B0": {
-      "accepted": 40512,
-      "no_shows": 790,
-      "no_show_share": 0.01950039494470774,
-      "cancelled_in_week": 5595,
+      "accepted": 41391,
+      "no_shows": 719,
+      "no_show_share": 0.017370926046725133,
+      "cancelled_in_week": 7174,
       "days": [
         {
           "day": 7,
@@ -174,199 +174,199 @@
         {
           "day": 6,
           "standing": 1266,
-          "cancelled": 56,
-          "hazard": 0.044233807266982623
+          "cancelled": 65,
+          "hazard": 0.05134281200631911
         },
         {
           "day": 5,
-          "standing": 2961,
-          "cancelled": 187,
-          "hazard": 0.06315433975008443
+          "standing": 2960,
+          "cancelled": 258,
+          "hazard": 0.08716216216216216
         },
         {
           "day": 4,
-          "standing": 5809,
-          "cancelled": 334,
-          "hazard": 0.057496987433293165
+          "standing": 5749,
+          "cancelled": 431,
+          "hazard": 0.07496955992346495
         },
         {
           "day": 3,
-          "standing": 10160,
-          "cancelled": 586,
-          "hazard": 0.057677165354330706
+          "standing": 10033,
+          "cancelled": 795,
+          "hazard": 0.07923851290740556
         },
         {
           "day": 2,
-          "standing": 16869,
-          "cancelled": 1010,
-          "hazard": 0.05987314007943565
+          "standing": 16635,
+          "cancelled": 1272,
+          "hazard": 0.07646528403967538
         },
         {
           "day": 1,
-          "standing": 26692,
-          "cancelled": 1400,
-          "hazard": 0.052450172336280534
+          "standing": 26397,
+          "cancelled": 1834,
+          "hazard": 0.06947759215062317
         },
         {
           "day": 0,
-          "standing": 36505,
-          "cancelled": 2022,
-          "hazard": 0.05538967264758252
+          "standing": 36318,
+          "cancelled": 2519,
+          "hazard": 0.0693595462305193
         }
       ],
-      "survival_from_day_6": 0.6691806638777791,
-      "share_on_day_0": 0.3613941018766756,
-      "share_on_days_0_1": 0.6116175156389634,
+      "survival_from_day_6": 0.5898860059172325,
+      "share_on_day_0": 0.3511290772233064,
+      "share_on_days_0_1": 0.6067744633398383,
       "by_seed": [
         {
           "seed": 1,
-          "accepted": 1362,
-          "survival_from_day_6": 0.6128714045460716
+          "accepted": 1379,
+          "survival_from_day_6": 0.5279233390143628
         },
         {
           "seed": 2,
-          "accepted": 1308,
-          "survival_from_day_6": 0.6069664440037921
+          "accepted": 1334,
+          "survival_from_day_6": 0.5541270701583004
         },
         {
           "seed": 3,
-          "accepted": 1320,
-          "survival_from_day_6": 0.6575844446925917
+          "accepted": 1345,
+          "survival_from_day_6": 0.5866543808350904
         },
         {
           "seed": 4,
-          "accepted": 1411,
-          "survival_from_day_6": 0.6858903572070592
+          "accepted": 1448,
+          "survival_from_day_6": 0.57869581845593
         },
         {
           "seed": 5,
-          "accepted": 1413,
-          "survival_from_day_6": 0.6632248240081573
+          "accepted": 1437,
+          "survival_from_day_6": 0.5961001056789574
         },
         {
           "seed": 6,
-          "accepted": 1379,
-          "survival_from_day_6": 0.6505699698205617
+          "accepted": 1412,
+          "survival_from_day_6": 0.5782133603797108
         },
         {
           "seed": 7,
-          "accepted": 1325,
-          "survival_from_day_6": 0.6917711876218523
+          "accepted": 1355,
+          "survival_from_day_6": 0.6235449615825972
         },
         {
           "seed": 8,
-          "accepted": 1448,
-          "survival_from_day_6": 0.6442298859075002
+          "accepted": 1473,
+          "survival_from_day_6": 0.5490616525536828
         },
         {
           "seed": 9,
-          "accepted": 1408,
-          "survival_from_day_6": 0.7260442931999054
+          "accepted": 1443,
+          "survival_from_day_6": 0.6519900827623493
         },
         {
           "seed": 10,
-          "accepted": 1366,
-          "survival_from_day_6": 0.643375586639471
+          "accepted": 1396,
+          "survival_from_day_6": 0.570903289293207
         },
         {
           "seed": 11,
-          "accepted": 1326,
-          "survival_from_day_6": 0.6287782308680655
+          "accepted": 1348,
+          "survival_from_day_6": 0.5680076655611005
         },
         {
           "seed": 12,
-          "accepted": 1359,
-          "survival_from_day_6": 0.6347002764366978
+          "accepted": 1394,
+          "survival_from_day_6": 0.5617230930836787
         },
         {
           "seed": 13,
-          "accepted": 1382,
-          "survival_from_day_6": 0.6581802037920623
+          "accepted": 1420,
+          "survival_from_day_6": 0.5776292941706623
         },
         {
           "seed": 14,
-          "accepted": 1349,
-          "survival_from_day_6": 0.6838376165740613
+          "accepted": 1378,
+          "survival_from_day_6": 0.5821113338520175
         },
         {
           "seed": 15,
-          "accepted": 1323,
-          "survival_from_day_6": 0.6851337595711773
+          "accepted": 1342,
+          "survival_from_day_6": 0.6141892336801167
         },
         {
           "seed": 16,
-          "accepted": 1350,
-          "survival_from_day_6": 0.6817721023838351
+          "accepted": 1387,
+          "survival_from_day_6": 0.5886453172836668
         },
         {
           "seed": 17,
-          "accepted": 1334,
-          "survival_from_day_6": 0.6428060856049486
+          "accepted": 1362,
+          "survival_from_day_6": 0.5669280470038773
         },
         {
           "seed": 18,
-          "accepted": 1355,
-          "survival_from_day_6": 0.6618331096829918
+          "accepted": 1375,
+          "survival_from_day_6": 0.5977908162499528
         },
         {
           "seed": 19,
-          "accepted": 1332,
-          "survival_from_day_6": 0.6784918437608488
+          "accepted": 1368,
+          "survival_from_day_6": 0.6014084277084784
         },
         {
           "seed": 20,
-          "accepted": 1305,
-          "survival_from_day_6": 0.7082817220316227
+          "accepted": 1335,
+          "survival_from_day_6": 0.6058966342464783
         },
         {
           "seed": 21,
-          "accepted": 1344,
-          "survival_from_day_6": 0.6369498280162809
+          "accepted": 1371,
+          "survival_from_day_6": 0.5461902186110076
         },
         {
           "seed": 22,
-          "accepted": 1258,
-          "survival_from_day_6": 0.7044909472321589
+          "accepted": 1286,
+          "survival_from_day_6": 0.6140595728353092
         },
         {
           "seed": 23,
-          "accepted": 1330,
-          "survival_from_day_6": 0.6873292586645103
+          "accepted": 1368,
+          "survival_from_day_6": 0.6302057333083583
         },
         {
           "seed": 24,
-          "accepted": 1358,
-          "survival_from_day_6": 0.7056453421352263
+          "accepted": 1390,
+          "survival_from_day_6": 0.6152149346912746
         },
         {
           "seed": 25,
-          "accepted": 1261,
-          "survival_from_day_6": 0.6390249282091273
+          "accepted": 1289,
+          "survival_from_day_6": 0.5819904749032049
         },
         {
           "seed": 26,
-          "accepted": 1359,
-          "survival_from_day_6": 0.6951902525252838
+          "accepted": 1395,
+          "survival_from_day_6": 0.6157494872768278
         },
         {
           "seed": 27,
-          "accepted": 1369,
-          "survival_from_day_6": 0.6657501212681513
+          "accepted": 1403,
+          "survival_from_day_6": 0.5631575715314202
         },
         {
           "seed": 28,
-          "accepted": 1327,
-          "survival_from_day_6": 0.6916158261539355
+          "accepted": 1349,
+          "survival_from_day_6": 0.6180922245219974
         },
         {
           "seed": 29,
-          "accepted": 1397,
-          "survival_from_day_6": 0.6779859246255338
+          "accepted": 1425,
+          "survival_from_day_6": 0.6097910888403204
         },
         {
           "seed": 30,
-          "accepted": 1354,
-          "survival_from_day_6": 0.6981234838313228
+          "accepted": 1384,
+          "survival_from_day_6": 0.6088552068968894
         }
       ]
     }
