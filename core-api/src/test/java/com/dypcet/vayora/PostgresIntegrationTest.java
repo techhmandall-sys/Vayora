@@ -15,6 +15,7 @@ import org.testcontainers.utility.DockerImageName;
  * are straight lines between stops.
  */
 @SpringBootTest
+@SuppressWarnings("resource") // The containers are closed by Testcontainers when the JVM exits, by design.
 public abstract class PostgresIntegrationTest {
 
     /**

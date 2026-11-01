@@ -26,7 +26,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 
 @AutoConfigureMockMvc
@@ -55,9 +54,6 @@ class LevelIntegrationTest extends PostgresIntegrationTest {
 
     @Autowired
     private TokenService tokens;
-
-    @Autowired
-    private JdbcTemplate jdbc;
 
     @Autowired
     private MockMvc mvc;

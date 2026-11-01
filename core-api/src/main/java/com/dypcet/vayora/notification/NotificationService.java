@@ -94,7 +94,7 @@ public class NotificationService {
     @PostConstruct
     void ensureIndex() {
         try {
-            mongo.indexOps(COLLECTION).ensureIndex(
+            mongo.indexOps(COLLECTION).createIndex(
                     new Index().on("userId", Sort.Direction.ASC).on("createdAt", Sort.Direction.DESC));
         } catch (RuntimeException e) {
             log.warn("Could not create the notifications index: {}", e.getMessage());
