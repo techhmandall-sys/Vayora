@@ -181,7 +181,7 @@ Last updated: 2026-10-21. Test suites and how to run them are in [TESTING.md](TE
 | Item | State |
 |---|---|
 | `events` table and 22-event vocabulary (core-api V2 migration) | Verified 2026-10-10: migration applies, core-api tests 11/11 |
-| Java `EventLogService` and Python `journex_events` writer | Verified 2026-10-10: Java 11/11, Python 17/17 (shared run) |
+| Java `EventLogService` and Python `vayora_events` writer | Verified 2026-10-10: Java 11/11, Python 17/17 (shared run) |
 | Metric queries (`experiments/analysis/metrics.sql`) | Verified: five named queries, each tested against hand-computed values |
 | Service skeletons: core-api, intel, gateway, web | Verified 2026-10-10: all four health endpoints UP; gateway tests 6/6 |
 | OSRM routing | Verified against the running container: 235.9 km for the four-town route; cached in Redis |

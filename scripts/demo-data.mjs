@@ -1,7 +1,7 @@
 // Fills a local VAYORA with demo data, through the public API as any client would: four
 // drivers with vehicles, the coming six days of rides on the Kolhapur to Pune corridor,
 // and two passengers with two seats booked each. Every demo account says in its profile
-// that it is made up, and uses an address under demo.journex.test, a reserved name that
+// that it is made up, and uses an address under demo.vayora.test, a reserved name that
 // mail cannot reach.
 //
 // Platform events have no run id, so nothing here reaches the research figures, which are
@@ -28,7 +28,7 @@ if (!['localhost', '127.0.0.1', '[::1]'].includes(new URL(api).hostname) && !arg
   fail(`${api} is not this machine. Demo accounts share one password; add --allow-remote only for a server nobody relies on.`);
 }
 
-const DOMAIN = 'demo.journex.test';
+const DOMAIN = 'demo.vayora.test';
 const BIO = 'Demo account, made up by scripts/demo-data.mjs. Not a real person.';
 
 // The corridor as the publish form offers it (web/src/lib/corridor.ts), in travel order.

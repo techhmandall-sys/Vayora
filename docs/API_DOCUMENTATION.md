@@ -183,7 +183,7 @@ Base URL `http://localhost:8000`. Holds nothing. The model and the scheduler hav
 authentication: they are called by core-api and by research code and are not meant to be
 reachable from a browser. The what-if runs are: an administrator's browser calls them
 with the session token core-api issued, which intel checks itself (HS256, issuer
-`journex-core-api`, not expired, role `ADMIN`).
+`vayora-core-api`, not expired, role `ADMIN`).
 
 | Method and path | Who | What |
 |---|---|---|

@@ -12,7 +12,7 @@ import os
 import jwt
 from fastapi import Header, HTTPException
 
-ISSUER = "journex-core-api"
+ISSUER = "vayora-core-api"
 
 
 def administrator(authorization: str | None = Header(default=None)) -> int:

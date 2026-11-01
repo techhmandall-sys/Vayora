@@ -12,7 +12,7 @@ SECRET = "test-secret-test-secret-test-secret!"
 client = TestClient(app)
 
 
-def token(role="ADMIN", secret=SECRET, issuer="journex-core-api", expires_in=timedelta(hours=1)):
+def token(role="ADMIN", secret=SECRET, issuer="vayora-core-api", expires_in=timedelta(hours=1)):
     now = datetime.now(timezone.utc)
     return jwt.encode({"iss": issuer, "sub": "1", "role": role, "iat": now, "exp": now + expires_in},
                       secret, algorithm="HS256")

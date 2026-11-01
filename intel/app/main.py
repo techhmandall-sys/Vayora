@@ -9,7 +9,7 @@ from .hazard.api import router as hazard_router
 from .scheduler.api import router as scheduler_router
 from .whatif.api import router as whatif_router
 
-app = FastAPI(title="journex-intel")
+app = FastAPI(title="vayora-intel")
 app.include_router(hazard_router)
 app.include_router(scheduler_router)
 app.include_router(whatif_router)

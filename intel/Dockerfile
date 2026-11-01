@@ -6,7 +6,7 @@ COPY intel/app intel/app
 # For a live what-if run: the simulator, the event vocabulary it speaks, and the
 # configurations it runs (feature 87). Nothing here is written to.
 COPY sim sim
-COPY journex_events journex_events
+COPY vayora_events vayora_events
 COPY experiments/configs experiments/configs
 # An unprivileged user: intel holds no state and writes no files.
 RUN useradd --system --no-create-home intel

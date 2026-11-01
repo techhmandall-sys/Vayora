@@ -20,9 +20,9 @@ EVENTS_MIGRATION = (
 
 @pytest.fixture(scope="session")
 def db_url():
-    url = os.environ.get("JOURNEX_DB_URL")
+    url = os.environ.get("VAYORA_DB_URL")
     if not url:
-        pytest.fail("JOURNEX_DB_URL is not set; these tests need a real PostgreSQL")
+        pytest.fail("VAYORA_DB_URL is not set; these tests need a real PostgreSQL")
     return make_url(url)
 
 

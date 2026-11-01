@@ -3,7 +3,7 @@ import uuid
 import pytest
 
 from experiments.analysis.compare import build_report, paired, to_markdown
-from journex_events import EventWriter
+from vayora_events import EventWriter
 from sim.config import load_variant, load_world
 from sim.run import CONFIGS
 from sim.simulator import Simulation

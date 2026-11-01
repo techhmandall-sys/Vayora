@@ -99,7 +99,7 @@ export function toVehicleRequest(form: VehicleForm) {
 
 /** How many further weeks a ride can be repeated for. The server enforces the same limit. */
 export const MAX_REPEAT_WEEKS = 8;
-/** As journex.detour.max-minutes on the server, which has the last word. */
+/** As vayora.detour.max-minutes on the server, which has the last word. */
 export const MAX_DETOUR_MINUTES = 30;
 
 /** How many rides the form will publish: out and back, for each week. */

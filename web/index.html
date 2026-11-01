@@ -19,7 +19,7 @@
     <script>
       // The theme before the first paint, as lib/theme.tsx will set it: no flash of the wrong one.
       try {
-        var choice = localStorage.getItem('journex.theme');
+        var choice = localStorage.getItem('vayora.theme');
         var dark = choice === 'dark' || (choice !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
         document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
       } catch (error) {}

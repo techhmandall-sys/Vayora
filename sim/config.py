@@ -67,7 +67,7 @@ class LastMile:
     where the passenger is, not of the platform (feature 91 estimates it per candidate;
     this is the ground truth it would be estimating). A non-walk access option (the
     simulator's stand-in for feature 91's rickshaw or bus) is offered beyond
-    offer_beyond_metres, mirroring core-api's journex.rickshaw.offer-beyond-metres.
+    offer_beyond_metres, mirroring core-api's vayora.rickshaw.offer-beyond-metres.
     """
 
     offset_metres_mean: float

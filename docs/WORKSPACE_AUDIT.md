@@ -29,7 +29,7 @@ Docker is the supported path. Nothing but Docker needs to be on the host.
 | `intel/` | FastAPI skeleton with `/health` only |
 | `gateway/` | Express + Socket.IO, JWT verification, auth tests |
 | `web/` | Vite + React 18 + TypeScript + Tailwind shell, nginx config |
-| `journex_events/` | Python vocabulary and batched `COPY` writer, tests |
+| `vayora_events/` | Python vocabulary and batched `COPY` writer, tests |
 | `experiments/` | `analysis/metrics.sql`, `queries.py`, metric acceptance test, `configs/README.md` |
 | `infra/` | OSRM corridor preparation, research image, `check-health.sh` |
 | `sim/` | README placeholder only |
@@ -42,7 +42,7 @@ tables (users, rides, bookings, payments) and no API beyond health endpoints.
 
 | Check | Command | Result |
 |---|---|---|
-| Python event writer and metric queries | `pytest -q` with `JOURNEX_DB_URL` pointing at the compose Postgres | 17 passed |
+| Python event writer and metric queries | `pytest -q` with `VAYORA_DB_URL` pointing at the compose Postgres | 17 passed |
 | core-api unit and integration tests | `docker compose --profile test run --rm core-api-tests` | 11 run, 0 failures, BUILD SUCCESS |
 | Gateway auth tests | `npm test` in `gateway/` | 6 passed |
 | Images build and containers reach healthy | `docker compose up -d --build --wait --no-deps mongo redis core-api intel gateway web` | all healthy |

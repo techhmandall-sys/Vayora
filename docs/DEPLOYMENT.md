@@ -26,7 +26,7 @@ road graph for the corridor, which takes several minutes. Later starts reuse it.
 | gateway | http://localhost:3000 | Chat and live position; health at `/health` |
 | intel | http://localhost:8000 | The model, the scheduler and live what-if runs; health at `/health` |
 | osrm | http://localhost:5000 | Road routing |
-| postgres | localhost:5432 | Database `journex`, user `journex` |
+| postgres | localhost:5432 | Database `vayora`, user `vayora` |
 | mongo | localhost:27017 | |
 | redis | localhost:6379 | |
 
@@ -45,15 +45,15 @@ Every setting has a working default in `docker-compose.yml`. To change one, copy
 |---|---|---|
 | `JWT_SECRET` | a public development value | At least 32 bytes. core-api signs with it; the gateway, and intel for live what-if runs, verify with it, so all three must have the same one. **Change it** |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | empty | Set both to have an administrator created when core-api starts. The password needs 12 characters or more. There is no other way to make one |
-| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | `journex` | |
+| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | `vayora` | |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Where the browser app is served from, for core-api, the gateway and intel. Change it together with `WEB_PORT` |
 | `*_PORT` | see the table above | Change one if the port is taken |
 | `OSRM_PBF_URL`, `OSRM_BBOX` | western India, clipped to the corridor | |
-| `JOURNEX_PUSH_PUBLIC_KEY`, `JOURNEX_PUSH_PRIVATE_KEY` | empty | Push notifications are off unless both are set. `node scripts/vapid-keys.mjs` prints a new pair. Keep the private key secret; a new pair makes every browser subscribe again |
+| `VAYORA_PUSH_PUBLIC_KEY`, `VAYORA_PUSH_PRIVATE_KEY` | empty | Push notifications are off unless both are set. `node scripts/vapid-keys.mjs` prints a new pair. Keep the private key secret; a new pair makes every browser subscribe again |
 | `GOOGLE_CLIENT_ID` | empty | "Sign in with Google" is off unless set: a Web application OAuth client ID from the Google Cloud console, with the web app's address as an authorised JavaScript origin. Add it to the core-api service's environment |
 | `SPRING_MAIL_HOST`, `SPRING_MAIL_PORT`, `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD` | unset | An SMTP server for real email. Unset: nothing is emailed. Add them to the core-api service's environment |
-| `JOURNEX_MAIL_FROM` | empty | The sender address. Required once an SMTP server is set; core-api will not start without it |
-| `JOURNEX_PUSH_SUBJECT` | `mailto:journex@example.invalid` | A contact push services can use about this server's messages. Set a real one before turning push on |
+| `VAYORA_MAIL_FROM` | empty | The sender address. Required once an SMTP server is set; core-api will not start without it |
+| `VAYORA_PUSH_SUBJECT` | `mailto:vayora@example.invalid` | A contact push services can use about this server's messages. Set a real one before turning push on |
 | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` | empty | Payments through Razorpay. Both or neither; neither is the simulated provider. A test key (`rzp_test_...`) is Razorpay's test mode, where no real money moves; get one from the Razorpay dashboard in Test Mode, under API Keys. Keep the secret out of git |
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` | empty | Text messages and masked calls through Twilio. All three or none; none sends texts to the simulated outbox and simulates calls. `TWILIO_FROM` must be able to text and call. Twilio's test credentials with `TWILIO_FROM=+15005550006` are answered as if sent and send nothing. Real texts to Indian numbers need DLT registration |
 

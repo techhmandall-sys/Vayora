@@ -30,7 +30,7 @@ import yaml
 from sqlalchemy import Connection, create_engine, make_url
 
 from experiments.analysis.compare import paired, per_seed
-from journex_events import EventWriter
+from vayora_events import EventWriter
 from sim.config import Variant, World, apply_cell, load_variant, load_world, validate, validate_variant
 from sim.frozen import SEEDS_PER_VARIANT
 from sim.simulator import Simulation
@@ -159,9 +159,9 @@ def main() -> None:
     parser.add_argument("--run-id", type=uuid.UUID, default=None)
     args = parser.parse_args()
 
-    url = os.environ.get("JOURNEX_DB_URL")
+    url = os.environ.get("VAYORA_DB_URL")
     if not url:
-        parser.error("JOURNEX_DB_URL is not set")
+        parser.error("VAYORA_DB_URL is not set")
     config = yaml.safe_load(args.config.read_text(encoding="utf-8"))
     run_id = args.run_id or uuid.uuid4()
     seeds = range(1, SEEDS_PER_VARIANT + 1)

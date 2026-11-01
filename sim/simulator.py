@@ -35,7 +35,7 @@ import simpy
 from intel.app.hazard.features import FeatureTracker
 from intel.app.hazard.model import MODEL_DIR, HazardModel
 from intel.app.scheduler.plan import Candidate, Limits, plan
-from journex_events import EventType
+from vayora_events import EventType
 from sim.config import PassengerType, Variant, World
 from sim.frozen import BOOKING_HORIZON_DAYS, DESTINATION, LATENT_TYPES, ORIGIN, SPAN_DAYS
 from sim.hazard import cancellation_time
@@ -44,7 +44,7 @@ HOURS_PER_DAY = 24.0
 
 
 class Sink(Protocol):
-    """Where events go. ``journex_events.EventWriter`` satisfies this."""
+    """Where events go. ``vayora_events.EventWriter`` satisfies this."""
 
     def write(
         self,

@@ -31,7 +31,7 @@ of 22 types and the same payload conventions.
 | `run_id`, `variant`, `seed` | Which simulated run produced the row. Empty for platform rows |
 | `sim_time` | When it happened: simulated time for a simulation, wall-clock time for the platform |
 | `actor_type`, `actor_id` | `passenger`, `driver` or `platform`, and who. `platform` rows have no id |
-| `event_type` | One of the 22 types in `journex_events/vocabulary.py`, mirrored in core-api |
+| `event_type` | One of the 22 types in `vayora_events/vocabulary.py`, mirrored in core-api |
 | `payload` | JSON, snake_case keys, timestamps in ISO-8601 with offset |
 
 The vocabulary is frozen. Of the 22 types, these are written today: `search_issued`,

@@ -1,6 +1,6 @@
 [tool.pytest.ini_options]
 pythonpath = ["."]
-testpaths = ["journex_events/tests", "experiments/tests", "sim/tests", "intel/tests"]
+testpaths = ["vayora_events/tests", "experiments/tests", "sim/tests", "intel/tests"]
 # Deprecations raised inside third-party libraries, about their own dependencies. Filtered
 # by message so that any warning from this project's code still shows.
 filterwarnings = [

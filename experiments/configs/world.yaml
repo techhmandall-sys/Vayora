@@ -86,7 +86,7 @@ demand:
   # The gap from a passenger's start to the stop they would board at: log-normal,
   # metres, independent of which ride they take. How much it speeds up a cancellation
   # is set per type above (last_mile_sensitivity); this only draws the gap itself.
-  # offer_beyond_metres mirrors core-api's journex.rickshaw.offer-beyond-metres: beyond
+  # offer_beyond_metres mirrors core-api's vayora.rickshaw.offer-beyond-metres: beyond
   # it, a non-walk access option is shown, which is the boolean feature the model sees.
   last_mile:
     offset_metres_mean: 1200

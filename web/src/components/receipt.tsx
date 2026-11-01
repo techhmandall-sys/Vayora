@@ -22,7 +22,7 @@ export function ReceiptLinks({ of, id }: { of: 'booking' | 'pass'; id: number })
         disabled={state === 'busy'}
         onClick={() => {
           setState('busy');
-          download(`/${of === 'booking' ? 'bookings' : 'passes'}/${id}/receipt`, `journex-${of}-${id}.pdf`).then(
+          download(`/${of === 'booking' ? 'bookings' : 'passes'}/${id}/receipt`, `vayora-${of}-${id}.pdf`).then(
             () => setState('idle'),
             () => setState('failed'),
           );

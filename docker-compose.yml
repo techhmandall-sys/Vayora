@@ -1,12 +1,12 @@
-name: journex
+name: vayora
 
 services:
   postgres:
     image: postgis/postgis:16-3.4
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-journex}
-      POSTGRES_USER: ${POSTGRES_USER:-journex}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-journex}
+      POSTGRES_DB: ${POSTGRES_DB:-vayora}
+      POSTGRES_USER: ${POSTGRES_USER:-vayora}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vayora}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
@@ -125,22 +125,22 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-journex}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-journex}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-journex}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-vayora}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-vayora}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-vayora}
       JWT_SECRET: ${JWT_SECRET:-dev-only-change-me-dev-only-change-me}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
       INTEL_URL: http://intel:8000
       OSRM_URL: http://osrm:5000
       OSRM_FOOT_URL: http://osrm-foot:5000
       REDIS_HOST: redis
-      MONGO_URI: mongodb://mongo:27017/${MONGO_DB:-journex}?serverSelectionTimeoutMS=2000
+      MONGO_URI: mongodb://mongo:27017/${MONGO_DB:-vayora}?serverSelectionTimeoutMS=2000
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       # Push notifications are off unless both are set (node scripts/vapid-keys.mjs).
-      JOURNEX_PUSH_PUBLIC_KEY: ${JOURNEX_PUSH_PUBLIC_KEY:-}
-      JOURNEX_PUSH_PRIVATE_KEY: ${JOURNEX_PUSH_PRIVATE_KEY:-}
-      JOURNEX_PUSH_SUBJECT: ${JOURNEX_PUSH_SUBJECT:-mailto:journex@example.invalid}
+      VAYORA_PUSH_PUBLIC_KEY: ${VAYORA_PUSH_PUBLIC_KEY:-}
+      VAYORA_PUSH_PRIVATE_KEY: ${VAYORA_PUSH_PRIVATE_KEY:-}
+      VAYORA_PUSH_SUBJECT: ${VAYORA_PUSH_SUBJECT:-mailto:vayora@example.invalid}
       # "Sign in with Google" is off unless set (see DEPLOYMENT.md).
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       # Real text messages through Twilio: all three or none. None: the simulated outbox.
@@ -184,7 +184,7 @@ services:
         condition: service_healthy
     environment:
       JWT_SECRET: ${JWT_SECRET:-dev-only-change-me-dev-only-change-me}
-      MONGO_URI: mongodb://mongo:27017/${MONGO_DB:-journex}
+      MONGO_URI: mongodb://mongo:27017/${MONGO_DB:-vayora}
       CORE_API_URL: http://core-api:8080
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
     ports:
@@ -210,7 +210,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # Python 3.11 environment for journex_events, sim and experiments. Not started by
+  # Python 3.11 environment for vayora_events, sim and experiments. Not started by
   # `docker compose up`; run with `docker compose run --rm research`.
   research:
     profiles: ["research"]
@@ -221,7 +221,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      JOURNEX_DB_URL: postgresql://${POSTGRES_USER:-journex}:${POSTGRES_PASSWORD:-journex}@postgres:5432/${POSTGRES_DB:-journex}
+      VAYORA_DB_URL: postgresql://${POSTGRES_USER:-vayora}:${POSTGRES_PASSWORD:-vayora}@postgres:5432/${POSTGRES_DB:-vayora}
     volumes:
       - .:/work
 

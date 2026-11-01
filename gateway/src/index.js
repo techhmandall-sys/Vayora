@@ -10,7 +10,7 @@ import { MongoStore } from './store.js';
 
 const PORT = process.env.PORT ?? 3000;
 const JWT_SECRET = process.env.JWT_SECRET;
-const MONGO_URI = process.env.MONGO_URI ?? 'mongodb://localhost:27017/journex';
+const MONGO_URI = process.env.MONGO_URI ?? 'mongodb://localhost:27017/vayora';
 const CORE_API_URL = process.env.CORE_API_URL ?? 'http://localhost:8080';
 // Browser origins allowed to open a socket, comma-separated.
 const ORIGINS = (process.env.CORS_ALLOWED_ORIGINS ?? 'http://localhost:5173').split(',');

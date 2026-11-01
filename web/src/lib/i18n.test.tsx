@@ -126,7 +126,7 @@ describe('translate', () => {
 describe('the app in another language', () => {
   function open(path: string, language: Language) {
     sessionStorage.setItem(
-      'journex.session',
+      'vayora.session',
       JSON.stringify({ accessToken: 'token', expiresInSeconds: 3600, user: { id: 1, email: 'a@example.test', fullName: 'Asha Patil', role: 'PASSENGER' } }),
     );
     vi.stubGlobal(
@@ -202,7 +202,7 @@ describe('the app in another language', () => {
 
     await userEvent.selectOptions(await screen.findByLabelText('Language'), 'मराठी');
     expect(await screen.findByRole('heading', { name: 'माझी बुकिंग' })).toBeInTheDocument();
-    expect(localStorage.getItem('journex.language')).toBe('mr');
+    expect(localStorage.getItem('vayora.language')).toBe('mr');
     expect(document.documentElement.lang).toBe('mr');
 
     await userEvent.selectOptions(screen.getByLabelText('भाषा'), 'English');

@@ -85,11 +85,11 @@ No third data store, no fourth runtime.
 | Path           | What                                                        |
 |----------------|-------------------------------------------------------------|
 | `infra/`       | Docker support: OSRM corridor preparation, health check     |
-| `core-api/`    | Spring Boot 3, Java 21, `com.dypcet.journex`, Flyway        |
+| `core-api/`    | Spring Boot 3, Java 21, `com.dypcet.vayora`, Flyway        |
 | `intel/`       | FastAPI, Python 3.11, pinned requirements                   |
 | `gateway/`     | Express 4 + Socket.IO 4, JWT verification                   |
 | `web/`         | Vite + React 18 + TypeScript + Tailwind                     |
-| `journex_events/` | Python event-log writer; same table and vocabulary as core-api |
+| `vayora_events/` | Python event-log writer; same table and vocabulary as core-api |
 | `sim/`         | SimPy simulator (Stage 3)                                   |
 | `experiments/` | Configs and experiment runners; all tunables in `configs/`  |
 | `docs/`        | Report material and `figures/`                              |

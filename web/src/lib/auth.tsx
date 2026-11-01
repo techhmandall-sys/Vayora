@@ -6,7 +6,7 @@ import type { Role, Session, User } from './types';
 
 // sessionStorage, not localStorage: the token dies with the tab. It is still readable
 // by any script on the page, so the app must never render untrusted HTML.
-const STORAGE_KEY = 'journex.session';
+const STORAGE_KEY = 'vayora.session';
 
 interface AuthContextValue {
   user: User | null;

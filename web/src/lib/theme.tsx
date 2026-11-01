@@ -12,7 +12,7 @@ export const themeLabels: Record<ThemeChoice, string> = {
 };
 
 // index.html reads the same key before the first paint, so the page never flashes the wrong theme.
-const STORAGE_KEY = 'journex.theme';
+const STORAGE_KEY = 'vayora.theme';
 
 function stored(): ThemeChoice {
   try {

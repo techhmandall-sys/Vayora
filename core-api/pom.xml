@@ -12,9 +12,9 @@
     </parent>
 
     <groupId>com.dypcet</groupId>
-    <artifactId>journex-core-api</artifactId>
+    <artifactId>vayora-core-api</artifactId>
     <version>0.1.0</version>
-    <name>journex-core-api</name>
+    <name>vayora-core-api</name>
     <description>VAYORA core API: transactions and truth</description>
 
     <properties>

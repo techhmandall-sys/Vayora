@@ -22,7 +22,7 @@ export const LANGUAGES: { code: Language; name: string }[] = [
 
 export const TABLES: Record<Exclude<Language, 'en'>, Record<string, string>> = { hi, mr };
 
-const STORAGE_KEY = 'journex.language';
+const STORAGE_KEY = 'vayora.language';
 
 export type Translate = (text: string, values?: Record<string, string | number>) => string;
 

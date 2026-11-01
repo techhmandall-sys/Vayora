@@ -1,10 +1,10 @@
 spring:
   application:
-    name: journex-core-api
+    name: vayora-core-api
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/journex}
-    username: ${SPRING_DATASOURCE_USERNAME:journex}
-    password: ${SPRING_DATASOURCE_PASSWORD:journex}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/vayora}
+    username: ${SPRING_DATASOURCE_USERNAME:vayora}
+    password: ${SPRING_DATASOURCE_PASSWORD:vayora}
   flyway:
     enabled: true
   data:
@@ -16,7 +16,7 @@ spring:
       connect-timeout: 1s
     mongodb:
       # The short server selection timeout keeps a MongoDB outage from stalling requests.
-      uri: ${MONGO_URI:mongodb://localhost:27017/journex?serverSelectionTimeoutMS=2000}
+      uri: ${MONGO_URI:mongodb://localhost:27017/vayora?serverSelectionTimeoutMS=2000}
   mail:
     # Only used when SPRING_MAIL_HOST is set. A mail server that does not answer costs
     # seconds, not a hung request.
@@ -28,7 +28,7 @@ spring:
     problemdetails:
       enabled: true
 
-journex:
+vayora:
   jwt:
     # Shared HS256 secret: core-api signs, gateway verifies. At least 32 bytes.
     secret: ${JWT_SECRET:}
@@ -91,7 +91,7 @@ journex:
     # The routing service. Empty means none: routes are then straight lines between stops.
     url: ${OSRM_URL:}
     # The same map built for walking (feature 91). Empty means none: walks to and from stops
-    # are then estimated in a straight line at journex.search.walking-kmh, and said to be.
+    # are then estimated in a straight line at vayora.search.walking-kmh, and said to be.
     foot-url: ${OSRM_FOOT_URL:}
     timeout: PT3S
     cache-ttl: P7D
@@ -112,7 +112,7 @@ journex:
   mail:
     # The sender address for real email. Email is sent only when SPRING_MAIL_HOST names an
     # SMTP server; without one, copies and codes go to the simulated outbox as before.
-    from: ${JOURNEX_MAIL_FROM:}
+    from: ${VAYORA_MAIL_FROM:}
   twilio:
     # A real telephony provider for texts (feature 64) and masked calls (feature 61). Set all
     # three or none; with none, texts go to the simulated outbox and calls are simulated, as
@@ -126,10 +126,10 @@ journex:
   push:
     # The server's key pair, base64url. Empty: push notifications are off. Make a pair with
     # node scripts/vapid-keys.mjs; never commit a real private key.
-    public-key: ${JOURNEX_PUSH_PUBLIC_KEY:}
-    private-key: ${JOURNEX_PUSH_PRIVATE_KEY:}
+    public-key: ${VAYORA_PUSH_PUBLIC_KEY:}
+    private-key: ${VAYORA_PUSH_PRIVATE_KEY:}
     # Who push services can contact about this server's messages (RFC 8292).
-    subject: ${JOURNEX_PUSH_SUBJECT:mailto:journex@example.invalid}
+    subject: ${VAYORA_PUSH_SUBJECT:mailto:vayora@example.invalid}
     # Push services a browser may name, and their subdomains; a subscription anywhere else is
     # refused. Comma-separated.
     allowed-hosts: fcm.googleapis.com,updates.push.services.mozilla.com,notify.windows.com,push.apple.com

@@ -1,5 +1,5 @@
 {
-  "name": "journex-gateway",
+  "name": "vayora-gateway",
   "version": "0.1.0",
   "private": true,
   "description": "VAYORA gateway: ephemeral streams only",

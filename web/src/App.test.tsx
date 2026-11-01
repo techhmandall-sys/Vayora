@@ -16,7 +16,7 @@ function signIn(role: Role) {
     expiresInSeconds: 3600,
     user: { id: 1, email: 'user@example.test', fullName: 'Asha Patil', role },
   };
-  sessionStorage.setItem('journex.session', JSON.stringify(session));
+  sessionStorage.setItem('vayora.session', JSON.stringify(session));
 }
 
 function open(path: string) {
@@ -215,7 +215,7 @@ describe('access', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Sign out' }));
 
     expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument();
-    expect(sessionStorage.getItem('journex.session')).toBeNull();
+    expect(sessionStorage.getItem('vayora.session')).toBeNull();
   });
 });
 
@@ -256,7 +256,7 @@ describe('command palette', () => {
     await userEvent.type(within(await screen.findByRole('dialog')).getByRole('combobox'), 'dark');
     await userEvent.keyboard('{Enter}');
     await waitFor(() => expect(document.documentElement.dataset.theme).toBe('dark'));
-    expect(localStorage.getItem('journex.theme')).toBe('dark');
+    expect(localStorage.getItem('vayora.theme')).toBe('dark');
   });
 });
 
@@ -1923,7 +1923,7 @@ describe('receipts', () => {
       open('/payments');
       await userEvent.click(await screen.findByRole('button', { name: 'Download receipt (PDF, in English)' }));
 
-      await waitFor(() => expect(clicked).toEqual(['journex-booking-90.pdf']));
+      await waitFor(() => expect(clicked).toEqual(['vayora-booking-90.pdf']));
       const asked = fetchMock.mock.calls.find(([url]) => String(url).endsWith('/bookings/90/receipt'));
       expect((asked?.[1]?.headers as Record<string, string>).Authorization).toBe('Bearer token');
       expect(revoked).toHaveBeenCalledWith('blob:receipt');
@@ -3055,7 +3055,7 @@ describe('the meeting point of a pickup away from the stops', () => {
 });
 describe('paying through Razorpay', () => {
   const razorpayTerms = { ...terms, provider: 'RAZORPAY_TEST', checkout: true, flexibleTiers: false };
-  const order = { orderId: 'order_T', keyId: 'rzp_test_journex', amount: 57200, currency: 'INR', testMode: true };
+  const order = { orderId: 'order_T', keyId: 'rzp_test_vayora', amount: 57200, currency: 'INR', testMode: true };
 
   /** Razorpay's checkout, replaced: it pays at once, or is closed unpaid. */
   function stubCheckout(outcome: 'pay' | 'close') {
@@ -3106,7 +3106,7 @@ describe('paying through Razorpay', () => {
       await userEvent.click(screen.getAllByRole('button', { name: /^(Book|Request)/ })[0]);
 
       expect(await screen.findByText(/paid in Razorpay's test mode: no real money moved/)).toBeInTheDocument();
-      expect(opened[0]).toMatchObject({ key: 'rzp_test_journex', order_id: 'order_T', amount: 57200, currency: 'INR' });
+      expect(opened[0]).toMatchObject({ key: 'rzp_test_vayora', order_id: 'order_T', amount: 57200, currency: 'INR' });
       const stretch = { rideId: candidate.rideId, fromSeq: candidate.fromSeq, toSeq: candidate.toSeq, seats: 1 };
       expect(bodyOf(fetchMock, '/bookings/checkout')).toEqual(stretch);
       expect(bodyOf(fetchMock, '/bookings')).toEqual({

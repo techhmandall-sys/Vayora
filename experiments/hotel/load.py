@@ -10,7 +10,7 @@ guest never came. The variant is the hotel (HOTEL-CITY, HOTEL-RESORT) and the se
 year of arrival, so each metric query gives one row per year.
 
 The file is downloaded once into experiments/data/, which is not committed, and refused
-unless its SHA-256 matches the configuration. Needs JOURNEX_DB_URL.
+unless its SHA-256 matches the configuration. Needs VAYORA_DB_URL.
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ import psycopg
 import yaml
 from sqlalchemy import make_url
 
-from journex_events import EventWriter
+from vayora_events import EventWriter
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "experiments" / "configs" / "hotel.yaml"
@@ -138,9 +138,9 @@ def main() -> None:
     parser.add_argument("--run-id", type=uuid.UUID, required=True)
     args = parser.parse_args()
 
-    url = os.environ.get("JOURNEX_DB_URL")
+    url = os.environ.get("VAYORA_DB_URL")
     if not url:
-        parser.error("JOURNEX_DB_URL is not set")
+        parser.error("VAYORA_DB_URL is not set")
     config = load_config()
     grouped: dict[tuple[str, int], list[Event]] = defaultdict(list)
     with fetch(config).open(newline="", encoding="utf-8") as file:

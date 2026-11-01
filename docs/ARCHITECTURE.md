@@ -94,7 +94,7 @@ Every research number is a SQL aggregate over one table, `events`, through
 
 - core-api, from real use of the platform. Its writer never throws into its caller: a
   lost research row must not cost anyone a booking.
-- the simulator, through `journex_events`. Its writer fails loudly: a simulation with
+- the simulator, through `vayora_events`. Its writer fails loudly: a simulation with
   missing rows is worthless.
 
 Because both write the same vocabulary, the queries that analyse a simulation would

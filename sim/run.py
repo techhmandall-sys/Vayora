@@ -2,7 +2,7 @@
 
     python -m sim.run --variant experiments/configs/variants/B0.yaml
 
-Needs JOURNEX_DB_URL. Prints the run id; pass it to the metric queries.
+Needs VAYORA_DB_URL. Prints the run id; pass it to the metric queries.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ from pathlib import Path
 import psycopg
 from sqlalchemy import make_url
 
-from journex_events import EventWriter
+from vayora_events import EventWriter
 from sim.config import load_variant, load_world
 from sim.frozen import SEEDS_PER_VARIANT
 from sim.simulator import Simulation
@@ -46,9 +46,9 @@ def main() -> None:
                         help="reuse a run id to add a variant to an existing run")
     args = parser.parse_args()
 
-    url = os.environ.get("JOURNEX_DB_URL")
+    url = os.environ.get("VAYORA_DB_URL")
     if not url:
-        parser.error("JOURNEX_DB_URL is not set")
+        parser.error("VAYORA_DB_URL is not set")
     dsn = make_url(url).set(drivername="postgresql").render_as_string(hide_password=False)
     run_id = args.run_id or uuid.uuid4()
     with psycopg.connect(dsn) as conn:

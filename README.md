@@ -184,8 +184,8 @@ tested against a stand-in; none has yet been tried against the real service.
 | Google | "Sign in with Google" | `GOOGLE_CLIENT_ID` |
 | Razorpay, test mode | Paying by card, UPI or wallet in Razorpay's checkout, refunds through Razorpay | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` |
 | Twilio | Codes, notification copies and emergency texts by SMS; masked calls bridged through the platform's number | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` |
-| Any SMTP server | Codes and notification copies by email | `SPRING_MAIL_HOST`, `SPRING_MAIL_PORT`, `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD`, `JOURNEX_MAIL_FROM` |
-| Web Push | Push notifications in the browser | `JOURNEX_PUSH_PUBLIC_KEY`, `JOURNEX_PUSH_PRIVATE_KEY` (`node scripts/vapid-keys.mjs` makes a pair) |
+| Any SMTP server | Codes and notification copies by email | `SPRING_MAIL_HOST`, `SPRING_MAIL_PORT`, `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD`, `VAYORA_MAIL_FROM` |
+| Web Push | Push notifications in the browser | `VAYORA_PUSH_PUBLIC_KEY`, `VAYORA_PUSH_PRIVATE_KEY` (`node scripts/vapid-keys.mjs` makes a pair) |
 
 `.env` is never committed. Every setting and what breaks is in
 [DEPLOYMENT](docs/DEPLOYMENT.md).
@@ -233,7 +233,7 @@ code. Latent passenger types drive behaviour in the simulator and are never mode
 Every number in the report is a SQL aggregate over one table, `events`, through
 [`experiments/analysis/metrics.sql`](experiments/analysis/metrics.sql). Two writers share
 it and a fixed vocabulary of 22 event types: core-api's `EventLogService`, which never
-throws into its caller, and the Python `journex_events` writer, which fails loudly. The
+throws into its caller, and the Python `vayora_events` writer, which fails loudly. The
 platform and the simulator speak the same vocabulary; the platform's own rows sit outside
 every simulation run.
 
@@ -265,11 +265,11 @@ are in [CLAUDE.md](CLAUDE.md).
 | Path | What |
 |---|---|
 | `web/` | Vite + React 18 + TypeScript + Tailwind |
-| `core-api/` | Spring Boot 3, Java 21, `com.dypcet.journex`, Flyway migrations |
+| `core-api/` | Spring Boot 3, Java 21, `com.dypcet.vayora`, Flyway migrations |
 | `intel/` | FastAPI, Python 3.11: durability model, explanations, contact scheduler, live what-if |
 | `gateway/` | Express 4 + Socket.IO 4, JWT verification |
 | `sim/` | SimPy simulator of the corridor |
-| `journex_events/` | Python event-log writer and the event vocabulary |
+| `vayora_events/` | Python event-log writer and the event vocabulary |
 | `experiments/` | Configs (every tunable number), runners, analysis queries and committed reports |
 | `infra/` | OSRM corridor preparation, stack health check |
 | `scripts/` | `reproduce.sh`, push key generation |
@@ -277,7 +277,7 @@ are in [CLAUDE.md](CLAUDE.md).
 
 OSRM serves a clipped bounding box: `infra/osrm/prepare.sh` downloads Geofabrik's western
 India extract and clips it to the corridor (`OSRM_BBOX`, default `73.4,16.4,74.9,18.9`).
-To rebuild from scratch: `docker compose down && docker volume rm journex_osrmdata`.
+To rebuild from scratch: `docker compose down && docker volume rm vayora_osrmdata`.
 
 ## Data and credits
 

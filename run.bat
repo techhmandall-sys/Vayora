@@ -1,10 +1,10 @@
 @echo off
-rem Starts all of JOURNEX on Windows: Docker Desktop if it is not running, then every
+rem Starts all of VAYORA on Windows: Docker Desktop if it is not running, then every
 rem service (rebuilt where the code changed), then the app in the browser.
 rem Double-click it, or run "run.bat" from a terminal. stop.bat shuts it down.
 setlocal
 cd /d "%~dp0"
-title JOURNEX
+title VAYORA
 
 rem Docker's command-line tools, if Docker Desktop has not put them on the PATH.
 where docker >nul 2>nul
@@ -29,7 +29,7 @@ goto fail
 :docker_ready
 
 echo.
-echo Building and starting JOURNEX. The very first run downloads and prepares the
+echo Building and starting VAYORA. The very first run downloads and prepares the
 echo corridor's road map and can take 10 minutes or more; later runs take seconds.
 echo.
 docker compose up -d --build --wait
@@ -44,7 +44,7 @@ for /f "tokens=2 delims=:" %%p in ('docker compose port core-api 8080 2^>nul') d
 echo.
 docker compose ps --format "table {{.Service}}\t{{.Status}}"
 echo.
-echo JOURNEX is running.
+echo VAYORA is running.
 echo   App:            http://localhost:%WEB%
 echo   API reference:  http://localhost:%API%/swagger-ui.html
 echo.

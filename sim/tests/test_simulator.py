@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import pytest
 
 from experiments.analysis.queries import run_query
-from journex_events import EventType, EventWriter
+from vayora_events import EventType, EventWriter
 from sim.config import Variant, load_variant, load_world
 from sim.frozen import BOOKING_HORIZON_DAYS, LATENT_TYPES, SPAN_DAYS
 from sim.run import CONFIGS

@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 
 from experiments.analysis.queries import run_query
-from journex_events import EventWriter
+from vayora_events import EventWriter
 from sim import live
 from sim.config import load_variant, load_world
 from sim.simulator import Simulation

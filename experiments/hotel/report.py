@@ -140,9 +140,9 @@ def main() -> None:
     parser.add_argument("--simulated", nargs=2, metavar=("RUN_ID", "VARIANT"), required=True)
     args = parser.parse_args()
 
-    url = os.environ.get("JOURNEX_DB_URL")
+    url = os.environ.get("VAYORA_DB_URL")
     if not url:
-        parser.error("JOURNEX_DB_URL is not set")
+        parser.error("VAYORA_DB_URL is not set")
     engine = create_engine(make_url(url).set(drivername="postgresql+psycopg"))
     with engine.connect() as conn:
         report = build_report(conn, args.run_id, uuid.UUID(args.simulated[0]), args.simulated[1])

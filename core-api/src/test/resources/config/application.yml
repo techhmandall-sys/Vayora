@@ -1,4 +1,4 @@
-journex:
+vayora:
   push:
     # RFC 8291's published example key pair: a test fixture, not a secret.
     public-key: BP4z9KsN6nGRTbVYI_c7VJSPQTBtkgcy27mlmlMoZIIgDll6e3vCYLocInmYWAmS6TlzAC8wEqKK6PBru3jl7A8

@@ -16,7 +16,7 @@ SWEEPS=true
 [[ "${1:-}" == "--no-sweeps" ]] && SWEEPS=false
 
 research() { docker compose --profile research run --rm research "$@"; }
-sql() { docker compose exec -T postgres psql -U "${POSTGRES_USER:-journex}" -d "${POSTGRES_DB:-journex}" -v ON_ERROR_STOP=1 -qc "$1"; }
+sql() { docker compose exec -T postgres psql -U "${POSTGRES_USER:-vayora}" -d "${POSTGRES_DB:-vayora}" -v ON_ERROR_STOP=1 -qc "$1"; }
 forget() { sql "DELETE FROM events WHERE run_id = '$1'"; }
 
 LADDER=7a1c0de0-0000-4000-8000-000000000003

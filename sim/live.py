@@ -21,7 +21,7 @@ from typing import Any, Mapping
 
 import yaml
 
-from journex_events.vocabulary import EventType
+from vayora_events.vocabulary import EventType
 from sim.config import ConfigError, apply_cell, load_variant, load_world, validate, validate_variant
 from sim.frozen import SEEDS_PER_VARIANT
 from sim.simulator import Simulation

@@ -2,7 +2,7 @@
 // stands a small "you are offline" page in for a page that cannot be fetched. It caches that
 // page and nothing else: every other request goes to the network as if it were not here.
 
-const CACHE = 'journex-offline-v1';
+const CACHE = 'vayora-offline-v1';
 const OFFLINE = '/offline.html';
 
 self.addEventListener('install', (event) => {

@@ -72,7 +72,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Lint
-        run: pipx run ruff check sim intel experiments journex_events conftest.py
+        run: pipx run ruff check sim intel experiments vayora_events conftest.py
       # The suite needs PostgreSQL with core-api's schema, which core-api's Flyway creates.
       - name: Start PostgreSQL and core-api
         run: docker compose up -d --wait postgres core-api

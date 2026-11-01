@@ -104,12 +104,12 @@ function Logo() {
   return (
     <svg viewBox="0 0 32 32" aria-hidden="true" className="h-8 w-8 flex-none drop-shadow-sm">
       <defs>
-        <linearGradient id="journex-mark" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id="vayora-mark" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#14b8a6" />
           <stop offset="1" stopColor="#0f766e" />
         </linearGradient>
       </defs>
-      <rect width="32" height="32" rx="9" fill="url(#journex-mark)" />
+      <rect width="32" height="32" rx="9" fill="url(#vayora-mark)" />
       <path d="M9 22c3-9 11-3 14-12" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" />
       <circle cx="9" cy="22" r="2.6" fill="#fff" />
       <circle cx="23" cy="10" r="2.6" fill="#fff" />

@@ -51,7 +51,7 @@ function joinedAs(role: 'DRIVER' | 'PASSENGER', rideStatus = 'SCHEDULED', extra:
 
 function openChat(role: 'DRIVER' | 'PASSENGER' = 'PASSENGER', rideStatus?: 'SCHEDULED' | 'IN_PROGRESS') {
   sessionStorage.setItem(
-    'journex.session',
+    'vayora.session',
     JSON.stringify({ accessToken: 'session-token', expiresInSeconds: 3600, user: { id: role === 'DRIVER' ? 7 : 1, email: 'a@example.test', fullName: 'Asha Patil', role } }),
   );
   return render(
