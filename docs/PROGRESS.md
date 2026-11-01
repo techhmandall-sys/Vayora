@@ -8,13 +8,13 @@
   to v5. Proved in that same copy (246 web, 28 gateway), not yet on GitHub: it needs a push.
 - **An empty reply from Razorpay** crashed into a bare 500; it now counts as no answer, with
   the message that says so, and books nothing. A new test covers it.
-- **The Problems panel: no errors, 273 warnings, now 5.** About 262 were the Java extension's
-  null analysis, which meets Spring's non-null annotations with none of the project's own.
-  It is off in `.vscode/settings.json` (local, and `automatic` brings it back). The riskiest
-  "may be null" sites were read first; the Razorpay one was the only real fault. The other
-  warnings were an unused import and field, a deprecated call, a shadowed name and the test
-  containers' leak warning, by design. The 5 left say that methods the framework calls are
-  "never used".
+- **The Problems panel: no errors, 273 warnings, now 5.** 268 were the Java extension's null
+  analysis, which meets Spring's non-null annotations with none of the project's own. It is
+  off in `.vscode/settings.json` (local, and `automatic` brings it back). The riskiest "may be
+  null" sites were read first; the Razorpay one was the only real fault. The other 5 were an
+  unused import and field, a deprecated call and the test containers' two leak warnings, by
+  design. A shadowed name was also renamed. The 5 left say that methods the framework calls
+  are "never used".
 - **Removed:** `.pytest_cache`, `.ruff_cache`, `core-api/target`, `web/dist`, the TypeScript
   build cache, `.github/modernize` (a Copilot extension's leftovers), and the six superseded
   `journex-*` Docker images, about 1.9 GB.
