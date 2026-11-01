@@ -1,0 +1,409 @@
+{
+  "run_id": "7a1c0de0-0000-4000-8000-000000000008",
+  "baseline": "B3",
+  "data": "synthetic (simulator)",
+  "variants": {
+    "B3": {
+      "per_100": {
+        "label": "Completed rides per 100 searches",
+        "seeds": 30,
+        "mean": 32.07898683636962,
+        "vs_baseline": null
+      },
+      "late_share": {
+        "label": "Late share of cancellations",
+        "seeds": 30,
+        "mean": 0.38149925491776476,
+        "vs_baseline": null
+      },
+      "booking_rate": {
+        "label": "Booking requests per search",
+        "seeds": 30,
+        "mean": 0.4313494570007343,
+        "vs_baseline": null
+      },
+      "contact_rate": {
+        "label": "Reconfirmation requests per accepted booking",
+        "seeds": 30,
+        "mean": 0.0,
+        "vs_baseline": null
+      },
+      "refilled": {
+        "label": "Released seats refilled",
+        "seeds": 30,
+        "mean": 94.43333333333334,
+        "vs_baseline": null
+      },
+      "refills_only_option": {
+        "label": "Refills by a passenger offered no other ride",
+        "seeds": 30,
+        "mean": 40.3,
+        "vs_baseline": null
+      },
+      "empty_share": {
+        "label": "Searches offered no ride",
+        "seeds": 30,
+        "mean": 0.570917843192555,
+        "vs_baseline": null
+      },
+      "no_ride_share": {
+        "label": "Searches offered no ride: none left at that time",
+        "seeds": 30,
+        "mean": 0.19383920885985345,
+        "vs_baseline": null
+      },
+      "full_share": {
+        "label": "Searches offered no ride: every ride then full",
+        "seeds": 30,
+        "mean": 0.37707863433270156,
+        "vs_baseline": null
+      },
+      "early_refill_share": {
+        "label": "Share of seats refilled, rides with only early releases",
+        "seeds": 30,
+        "mean": 0.9380108496763593,
+        "vs_baseline": null
+      },
+      "late_refill_share": {
+        "label": "Share of seats refilled, rides with only late releases",
+        "seeds": 30,
+        "mean": 0.7164828240812305,
+        "vs_baseline": null
+      }
+    },
+    "B0": {
+      "per_100": {
+        "label": "Completed rides per 100 searches",
+        "seeds": 30,
+        "mean": 31.737303530101446,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": -0.34168330626817467,
+          "ci_low": -0.41509559327303824,
+          "ci_high": -0.2682710192633111,
+          "confidence": 0.95,
+          "wilcoxon_p": 2.60770320892334e-08,
+          "seeds_improved": 2,
+          "seeds_worsened": 28
+        }
+      },
+      "late_share": {
+        "label": "Late share of cancellations",
+        "seeds": 30,
+        "mean": 0.37198163854114796,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": -0.009517616376616763,
+          "ci_low": -0.016881149323234746,
+          "ci_high": -0.0021540834299987807,
+          "confidence": 0.95,
+          "wilcoxon_p": 0.013291697673508594,
+          "seeds_improved": 10,
+          "seeds_worsened": 19
+        }
+      },
+      "booking_rate": {
+        "label": "Booking requests per search",
+        "seeds": 30,
+        "mean": 0.4272737553538134,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": -0.004075701646920906,
+          "ci_low": -0.005334970497007508,
+          "ci_high": -0.0028164327968343045,
+          "confidence": 0.95,
+          "wilcoxon_p": 1.6838312149047852e-06,
+          "seeds_improved": 4,
+          "seeds_worsened": 26
+        }
+      },
+      "contact_rate": {
+        "label": "Reconfirmation requests per accepted booking",
+        "seeds": 30,
+        "mean": 0.0,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "confidence": 0.95,
+          "wilcoxon_p": 1.0,
+          "seeds_improved": 0,
+          "seeds_worsened": 0
+        }
+      },
+      "refilled": {
+        "label": "Released seats refilled",
+        "seeds": 30,
+        "mean": 91.76666666666667,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": -2.6666666666666665,
+          "ci_low": -4.763741258233719,
+          "ci_high": -0.5695920750996137,
+          "confidence": 0.95,
+          "wilcoxon_p": 0.027608628553616312,
+          "seeds_improved": 10,
+          "seeds_worsened": 18
+        }
+      },
+      "refills_only_option": {
+        "label": "Refills by a passenger offered no other ride",
+        "seeds": 30,
+        "mean": 40.666666666666664,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": 0.36666666666666664,
+          "ci_low": -1.561137147008864,
+          "ci_high": 2.294470480342197,
+          "confidence": 0.95,
+          "wilcoxon_p": 0.5629250942103726,
+          "seeds_improved": 16,
+          "seeds_worsened": 11
+        }
+      },
+      "empty_share": {
+        "label": "Searches offered no ride",
+        "seeds": 30,
+        "mean": 0.5763872576336758,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": 0.005469414441120724,
+          "ci_low": 0.0038849342226412453,
+          "ci_high": 0.007053894659600202,
+          "confidence": 0.95,
+          "wilcoxon_p": 9.98377799987793e-07,
+          "seeds_improved": 25,
+          "seeds_worsened": 5
+        }
+      },
+      "no_ride_share": {
+        "label": "Searches offered no ride: none left at that time",
+        "seeds": 30,
+        "mean": 0.19345330543424438,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": -0.0003859034256090697,
+          "ci_low": -0.0006124616175806221,
+          "ci_high": -0.00015934523363751726,
+          "confidence": 0.95,
+          "wilcoxon_p": 0.002560090273618698,
+          "seeds_improved": 9,
+          "seeds_worsened": 21
+        }
+      },
+      "full_share": {
+        "label": "Searches offered no ride: every ride then full",
+        "seeds": 30,
+        "mean": 0.3829339521994314,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": 0.0058553178667297996,
+          "ci_low": 0.004167037247644803,
+          "ci_high": 0.007543598485814796,
+          "confidence": 0.95,
+          "wilcoxon_p": 4.7124922275543213e-07,
+          "seeds_improved": 26,
+          "seeds_worsened": 4
+        }
+      },
+      "early_refill_share": {
+        "label": "Share of seats refilled, rides with only early releases",
+        "seeds": 30,
+        "mean": 0.9295080480391442,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": -0.008502801637215163,
+          "ci_low": -0.023084027155602108,
+          "ci_high": 0.006078423881171783,
+          "confidence": 0.95,
+          "wilcoxon_p": 0.19963300326785705,
+          "seeds_improved": 9,
+          "seeds_worsened": 17
+        }
+      },
+      "late_refill_share": {
+        "label": "Share of seats refilled, rides with only late releases",
+        "seeds": 30,
+        "mean": 0.6891273112232998,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": -0.027355512857930732,
+          "ci_low": -0.05537215364221246,
+          "ci_high": 0.0006611279263509968,
+          "confidence": 0.95,
+          "wilcoxon_p": 0.0780201614093598,
+          "seeds_improved": 9,
+          "seeds_worsened": 20
+        }
+      }
+    },
+    "B4": {
+      "per_100": {
+        "label": "Completed rides per 100 searches",
+        "seeds": 30,
+        "mean": 32.05639286036811,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": -0.02259397600150687,
+          "ci_low": -0.05865133718360929,
+          "ci_high": 0.01346338518059555,
+          "confidence": 0.95,
+          "wilcoxon_p": 0.312950675522914,
+          "seeds_improved": 11,
+          "seeds_worsened": 16
+        }
+      },
+      "late_share": {
+        "label": "Late share of cancellations",
+        "seeds": 30,
+        "mean": 0.30091623881610857,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": -0.08058301610165615,
+          "ci_low": -0.08674922441971535,
+          "ci_high": -0.07441680778359695,
+          "confidence": 0.95,
+          "wilcoxon_p": 1.862645149230957e-09,
+          "seeds_improved": 0,
+          "seeds_worsened": 30
+        }
+      },
+      "booking_rate": {
+        "label": "Booking requests per search",
+        "seeds": 30,
+        "mean": 0.4331527053152341,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": 0.0018032483144997669,
+          "ci_low": 0.001206015520007701,
+          "ci_high": 0.002400481108991833,
+          "confidence": 0.95,
+          "wilcoxon_p": 4.421919584274292e-06,
+          "seeds_improved": 28,
+          "seeds_worsened": 2
+        }
+      },
+      "contact_rate": {
+        "label": "Reconfirmation requests per accepted booking",
+        "seeds": 30,
+        "mean": 0.2783669349649358,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": 0.2783669349649358,
+          "ci_low": 0.2730521439377871,
+          "ci_high": 0.2836817259920845,
+          "confidence": 0.95,
+          "wilcoxon_p": 1.862645149230957e-09,
+          "seeds_improved": 30,
+          "seeds_worsened": 0
+        }
+      },
+      "refilled": {
+        "label": "Released seats refilled",
+        "seeds": 30,
+        "mean": 104.83333333333333,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": 10.4,
+          "ci_low": 8.663457258785172,
+          "ci_high": 12.136542741214829,
+          "confidence": 0.95,
+          "wilcoxon_p": 1.8664395437193567e-06,
+          "seeds_improved": 29,
+          "seeds_worsened": 1
+        }
+      },
+      "refills_only_option": {
+        "label": "Refills by a passenger offered no other ride",
+        "seeds": 30,
+        "mean": 41.2,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": 0.9,
+          "ci_low": -0.8247355304977396,
+          "ci_high": 2.6247355304977398,
+          "confidence": 0.95,
+          "wilcoxon_p": 0.34422312127306454,
+          "seeds_improved": 14,
+          "seeds_worsened": 10
+        }
+      },
+      "empty_share": {
+        "label": "Searches offered no ride",
+        "seeds": 30,
+        "mean": 0.5676585011657992,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": -0.003259342026755748,
+          "ci_low": -0.0042841376244143236,
+          "ci_high": -0.0022345464290971723,
+          "confidence": 0.95,
+          "wilcoxon_p": 1.6838312149047852e-06,
+          "seeds_improved": 2,
+          "seeds_worsened": 28
+        }
+      },
+      "no_ride_share": {
+        "label": "Searches offered no ride: none left at that time",
+        "seeds": 30,
+        "mean": 0.19428027792167177,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": 0.00044106906181831293,
+          "ci_low": 0.00028455047718922217,
+          "ci_high": 0.0005975876464474038,
+          "confidence": 0.95,
+          "wilcoxon_p": 9.98377799987793e-07,
+          "seeds_improved": 28,
+          "seeds_worsened": 2
+        }
+      },
+      "full_share": {
+        "label": "Searches offered no ride: every ride then full",
+        "seeds": 30,
+        "mean": 0.3733782232441275,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": -0.0037004110885740754,
+          "ci_low": -0.004831642944179709,
+          "ci_high": -0.002569179232968442,
+          "confidence": 0.95,
+          "wilcoxon_p": 1.4193356037139893e-06,
+          "seeds_improved": 2,
+          "seeds_worsened": 28
+        }
+      },
+      "early_refill_share": {
+        "label": "Share of seats refilled, rides with only early releases",
+        "seeds": 30,
+        "mean": 0.9417764589134546,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": 0.003765609237095361,
+          "ci_low": -0.0034694892398663933,
+          "ci_high": 0.011000707714057116,
+          "confidence": 0.95,
+          "wilcoxon_p": 0.21293285302817822,
+          "seeds_improved": 20,
+          "seeds_worsened": 10
+        }
+      },
+      "late_refill_share": {
+        "label": "Share of seats refilled, rides with only late releases",
+        "seeds": 30,
+        "mean": 0.7180372089215182,
+        "vs_baseline": {
+          "seeds": 30,
+          "mean_difference": 0.0015543848402876574,
+          "ci_low": -0.02322986395166037,
+          "ci_high": 0.026338633632235684,
+          "confidence": 0.95,
+          "wilcoxon_p": 0.6120056137442589,
+          "seeds_improved": 19,
+          "seeds_worsened": 11
+        }
+      }
+    }
+  }
+}
